@@ -1,0 +1,8 @@
+nohup: ignoring input
+[audit] FBDB15K_r02
+  n=10277 base=0.5281 cdmr=0.5852 delta=+0.0571 rescued=896 harmed=309
+[audit] FBDB15K_r05
+  n=6423 base=0.7113 cdmr=0.7327 delta=+0.0213 rescued=300 harmed=163
+[audit] FBDB15K_r08
+  n=2570 base=0.8086 cdmr=0.8245 delta=+0.0160 rescued=95 harmed=54
+[done] /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/audits/modality_weight_stats/fbdb_modal_stats_0512_113836

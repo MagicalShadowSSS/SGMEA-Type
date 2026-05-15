@@ -1,0 +1,89 @@
+nohup: ignoring input
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+loading raw data...
+getting a sparse tensor r_adj...
+{
+  "virtual_edge_count": 2874,
+  "cross_kg_edge_count": 0,
+  "already_existing_undirected_count": 866,
+  "added_degree": {
+    "count": 4731,
+    "mean": 1.214965,
+    "median": 1.0,
+    "min": 1.0,
+    "max": 7.0
+  },
+  "max_added_degree_entities": [
+    {
+      "entity_id": 3177,
+      "added_degree": 7
+    },
+    {
+      "entity_id": 15568,
+      "added_degree": 6
+    },
+    {
+      "entity_id": 23832,
+      "added_degree": 6
+    },
+    {
+      "entity_id": 24677,
+      "added_degree": 6
+    },
+    {
+      "entity_id": 18078,
+      "added_degree": 5
+    },
+    {
+      "entity_id": 25150,
+      "added_degree": 5
+    },
+    {
+      "entity_id": 23816,
+      "added_degree": 5
+    },
+    {
+      "entity_id": 26658,
+      "added_degree": 5
+    },
+    {
+      "entity_id": 15849,
+      "added_degree": 4
+    },
+    {
+      "entity_id": 23361,
+      "added_degree": 4
+    }
+  ]
+}
+{
+  "gt_rank_mean_delta": 0.000348,
+  "candidate_rank_mean_delta": -0.554279,
+  "candidate_minus_positive_distance_delta": -0.063773,
+  "hits1_delta": -0.000348,
+  "hits10_delta": 0.0
+}
+Wrote /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/virtual_edge_offline_audit_top1_conf09_all.json

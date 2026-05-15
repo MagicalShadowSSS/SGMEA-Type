@@ -1,0 +1,36 @@
+nohup: ignoring input
+[INFO] RUN_TAG=softw_grid_0510_121128
+[INFO] GRID_PRESET=core
+[INFO] Experiment count=18
+[INFO] Effective LR=5e-05
+[INFO] Cache=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_aware_hnm_cache_top5.jsonl
+[INFO] Logs=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_121128
+[INFO] EXPERIMENTS:
+  baseline_warm_softw_grid_0510_121128|base|1.0|1.0
+  mask_only_softw_grid_0510_121128|mask|1.0|1.0
+  softw_s15_c01_softw_grid_0510_121128|soft|1.5|0.1
+  softw_s15_c02_softw_grid_0510_121128|soft|1.5|0.2
+  softw_s15_c035_softw_grid_0510_121128|soft|1.5|0.35
+  softw_s20_c01_softw_grid_0510_121128|soft|2.0|0.1
+  softw_s20_c02_softw_grid_0510_121128|soft|2.0|0.2
+  softw_s20_c035_softw_grid_0510_121128|soft|2.0|0.35
+  softw_s25_c01_softw_grid_0510_121128|soft|2.5|0.1
+  softw_s25_c02_softw_grid_0510_121128|soft|2.5|0.2
+  softw_s25_c035_softw_grid_0510_121128|soft|2.5|0.35
+  softw_s30_c01_softw_grid_0510_121128|soft|3.0|0.1
+  softw_s30_c02_softw_grid_0510_121128|soft|3.0|0.2
+  softw_s30_c035_softw_grid_0510_121128|soft|3.0|0.35
+  masksoft_s15_c02_softw_grid_0510_121128|masksoft|1.5|0.2
+  masksoft_s20_c02_softw_grid_0510_121128|masksoft|2.0|0.2
+  masksoft_s25_c01_softw_grid_0510_121128|masksoft|2.5|0.1
+  masksoft_s30_c02_softw_grid_0510_121128|masksoft|3.0|0.2
+[START] exp_id=softw_s15_c01_softw_grid_0510_121128 mode=soft gpu=2 safe=1.5 close=0.1
+[START] exp_id=baseline_warm_softw_grid_0510_121128 mode=base gpu=0 safe=1.0 close=1.0
+[START] exp_id=mask_only_softw_grid_0510_121128 mode=mask gpu=1 safe=1.0 close=1.0
+[START] exp_id=softw_s15_c02_softw_grid_0510_121128 mode=soft gpu=3 safe=1.5 close=0.2
+[DONE] exp_id=baseline_warm_softw_grid_0510_121128 mode=base gpu=0
+[START] exp_id=softw_s15_c035_softw_grid_0510_121128 mode=soft gpu=0 safe=1.5 close=0.35
+[DONE] exp_id=softw_s15_c01_softw_grid_0510_121128 mode=soft gpu=2
+[START] exp_id=softw_s20_c02_softw_grid_0510_121128 mode=soft gpu=2 safe=2.0 close=0.2
+[DONE] exp_id=mask_only_softw_grid_0510_121128 mode=mask gpu=1
+[START] exp_id=softw_s20_c01_softw_grid_0510_121128 mode=soft gpu=1 safe=2.0 close=0.1

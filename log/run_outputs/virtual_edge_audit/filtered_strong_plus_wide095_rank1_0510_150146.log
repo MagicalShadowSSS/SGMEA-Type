@@ -1,0 +1,86 @@
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+getting a sparse tensor r_adj...
+loading raw data...
+getting a sparse tensor r_adj...
+{
+  "virtual_edge_count": 1052,
+  "cross_kg_edge_count": 0,
+  "already_existing_undirected_count": 448,
+  "added_degree": {
+    "count": 1890,
+    "mean": 1.113228,
+    "median": 1.0,
+    "min": 1.0,
+    "max": 3.0
+  },
+  "max_added_degree_entities": [
+    {
+      "entity_id": 16009,
+      "added_degree": 3
+    },
+    {
+      "entity_id": 20864,
+      "added_degree": 3
+    },
+    {
+      "entity_id": 18290,
+      "added_degree": 3
+    },
+    {
+      "entity_id": 17810,
+      "added_degree": 3
+    },
+    {
+      "entity_id": 16581,
+      "added_degree": 3
+    },
+    {
+      "entity_id": 21252,
+      "added_degree": 3
+    },
+    {
+      "entity_id": 18663,
+      "added_degree": 3
+    },
+    {
+      "entity_id": 19232,
+      "added_degree": 3
+    },
+    {
+      "entity_id": 19407,
+      "added_degree": 3
+    },
+    {
+      "entity_id": 19488,
+      "added_degree": 3
+    }
+  ]
+}
+{
+  "gt_rank_mean_delta": 0.0,
+  "candidate_rank_mean_delta": -0.023764,
+  "candidate_minus_positive_distance_delta": -0.054912,
+  "hits1_delta": 0.0,
+  "hits10_delta": 0.0
+}
+Wrote /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/virtual_edge_offline_audit_filtered_strong_plus_wide095_rank1.json

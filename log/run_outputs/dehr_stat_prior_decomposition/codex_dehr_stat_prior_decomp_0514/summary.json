@@ -1,0 +1,37 @@
+[
+  {
+    "name": "baseline_onlytest",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_0514/baseline_onlytest_gpu0.log",
+    "status": "missing_metric"
+  },
+  {
+    "name": "manual_global_reference",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_0514/manual_global_reference_gpu2.log",
+    "status": "missing_metric"
+  },
+  {
+    "name": "prior_global_full",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_0514/prior_global_full_gpu1.log",
+    "status": "missing_metric"
+  },
+  {
+    "name": "prior_half_global_type",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_0514/prior_half_global_type_gpu3.log",
+    "status": "missing_metric"
+  },
+  {
+    "name": "prior_quarter_global_type",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_0514/prior_quarter_global_type_gpu1.log",
+    "status": "missing_metric"
+  },
+  {
+    "name": "prior_type_anchor_residual",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_0514/prior_type_anchor_residual_gpu0.log",
+    "status": "missing_metric"
+  },
+  {
+    "name": "prior_type_only",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_0514/prior_type_only_gpu2.log",
+    "status": "missing_metric"
+  }
+]

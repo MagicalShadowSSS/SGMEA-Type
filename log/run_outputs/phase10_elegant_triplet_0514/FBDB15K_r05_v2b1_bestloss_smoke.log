@@ -1,0 +1,15 @@
+INFO - 05/14/26 23:34:54 - 0:00:00 - ============ Initialized logger ============
+INFO - 05/14/26 23:34:54 - 0:00:00 - The experiment will be stored in /gly/tongqiang/dongyufeng/data/mmkg/dump/0514-EA_exp/SGMEA_FBDB15K_0.5_phase10_fbdb_r05_v2b1_bestloss_smoke
+                                     
+INFO - 05/14/26 23:34:54 - 0:00:00 - Running command: python main.py --gpu 2 --data_path '/gly/tongqiang/dongyufeng/data/mmkg' --data_choice FBDB15K --data_split norm --data_rate '0.5' --model_name SGMEA --model_name_save 'SGMEA_FBDB15K_0.5_baseline_warm_fbdb_rates_cdmr_0511_104108_r05_' --exp_id phase10_fbdb_r05_v2b1_bestloss_smoke --epoch 1 --eval_epoch 1 --lr '1e-4' --hidden_units '300,300,300' --batch_size 2048 --csls --csls_k 1 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler fixed --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau '0.1' --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --enable_sota --disable_sgmea_guidance --save_model 0 --no_tensorboard --type_modality_bias_only_train --freeze_type_modality_bias_entity --external_anchor_type_jsonl '/gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl' --use_tmhg_router --tmhg_input_mode semantic --tmhg_hidden_dim 64 --tmhg_heads 4 --tmhg_layers 1 --tmhg_dropout '0.1' --tmhg_token_proj_dim 300 --tmhg_semantic_proj_layers 2 --tmhg_bias_mode logit --tmhg_residual_scale '0.4' --tmhg_gamma_max '1.2' --tmhg_l2_weight '5e-5' --tmhg_entropy_weight '5e-5' --tmhg_strength_reg_weight '5e-4' --tmhg_calib_pretrain_epochs 12 --tmhg_calib_pretrain_lr '1e-3' --tmhg_calib_pretrain_weight_decay '1e-4' --tmhg_calib_pretrain_tau '0.05' --tmhg_calib_pretrain_batch_size 512 --tmhg_calib_pretrain_patience 5 --tmhg_calib_bias_l2 '5e-5' --tmhg_calib_selection best_loss --tmhg_calib_modal_utility_weight '1.0' --tmhg_calib_modal_target_temp '0.3' --tmhg_calib_joint_weight '1.0'
+
+Traceback (most recent call last):
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/main.py", line 1969, in <module>
+    torch.cuda.set_device(cfgs.gpu)
+  File "/gly/tongqiang/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/cuda/__init__.py", line 478, in set_device
+    torch._C._cuda_setDevice(device)
+RuntimeError: CUDA error: invalid device ordinal
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+

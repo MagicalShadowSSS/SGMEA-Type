@@ -1,0 +1,6 @@
+[START] exp_id=masksoft_s30_c02_softw_grid_0510_120559 mode=masksoft gpu=1 safe=3.0 close=0.2
+Traceback (most recent call last):
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/main.py", line 20, in <module>
+    from src.loss_upper_bound_probe import run_loss_upper_bound_probe
+ModuleNotFoundError: No module named 'src.loss_upper_bound_probe'
+[FAIL] exp_id=masksoft_s30_c02_softw_grid_0510_120559 mode=masksoft gpu=1

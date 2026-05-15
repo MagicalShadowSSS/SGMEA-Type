@@ -1,0 +1,177 @@
+{
+  "created_on": "2026-05-14",
+  "comparison_scope": "baseline vs old_dehr vs learned_dehr",
+  "notes": [
+    "FBDB baseline comes from fbdb_rates_baseline_cdmr_0511_104108.",
+    "FBYG baseline comes from fbyg_specific_prior_full/fbyg_specific_prior_0512_111257 with lr5e4 checkpoints.",
+    "r=0.5 also has baseline_onlytest logs in decomposition runs; they differ slightly at the 1e-3 level."
+  ],
+  "results": {
+    "FBDB15K": {
+      "0.2": {
+        "baseline": {
+          "avg_h1": 0.52895,
+          "avg_mrr": 0.6140,
+          "log": "log/run_outputs/fbdb_rates_baseline_cdmr/fbdb_rates_cdmr_0511_104108/baseline_r02_gpu1.log"
+        },
+        "old_dehr": {
+          "variant": "constrained",
+          "avg_h1": 0.58995,
+          "avg_mrr": 0.6675,
+          "gain_vs_baseline": 0.06100,
+          "log": "log/run_outputs/dehr_typescale_sweep/dehr_constrained_0512_210405/dehr_dehr_constrained_0512_210405_FBDB15K_r02_blr5e4_rho0.7-0.9-1.1-1.3_m2.0_gpu2.log"
+        },
+        "learned_dehr": {
+          "avg_h1": 0.58560,
+          "avg_mrr": 0.6640,
+          "gain_vs_baseline": 0.05665,
+          "pseudo_links": 5123,
+          "pseudo_margin_mean": 0.1259,
+          "log": "log/run_outputs/dehr_learned_router/rates_0514_172031/FBDB15K_r02.log"
+        }
+      },
+      "0.5": {
+        "baseline": {
+          "avg_h1": 0.71495,
+          "avg_mrr": 0.7740,
+          "log": "log/run_outputs/fbdb_rates_baseline_cdmr/fbdb_rates_cdmr_0511_104108/baseline_r05_gpu2.log"
+        },
+        "baseline_onlytest": {
+          "avg_h1": 0.71585,
+          "log": "log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_0514b/baseline_onlytest_gpu0.log"
+        },
+        "old_dehr": {
+          "variant": "manual_global_reference",
+          "avg_h1": 0.74395,
+          "avg_mrr": 0.7980,
+          "gain_vs_baseline_onlytest": 0.02810,
+          "log": "log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_0514b/manual_global_reference_gpu2.log"
+        },
+        "old_dehr_constrained": {
+          "variant": "constrained",
+          "avg_h1": 0.74220,
+          "avg_mrr": 0.7955,
+          "gain_vs_baseline": 0.02725,
+          "log": "log/run_outputs/dehr_typescale_sweep/dehr_constrained_0512_210405/dehr_dehr_constrained_0512_210405_FBDB15K_r05_blr5e4_rho0.5-0.7-0.9-1.1_m2.0_gpu0.log"
+        },
+        "learned_dehr": {
+          "avg_h1": 0.74410,
+          "avg_mrr": 0.7970,
+          "gain_vs_baseline": 0.02915,
+          "gain_vs_old_manual": 0.00015,
+          "pseudo_links": 4510,
+          "pseudo_margin_mean": 0.1788,
+          "log": "log/run_outputs/dehr_learned_router/rates_0514_172031/FBDB15K_r05.log"
+        }
+      },
+      "0.8": {
+        "baseline": {
+          "avg_h1": 0.80720,
+          "avg_mrr": 0.8505,
+          "log": "log/run_outputs/fbdb_rates_baseline_cdmr/fbdb_rates_cdmr_0511_104108/baseline_r08_gpu3.log"
+        },
+        "old_dehr": {
+          "variant": "constrained",
+          "avg_h1": 0.82470,
+          "avg_mrr": 0.8630,
+          "gain_vs_baseline": 0.01750,
+          "log": "log/run_outputs/dehr_typescale_sweep/dehr_constrained_0512_210405/dehr_dehr_constrained_0512_210405_FBDB15K_r08_blr5e4_rho0.7-0.9-1.1-1.3_m2.0_gpu2.log"
+        },
+        "learned_dehr": {
+          "avg_h1": 0.83015,
+          "avg_mrr": 0.8675,
+          "gain_vs_baseline": 0.02295,
+          "pseudo_links": 2106,
+          "pseudo_margin_mean": 0.2196,
+          "log": "log/run_outputs/dehr_learned_router/rates_0514_172031/FBDB15K_r08.log"
+        }
+      }
+    },
+    "FBYG15K": {
+      "0.2": {
+        "baseline": {
+          "avg_h1": 0.60205,
+          "avg_mrr": 0.6860,
+          "log": "log/run_outputs/fbyg_specific_prior_full/fbyg_specific_prior_0512_111257/sgmea_baseline_lr5e4_r0.2_gpu3.log"
+        },
+        "old_dehr": {
+          "variant": "constrained",
+          "avg_h1": 0.65665,
+          "avg_mrr": 0.7300,
+          "gain_vs_baseline": 0.05460,
+          "log": "log/run_outputs/dehr_typescale_sweep/dehr_constrained_0512_210405/dehr_dehr_constrained_0512_210405_FBYG15K_r02_blr5e4_rho0.6-0.8-1.0-1.2_m2.0_gpu1.log"
+        },
+        "learned_dehr": {
+          "avg_h1": 0.67370,
+          "avg_mrr": 0.7445,
+          "gain_vs_baseline": 0.07165,
+          "pseudo_links": 5062,
+          "pseudo_margin_mean": 0.1264,
+          "log": "log/run_outputs/dehr_learned_router/rates_0514_172031/FBYG15K_r02.log"
+        }
+      },
+      "0.5": {
+        "baseline": {
+          "avg_h1": 0.78920,
+          "avg_mrr": 0.8400,
+          "log": "log/run_outputs/fbyg_specific_prior_full/fbyg_specific_prior_0512_111257/sgmea_baseline_lr5e4_r0.5_gpu0.log"
+        },
+        "baseline_onlytest": {
+          "avg_h1": 0.79170,
+          "log": "log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_fbyg_0514/baseline_onlytest_gpu0.log"
+        },
+        "old_dehr": {
+          "variant": "manual_global_reference",
+          "avg_h1": 0.81580,
+          "avg_mrr": 0.8615,
+          "gain_vs_baseline_onlytest": 0.02410,
+          "log": "log/run_outputs/dehr_stat_prior_decomposition/codex_dehr_stat_prior_decomp_fbyg_0514/manual_global_reference_gpu2.log"
+        },
+        "old_dehr_constrained": {
+          "variant": "constrained",
+          "avg_h1": 0.81330,
+          "avg_mrr": 0.8585,
+          "gain_vs_baseline": 0.02410,
+          "log": "log/run_outputs/dehr_typescale_sweep/dehr_constrained_0512_210405/dehr_dehr_constrained_0512_210405_FBYG15K_r05_blr5e4_rho0.5-0.7-0.9-1.1_m2.0_gpu0.log"
+        },
+        "learned_dehr": {
+          "avg_h1": 0.82395,
+          "avg_mrr": 0.8670,
+          "gain_vs_baseline": 0.03475,
+          "gain_vs_old_manual": 0.00815,
+          "pseudo_links": 4324,
+          "pseudo_margin_mean": 0.1685,
+          "log": "log/run_outputs/dehr_learned_router/rates_0514_172031/FBYG15K_r05.log"
+        }
+      },
+      "0.8": {
+        "baseline": {
+          "avg_h1": 0.87770,
+          "avg_mrr": 0.9100,
+          "log": "log/run_outputs/fbyg_specific_prior_full/fbyg_specific_prior_0512_111257/sgmea_baseline_lr5e4_r0.8_gpu1.log"
+        },
+        "old_dehr": {
+          "variant": "constrained",
+          "avg_h1": 0.89395,
+          "avg_mrr": 0.9220,
+          "gain_vs_baseline": 0.01625,
+          "log": "log/run_outputs/dehr_typescale_sweep/dehr_constrained_0512_210405/dehr_dehr_constrained_0512_210405_FBYG15K_r08_blr5e4_rho0.7-0.9-1.1-1.3_m2.0_gpu2.log"
+        },
+        "learned_dehr": {
+          "avg_h1": 0.88930,
+          "avg_mrr": 0.9190,
+          "gain_vs_baseline": 0.01160,
+          "pseudo_links": 2091,
+          "pseudo_margin_mean": 0.2052,
+          "log": "log/run_outputs/dehr_learned_router/rates_0514_172031/FBYG15K_r08.log"
+        }
+      }
+    }
+  },
+  "learned_router_evidence": {
+    "manual_direction_zero": true,
+    "global_bias_abs_mean_zero": true,
+    "type_bias_fraction_one": true,
+    "source_dir": "log/run_outputs/dehr_learned_router/rates_0514_172031"
+  }
+}

@@ -1,0 +1,45 @@
+# Python/runtime generated files
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.ipynb_checkpoints/
+*.pid
+*.tmp
+*.bak
+
+# Local environments and editor state
+.env
+.venv/
+venv/
+env/
+.idea/
+.vscode/
+
+# Credentials and local Codex/auth state
+auth.json
+.codex/
+*.key
+*.pem
+*.token
+
+# Large experiment artifacts / model binaries
+*.pkl
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.npy
+*.npz
+core.*
+
+# Local datasets and generated dumps, if created inside the repo
+data/
+dataset/
+datasets/
+dump/
+dumps/
+checkpoint/
+checkpoints/
+save/
+runs/

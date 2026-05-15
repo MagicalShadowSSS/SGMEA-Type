@@ -1,0 +1,397 @@
+loading data/model...
+loading raw data...
+81.17% entities have images
+image feature shape:(30355, 4096)
+entity coarse types: external distribution loaded
+  Person: 12911 (42.53%)
+  Place: 5150 (16.97%)
+  Organization: 4016 (13.23%)
+  Creative Work: 4181 (13.77%)
+  Event: 1344 (4.43%)
+  Entity: 2753 (9.07%)
+#left entity : 14951, #right entity: 15404
+#left entity not in train set: 9352, #right entity not in train set: 9805
+relation feature shape:(30355, 1000)
+attribute feature shape:(30355, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBYG15K/norm
+triple num:	 715099
+entity num:	 30355
+relation num:	 1377
+train ill num:	 5599 	 test ill num:	 5600
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+modal_names=['img', 'attr', 'rel', 'graph'] weight_shape=(30355, 4) emb_shape=(30355, 1200)
+baseline avg_hits@1=0.7890 l2r=0.7902 r2l=0.7879
+sweeping type=Person configs=28560
+type=Person best_global_delta=+0.0104 best_type_delta=+0.0350
+type=Place fixed_global_delta=-0.0082 fixed_type_delta=-0.0060
+type=Organization fixed_global_delta=-0.0082 fixed_type_delta=-0.0002
+type=Creative Work fixed_global_delta=-0.0082 fixed_type_delta=-0.0111
+{
+  "baseline": {
+    "count": 5600,
+    "l2r": {
+      "hits@1": 0.7901785714285714,
+      "hits@10": 0.9251785714285714,
+      "hits@50": 0.9619642857142857,
+      "mr": 20.8525,
+      "mrr": 0.839728253967573
+    },
+    "r2l": {
+      "hits@1": 0.7878571428571428,
+      "hits@10": 0.9246428571428571,
+      "hits@50": 0.9619642857142857,
+      "mr": 23.619464285714287,
+      "mrr": 0.8390857707479082
+    },
+    "avg_hits@1": 0.7890178571428571,
+    "avg_mrr": 0.8394070123577406
+  },
+  "baseline_by_type": {
+    "Person": {
+      "l2r_count": 2230,
+      "r2l_count": 2222,
+      "l2r_hits@1": 0.8524663677130044,
+      "r2l_hits@1": 0.8492349234923492,
+      "avg_hits@1": 0.8508506456026768,
+      "l2r_mrr": 0.8914603867706578,
+      "r2l_mrr": 0.889179457645959,
+      "avg_mrr": 0.8903199222083084
+    },
+    "Place": {
+      "l2r_count": 1243,
+      "r2l_count": 1234,
+      "l2r_hits@1": 0.8020917135961384,
+      "r2l_hits@1": 0.7982171799027553,
+      "avg_hits@1": 0.8001544467494468,
+      "l2r_mrr": 0.8604018421033712,
+      "r2l_mrr": 0.8562071377057395,
+      "avg_mrr": 0.8583044899045553
+    },
+    "Organization": {
+      "l2r_count": 794,
+      "r2l_count": 980,
+      "l2r_hits@1": 0.7229219143576826,
+      "r2l_hits@1": 0.6357142857142857,
+      "avg_hits@1": 0.6793181000359841,
+      "l2r_mrr": 0.783695392597958,
+      "r2l_mrr": 0.703712773429167,
+      "avg_mrr": 0.7437040830135625
+    },
+    "Creative Work": {
+      "l2r_count": 898,
+      "r2l_count": 897,
+      "l2r_hits@1": 0.8853006681514477,
+      "r2l_hits@1": 0.8896321070234113,
+      "avg_hits@1": 0.8874663875874296,
+      "l2r_mrr": 0.9173372875757544,
+      "r2l_mrr": 0.9153037663806629,
+      "avg_mrr": 0.9163205269782086
+    }
+  },
+  "best": {
+    "Person": {
+      "type": "Person",
+      "scale": {
+        "img": 0.6,
+        "attr": 1.3,
+        "rel": 0.9,
+        "graph": 1.2
+      },
+      "global_avg_hits@1": 0.7994642857142857,
+      "global_delta": 0.010446428571428634,
+      "type_avg_hits@1": 0.885891997271476,
+      "type_delta": 0.03504135166879929,
+      "global_avg_mrr": null,
+      "type_avg_mrr": null
+    },
+    "Place": {
+      "type": "Place",
+      "scale": {
+        "img": 1.0,
+        "attr": 1.0,
+        "rel": 1.0,
+        "graph": 1.0
+      },
+      "global_avg_hits@1": 0.7808035714285715,
+      "global_delta": -0.008214285714285618,
+      "type_avg_hits@1": 0.7941118562165306,
+      "type_delta": -0.0060425905329162255,
+      "global_avg_mrr": null,
+      "type_avg_mrr": null,
+      "fixed": true
+    },
+    "Organization": {
+      "type": "Organization",
+      "scale": {
+        "img": 1.0,
+        "attr": 1.0,
+        "rel": 1.0,
+        "graph": 1.0
+      },
+      "global_avg_hits@1": 0.7808035714285715,
+      "global_delta": -0.008214285714285618,
+      "type_avg_hits@1": 0.6790790623554208,
+      "type_delta": -0.00023903768056332542,
+      "global_avg_mrr": null,
+      "type_avg_mrr": null,
+      "fixed": true
+    },
+    "Creative Work": {
+      "type": "Creative Work",
+      "scale": {
+        "img": 1.0,
+        "attr": 1.0,
+        "rel": 1.0,
+        "graph": 1.0
+      },
+      "global_avg_hits@1": 0.7808035714285715,
+      "global_delta": -0.008214285714285618,
+      "type_avg_hits@1": 0.8763243228479987,
+      "type_delta": -0.011142064739430912,
+      "global_avg_mrr": null,
+      "type_avg_mrr": null,
+      "fixed": true
+    }
+  },
+  "combined": {
+    "scales": {
+      "Person": {
+        "img": 0.6,
+        "attr": 1.3,
+        "rel": 0.9,
+        "graph": 1.2
+      },
+      "Place": {
+        "img": 1.0,
+        "attr": 1.0,
+        "rel": 1.0,
+        "graph": 1.0
+      },
+      "Organization": {
+        "img": 1.0,
+        "attr": 1.0,
+        "rel": 1.0,
+        "graph": 1.0
+      },
+      "Creative Work": {
+        "img": 1.0,
+        "attr": 1.0,
+        "rel": 1.0,
+        "graph": 1.0
+      }
+    },
+    "overall": {
+      "count": 5600,
+      "l2r": {
+        "hits@1": 0.7983928571428571
+      },
+      "r2l": {
+        "hits@1": 0.8005357142857142
+      },
+      "avg_hits@1": 0.7994642857142857
+    },
+    "overall_delta": 0.010446428571428634,
+    "by_type": {
+      "Person": {
+        "l2r_count": 2230,
+        "r2l_count": 2222,
+        "l2r_hits@1": 0.8869955156950673,
+        "r2l_hits@1": 0.8847884788478848,
+        "avg_hits@1": 0.885891997271476
+      },
+      "Place": {
+        "l2r_count": 1243,
+        "r2l_count": 1234,
+        "l2r_hits@1": 0.7924376508447305,
+        "r2l_hits@1": 0.7965964343598055,
+        "avg_hits@1": 0.7945170426022681
+      },
+      "Organization": {
+        "l2r_count": 794,
+        "r2l_count": 980,
+        "l2r_hits@1": 0.7216624685138538,
+        "r2l_hits@1": 0.639795918367347,
+        "avg_hits@1": 0.6807291934406003
+      },
+      "Creative Work": {
+        "l2r_count": 898,
+        "r2l_count": 897,
+        "l2r_hits@1": 0.8741648106904232,
+        "r2l_hits@1": 0.8773690078037905,
+        "avg_hits@1": 0.8757669092471068
+      }
+    }
+  },
+  "greedy": {
+    "scales": {
+      "Person": {
+        "img": 0.6,
+        "attr": 1.3,
+        "rel": 0.9,
+        "graph": 1.2
+      },
+      "Place": {
+        "img": 1.0,
+        "attr": 1.0,
+        "rel": 1.0,
+        "graph": 1.0
+      },
+      "Organization": {
+        "img": 1.0,
+        "attr": 1.0,
+        "rel": 1.0,
+        "graph": 1.0
+      },
+      "Creative Work": {
+        "img": 1.0,
+        "attr": 1.0,
+        "rel": 1.0,
+        "graph": 1.0
+      }
+    },
+    "overall": {
+      "count": 5600,
+      "l2r": {
+        "hits@1": 0.7983928571428571
+      },
+      "r2l": {
+        "hits@1": 0.8005357142857142
+      },
+      "avg_hits@1": 0.7994642857142857
+    },
+    "overall_delta": 0.010446428571428634,
+    "by_type": {
+      "Person": {
+        "l2r_count": 2230,
+        "r2l_count": 2222,
+        "l2r_hits@1": 0.8869955156950673,
+        "r2l_hits@1": 0.8847884788478848,
+        "avg_hits@1": 0.885891997271476
+      },
+      "Place": {
+        "l2r_count": 1243,
+        "r2l_count": 1234,
+        "l2r_hits@1": 0.7924376508447305,
+        "r2l_hits@1": 0.7965964343598055,
+        "avg_hits@1": 0.7945170426022681
+      },
+      "Organization": {
+        "l2r_count": 794,
+        "r2l_count": 980,
+        "l2r_hits@1": 0.7216624685138538,
+        "r2l_hits@1": 0.639795918367347,
+        "avg_hits@1": 0.6807291934406003
+      },
+      "Creative Work": {
+        "l2r_count": 898,
+        "r2l_count": 897,
+        "l2r_hits@1": 0.8741648106904232,
+        "r2l_hits@1": 0.8773690078037905,
+        "avg_hits@1": 0.8757669092471068
+      }
+    },
+    "history": [
+      {
+        "round": 0,
+        "type": "Person",
+        "chosen_scale": {
+          "img": 0.6,
+          "attr": 1.3,
+          "rel": 0.9,
+          "graph": 1.2
+        },
+        "overall_avg_hits@1": 0.7994642857142857,
+        "overall_delta": 0.010446428571428634
+      },
+      {
+        "round": 0,
+        "type": "Place",
+        "chosen_scale": {
+          "img": 1.0,
+          "attr": 1.0,
+          "rel": 1.0,
+          "graph": 1.0
+        },
+        "overall_avg_hits@1": 0.7994642857142857,
+        "overall_delta": 0.010446428571428634
+      },
+      {
+        "round": 0,
+        "type": "Organization",
+        "chosen_scale": {
+          "img": 1.0,
+          "attr": 1.0,
+          "rel": 1.0,
+          "graph": 1.0
+        },
+        "overall_avg_hits@1": 0.7994642857142857,
+        "overall_delta": 0.010446428571428634
+      },
+      {
+        "round": 0,
+        "type": "Creative Work",
+        "chosen_scale": {
+          "img": 1.0,
+          "attr": 1.0,
+          "rel": 1.0,
+          "graph": 1.0
+        },
+        "overall_avg_hits@1": 0.7994642857142857,
+        "overall_delta": 0.010446428571428634
+      },
+      {
+        "round": 1,
+        "type": "Person",
+        "chosen_scale": {
+          "img": 0.6,
+          "attr": 1.3,
+          "rel": 0.9,
+          "graph": 1.2
+        },
+        "overall_avg_hits@1": 0.7994642857142857,
+        "overall_delta": 0.010446428571428634
+      },
+      {
+        "round": 1,
+        "type": "Place",
+        "chosen_scale": {
+          "img": 1.0,
+          "attr": 1.0,
+          "rel": 1.0,
+          "graph": 1.0
+        },
+        "overall_avg_hits@1": 0.7994642857142857,
+        "overall_delta": 0.010446428571428634
+      },
+      {
+        "round": 1,
+        "type": "Organization",
+        "chosen_scale": {
+          "img": 1.0,
+          "attr": 1.0,
+          "rel": 1.0,
+          "graph": 1.0
+        },
+        "overall_avg_hits@1": 0.7994642857142857,
+        "overall_delta": 0.010446428571428634
+      },
+      {
+        "round": 1,
+        "type": "Creative Work",
+        "chosen_scale": {
+          "img": 1.0,
+          "attr": 1.0,
+          "rel": 1.0,
+          "graph": 1.0
+        },
+        "overall_avg_hits@1": 0.7994642857142857,
+        "overall_delta": 0.010446428571428634
+      }
+    ]
+  }
+}
+saved: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/fbyg_type_modality_oracle_4seg_refine_4gpu_0512_015217/person.json

@@ -1,0 +1,66 @@
+[start] 2026-05-12 21:03:48 gpu=2 dataset=FBDB15K rate=0.2 base_lr=5e-4 rho=0.7,0.9,1.1,1.3 rho_max=2.0
+[cmd] CUDA_VISIBLE_DEVICES=2 python main.py --data_choice FBDB15K --data_rate 0.2 --model_name_save SGMEA_FBDB15K_0.2_baseline_warm_fbdb_rates_cdmr_0511_104108_r02_ --lr 1e-4 --workers 0 --dehr_bias_clamp 0.5 --dehr_direction_mode constrained --dehr_direction_values -0.35,0.15,-0.10,0.30 --dehr_kl_weight 1e-3 --dehr_rho_weight 1e-3
+INFO - 05/12/26 21:03:51 - 0:00:00 - ============ Initialized logger ============
+INFO - 05/12/26 21:03:51 - 0:00:00 - The experiment will be stored in /gly/tongqiang/dongyufeng/data/mmkg/dump/0512-EA_exp/SGMEA_FBDB15K_0.2_dehr_dehr_constrained_0512_210348_FBDB15K_r02_blr5e4_rho0.7-0.9-1.1-1.3_m2.0
+                                     
+INFO - 05/12/26 21:03:51 - 0:00:00 - Running command: python main.py --gpu 0 --data_path '/gly/tongqiang/dongyufeng/data/mmkg' --data_choice FBDB15K --data_split norm --data_rate '0.2' --model_name SGMEA --model_name_save 'SGMEA_FBDB15K_0.2_baseline_warm_fbdb_rates_cdmr_0511_104108_r02_' --exp_id 'dehr_dehr_constrained_0512_210348_FBDB15K_r02_blr5e4_rho0.7-0.9-1.1-1.3_m2.0' --epoch 40 --eval_epoch 1 --lr '1e-4' --hidden_units '300,300,300' --save_model 1 --batch_size 2048 --csls --csls_k 3 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler fixed --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau '0.1' --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --enable_sota --disable_sgmea_guidance --type_modality_bias_only_train --freeze_type_modality_bias_entity --use_dehr_router --dehr_proj_dim 32 --dehr_hidden_dim 64 --dehr_heads 4 --dehr_layers 1 --dehr_dropout '0.1' --dehr_alpha0 '1.0' --dehr_direction_mode constrained --dehr_direction_values=-0.35,0.15,-0.10,0.30 --dehr_evidence_mix 0 --dehr_rho_init_values '0.7,0.9,1.1,1.3' --dehr_rho_max '2.0' --dehr_kl_weight '1e-3' --dehr_rho_weight '1e-3' --dehr_bias_clamp '0.5' --external_anchor_type_jsonl '/gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl'
+
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/main.py:48: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = GradScaler()
+INFO - 05/12/26 21:03:55 - 0:00:03 - 94.56% entities have images
+INFO - 05/12/26 21:03:55 - 0:00:03 - image feature shape:(27793, 4096)
+INFO - 05/12/26 21:03:55 - 0:00:04 - entity coarse types: external distribution loaded
+INFO - 05/12/26 21:03:55 - 0:00:04 -   Person: 9014 (32.43%)
+INFO - 05/12/26 21:03:55 - 0:00:04 -   Place: 5151 (18.53%)
+INFO - 05/12/26 21:03:55 - 0:00:04 -   Organization: 4009 (14.42%)
+INFO - 05/12/26 21:03:55 - 0:00:04 -   Creative Work: 4648 (16.72%)
+INFO - 05/12/26 21:03:55 - 0:00:04 -   Event: 1144 (4.12%)
+INFO - 05/12/26 21:03:55 - 0:00:04 -   Entity: 3827 (13.77%)
+INFO - 05/12/26 21:03:55 - 0:00:04 - #left entity : 14951, #right entity: 12842
+INFO - 05/12/26 21:03:55 - 0:00:04 - #left entity not in train set: 12382, #right entity not in train set: 10273
+INFO - 05/12/26 21:03:57 - 0:00:05 - relation feature shape:(27793, 1000)
+loading raw data...
+Traceback (most recent call last):
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/main.py", line 1120, in <module>
+    runner = Runner(cfgs, writer, logger, rank)
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/main.py", line 51, in __init__
+    self.data_init()
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/main.py", line 312, in data_init
+    self.KGs, self.non_train, self.train_set, self.eval_set, self.test_set, self.test_ill_ = load_data(self.logger, self.args)
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/data.py", line 68, in load_data
+    KGs, non_train, train_ill, test_ill, eval_ill, test_ill_ = load_eva_data(logger, args)
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/data.py", line 216, in load_eva_data
+    from sentence_transformers import SentenceTransformer
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/sentence_transformers/__init__.py", line 15, in <module>
+    from sentence_transformers.cross_encoder import (
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/sentence_transformers/cross_encoder/__init__.py", line 3, in <module>
+    from .CrossEncoder import CrossEncoder
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/sentence_transformers/cross_encoder/CrossEncoder.py", line 16, in <module>
+    from transformers import (
+  File "<frozen importlib._bootstrap>", line 1055, in _handle_fromlist
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/transformers/utils/import_utils.py", line 2317, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/transformers/utils/import_utils.py", line 2345, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/transformers/models/auto/modeling_auto.py", line 23, in <module>
+    from .auto_factory import (
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/transformers/models/auto/auto_factory.py", line 43, in <module>
+    from ...generation import GenerationMixin
+  File "<frozen importlib._bootstrap>", line 1055, in _handle_fromlist
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/transformers/utils/import_utils.py", line 2317, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/transformers/utils/import_utils.py", line 2345, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/transformers/generation/utils.py", line 45, in <module>
+    from ..tokenization_utils import ExtensionsTrie
+  File "<frozen importlib._bootstrap>", line 1007, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 986, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 846, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 978, in get_code
+  File "<frozen importlib._bootstrap_external>", line 647, in _compile_bytecode
+KeyboardInterrupt

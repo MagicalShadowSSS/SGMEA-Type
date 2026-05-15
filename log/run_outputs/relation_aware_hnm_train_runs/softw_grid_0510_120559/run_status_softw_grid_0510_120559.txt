@@ -1,0 +1,47 @@
+[INFO] RUN_TAG=softw_grid_0510_120559
+[INFO] GRID_PRESET=core
+[INFO] Experiment count=18
+[INFO] Effective LR=5e-05
+[INFO] Cache=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_aware_hnm_cache_top5.jsonl
+[INFO] Logs=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559
+[INFO] EXPERIMENTS:
+  baseline_warm_softw_grid_0510_120559|base|1.0|1.0
+  mask_only_softw_grid_0510_120559|mask|1.0|1.0
+  softw_s15_c01_softw_grid_0510_120559|soft|1.5|0.1
+  softw_s15_c02_softw_grid_0510_120559|soft|1.5|0.2
+  softw_s15_c035_softw_grid_0510_120559|soft|1.5|0.35
+  softw_s20_c01_softw_grid_0510_120559|soft|2.0|0.1
+  softw_s20_c02_softw_grid_0510_120559|soft|2.0|0.2
+  softw_s20_c035_softw_grid_0510_120559|soft|2.0|0.35
+  softw_s25_c01_softw_grid_0510_120559|soft|2.5|0.1
+  softw_s25_c02_softw_grid_0510_120559|soft|2.5|0.2
+  softw_s25_c035_softw_grid_0510_120559|soft|2.5|0.35
+  softw_s30_c01_softw_grid_0510_120559|soft|3.0|0.1
+  softw_s30_c02_softw_grid_0510_120559|soft|3.0|0.2
+  softw_s30_c035_softw_grid_0510_120559|soft|3.0|0.35
+  masksoft_s15_c02_softw_grid_0510_120559|masksoft|1.5|0.2
+  masksoft_s20_c02_softw_grid_0510_120559|masksoft|2.0|0.2
+  masksoft_s25_c01_softw_grid_0510_120559|masksoft|2.5|0.1
+  masksoft_s30_c02_softw_grid_0510_120559|masksoft|3.0|0.2
+FAILED softw_s15_c02_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s15_c02_softw_grid_0510_120559.log
+FAILED baseline_warm_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/baseline_warm_softw_grid_0510_120559.log
+FAILED mask_only_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/mask_only_softw_grid_0510_120559.log
+FAILED softw_s15_c01_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s15_c01_softw_grid_0510_120559.log
+FAILED softw_s15_c035_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s15_c035_softw_grid_0510_120559.log
+FAILED softw_s20_c01_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s20_c01_softw_grid_0510_120559.log
+FAILED softw_s20_c035_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s20_c035_softw_grid_0510_120559.log
+FAILED softw_s20_c02_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s20_c02_softw_grid_0510_120559.log
+FAILED softw_s30_c01_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s30_c01_softw_grid_0510_120559.log
+FAILED softw_s25_c01_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s25_c01_softw_grid_0510_120559.log
+FAILED softw_s25_c02_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s25_c02_softw_grid_0510_120559.log
+FAILED softw_s25_c035_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s25_c035_softw_grid_0510_120559.log
+FAILED softw_s30_c035_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s30_c035_softw_grid_0510_120559.log
+FAILED masksoft_s20_c02_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/masksoft_s20_c02_softw_grid_0510_120559.log
+FAILED masksoft_s15_c02_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/masksoft_s15_c02_softw_grid_0510_120559.log
+FAILED softw_s30_c02_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/softw_s30_c02_softw_grid_0510_120559.log
+FAILED masksoft_s30_c02_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/masksoft_s30_c02_softw_grid_0510_120559.log
+FAILED masksoft_s25_c01_softw_grid_0510_120559 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/masksoft_s25_c01_softw_grid_0510_120559.log
+[INFO] Status summary: /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/run_status_softw_grid_0510_120559.txt
+[INFO] Manifest: /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/run_manifest_softw_grid_0510_120559.txt
+[INFO] Checkpoints: /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559/checkpoint_paths_softw_grid_0510_120559.txt
+[INFO] Run logs: /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/relation_aware_hnm_train_runs/softw_grid_0510_120559

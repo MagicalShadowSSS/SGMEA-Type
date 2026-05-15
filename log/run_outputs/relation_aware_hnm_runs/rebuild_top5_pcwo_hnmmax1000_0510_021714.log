@@ -1,0 +1,222 @@
+nohup: ignoring input
+============================================================
+[PIPELINE] FBDB Relation-Aware HNM Full
+[CODE_ROOT] /gly/tongqiang/dongyufeng/Mode-Test/SGMEA
+[DATA_ROOT] /gly/tongqiang/dongyufeng/data/mmkg
+[DATA_CHOICE] FBDB15K
+[DATA_SPLIT] norm
+[DATA_RATE] 0.5
+[CKPT_NAME] SGMEA_FBDB15K_0.5_rebuild_gpu0_
+[TYPE_JSONL_FIXED] /gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl
+[OUT_DIR] /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm
+[LLM_PATH] /gly/tongqiang/lxwlxwlxw/HomeBenchReproduction/models/llama3-8b-Instruct
+[GPU_IDS] 0,1,2,3
+[SINGLE_GPU] 0
+[LLM_HNM_TOPN] 5
+[HNM_BUDGET_UNIT] anchors
+[HNM_MIN_CASES] 200
+[HNM_MAX_CASES] 1000
+[HNM_THRESHOLD] 0.40
+[HNM_FALLBACK_THRESHOLD] 0.35
+[HNM_WRITE_QUALITY] all
+[LABEL_DISTRIBUTED] 1
+[LABEL_MULTI_GPU_MIN_CASES] 1
+[KEEP_STATUSES] closely_related,safe_negative
+[KEEP_COARSE_TYPES] Person,Place,Creative Work,Organization
+[PRETRAIN_MARGIN_BASE] 0.5
+[PRETRAIN_MARGIN_SWEEP] 0.2,0.5,0.6,0.7,0.8,1.0
+============================================================
+[STAGE 1] Run relation-aware HNM data pipeline
+============================================================
+[PIPELINE] Phase 5 Relation-Aware HNM Data
+[CODE_ROOT] /gly/tongqiang/dongyufeng/Mode-Test/SGMEA
+[DATA_ROOT] /gly/tongqiang/dongyufeng/data/mmkg
+[DATA_CHOICE] FBDB15K
+[DATA_SPLIT] norm
+[DATA_RATE] 0.5
+[CKPT_NAME] SGMEA_FBDB15K_0.5_rebuild_gpu0_
+[TYPE_JSONL_FIXED] /gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl
+[OUT_DIR] /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm
+[LLM_PATH] /gly/tongqiang/lxwlxwlxw/HomeBenchReproduction/models/llama3-8b-Instruct
+[SINGLE_GPU] 0
+[GPU_IDS] 0,1,2,3
+[RESUME] 0
+[LLM_HNM_TOPN] 5
+[HNM_BUDGET_UNIT] anchors
+[HNM_MIN_CASES] 200
+[HNM_MAX_CASES] 1000
+[EFFECTIVE_HNM_MIN_ROWS] 1000
+[EFFECTIVE_HNM_MAX_ROWS] 5000
+[HNM_TYPES] Person,Place,Creative Work,Organization
+[LABEL_DISTRIBUTED] 1
+[LABEL_MULTI_GPU_MIN_CASES] 1
+============================================================
+[EXTRACT] Person -> budget_unit=anchors min_rows=1000 max_rows=5000
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+loaded checkpoint: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_rebuild_gpu0_.pkl
+TAGHNMCache[joint][right][Person] rows=2269 avg_valid=32.0000 avg_sim=0.2883 avg_top1=0.3609 avg_topk=0.2883 p50_top1=0.3562 p90_top1=0.4239 max_top1=0.6562 empty_ratio=0.0000
+TAGHNMCache[joint][right][Organization] rows=834 avg_valid=32.0000 avg_sim=0.3412 avg_top1=0.4194 avg_topk=0.3412 p50_top1=0.4149 p90_top1=0.5024 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][right][Place] rows=1286 avg_valid=32.0000 avg_sim=0.3181 avg_top1=0.4069 avg_topk=0.3181 p50_top1=0.4019 p90_top1=0.4949 max_top1=0.8182 empty_ratio=0.0000
+TAGHNMCache[joint][right][Creative Work] rows=1135 avg_valid=32.0000 avg_sim=0.2903 avg_top1=0.3619 avg_topk=0.2903 p50_top1=0.3501 p90_top1=0.4359 max_top1=0.5652 empty_ratio=0.0000
+TAGHNMCache[joint][right][overall] rows=5524 avg_valid=32.0000 avg_sim=0.3036 avg_top1=0.3807 avg_topk=0.3036 p50_top1=0.3703 p90_top1=0.4682 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Person] rows=2197 avg_valid=32.0000 avg_sim=0.2848 avg_top1=0.3582 avg_topk=0.2848 p50_top1=0.3563 p90_top1=0.4318 max_top1=0.6098 empty_ratio=0.0000
+TAGHNMCache[joint][left][Organization] rows=955 avg_valid=32.0000 avg_sim=0.3304 avg_top1=0.4063 avg_topk=0.3304 p50_top1=0.4023 p90_top1=0.4958 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Place] rows=1249 avg_valid=32.0000 avg_sim=0.3218 avg_top1=0.4161 avg_topk=0.3218 p50_top1=0.4147 p90_top1=0.5069 max_top1=0.8548 empty_ratio=0.0000
+TAGHNMCache[joint][left][Creative Work] rows=1250 avg_valid=32.0000 avg_sim=0.2842 avg_top1=0.3504 avg_topk=0.2842 p50_top1=0.3519 p90_top1=0.4341 max_top1=0.5857 empty_ratio=0.0000
+TAGHNMCache[joint][left][overall] rows=5651 avg_valid=32.0000 avg_sim=0.3005 avg_top1=0.3774 avg_topk=0.3005 p50_top1=0.3718 p90_top1=0.4724 max_top1=0.9282 empty_ratio=0.0000
+LLM HNM evidence summary | high=1561 low=2709
+LLM HNM evidence notes | low_combined_attr=2314 low_negative_attr=2240 low_positive_attr=2210
+wrote 4270 LLM HNM cases to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_cases_top5.jsonl (type=Person, threshold=0.40)
+[EXTRACT] Place -> budget_unit=anchors min_rows=1000 max_rows=5000
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+loaded checkpoint: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_rebuild_gpu0_.pkl
+TAGHNMCache[joint][right][Person] rows=2269 avg_valid=32.0000 avg_sim=0.2883 avg_top1=0.3609 avg_topk=0.2883 p50_top1=0.3562 p90_top1=0.4239 max_top1=0.6562 empty_ratio=0.0000
+TAGHNMCache[joint][right][Organization] rows=834 avg_valid=32.0000 avg_sim=0.3412 avg_top1=0.4194 avg_topk=0.3412 p50_top1=0.4149 p90_top1=0.5024 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][right][Place] rows=1286 avg_valid=32.0000 avg_sim=0.3181 avg_top1=0.4069 avg_topk=0.3181 p50_top1=0.4019 p90_top1=0.4949 max_top1=0.8182 empty_ratio=0.0000
+TAGHNMCache[joint][right][Creative Work] rows=1135 avg_valid=32.0000 avg_sim=0.2903 avg_top1=0.3619 avg_topk=0.2903 p50_top1=0.3501 p90_top1=0.4359 max_top1=0.5652 empty_ratio=0.0000
+TAGHNMCache[joint][right][overall] rows=5524 avg_valid=32.0000 avg_sim=0.3036 avg_top1=0.3807 avg_topk=0.3036 p50_top1=0.3703 p90_top1=0.4682 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Person] rows=2197 avg_valid=32.0000 avg_sim=0.2848 avg_top1=0.3582 avg_topk=0.2848 p50_top1=0.3563 p90_top1=0.4318 max_top1=0.6098 empty_ratio=0.0000
+TAGHNMCache[joint][left][Organization] rows=955 avg_valid=32.0000 avg_sim=0.3304 avg_top1=0.4063 avg_topk=0.3304 p50_top1=0.4023 p90_top1=0.4958 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Place] rows=1249 avg_valid=32.0000 avg_sim=0.3218 avg_top1=0.4161 avg_topk=0.3218 p50_top1=0.4147 p90_top1=0.5069 max_top1=0.8548 empty_ratio=0.0000
+TAGHNMCache[joint][left][Creative Work] rows=1250 avg_valid=32.0000 avg_sim=0.2842 avg_top1=0.3504 avg_topk=0.2842 p50_top1=0.3519 p90_top1=0.4341 max_top1=0.5857 empty_ratio=0.0000
+TAGHNMCache[joint][left][overall] rows=5651 avg_valid=32.0000 avg_sim=0.3005 avg_top1=0.3774 avg_topk=0.3005 p50_top1=0.3718 p90_top1=0.4724 max_top1=0.9282 empty_ratio=0.0000
+LLM HNM evidence summary | high=4379 low=621
+LLM HNM evidence notes | low_combined_attr=409 low_negative_attr=436 low_positive_attr=445
+wrote 5000 LLM HNM cases to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_cases_top5.jsonl (type=Place, threshold=0.40)
+[EXTRACT] Creative Work -> budget_unit=anchors min_rows=1000 max_rows=5000
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+loaded checkpoint: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_rebuild_gpu0_.pkl
+TAGHNMCache[joint][right][Person] rows=2269 avg_valid=32.0000 avg_sim=0.2883 avg_top1=0.3609 avg_topk=0.2883 p50_top1=0.3562 p90_top1=0.4239 max_top1=0.6562 empty_ratio=0.0000
+TAGHNMCache[joint][right][Organization] rows=834 avg_valid=32.0000 avg_sim=0.3412 avg_top1=0.4194 avg_topk=0.3412 p50_top1=0.4149 p90_top1=0.5024 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][right][Place] rows=1286 avg_valid=32.0000 avg_sim=0.3181 avg_top1=0.4069 avg_topk=0.3181 p50_top1=0.4019 p90_top1=0.4949 max_top1=0.8182 empty_ratio=0.0000
+TAGHNMCache[joint][right][Creative Work] rows=1135 avg_valid=32.0000 avg_sim=0.2903 avg_top1=0.3619 avg_topk=0.2903 p50_top1=0.3501 p90_top1=0.4359 max_top1=0.5652 empty_ratio=0.0000
+TAGHNMCache[joint][right][overall] rows=5524 avg_valid=32.0000 avg_sim=0.3036 avg_top1=0.3807 avg_topk=0.3036 p50_top1=0.3703 p90_top1=0.4682 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Person] rows=2197 avg_valid=32.0000 avg_sim=0.2848 avg_top1=0.3582 avg_topk=0.2848 p50_top1=0.3563 p90_top1=0.4318 max_top1=0.6098 empty_ratio=0.0000
+TAGHNMCache[joint][left][Organization] rows=955 avg_valid=32.0000 avg_sim=0.3304 avg_top1=0.4063 avg_topk=0.3304 p50_top1=0.4023 p90_top1=0.4958 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Place] rows=1249 avg_valid=32.0000 avg_sim=0.3218 avg_top1=0.4161 avg_topk=0.3218 p50_top1=0.4147 p90_top1=0.5069 max_top1=0.8548 empty_ratio=0.0000
+TAGHNMCache[joint][left][Creative Work] rows=1250 avg_valid=32.0000 avg_sim=0.2842 avg_top1=0.3504 avg_topk=0.2842 p50_top1=0.3519 p90_top1=0.4341 max_top1=0.5857 empty_ratio=0.0000
+TAGHNMCache[joint][left][overall] rows=5651 avg_valid=32.0000 avg_sim=0.3005 avg_top1=0.3774 avg_topk=0.3005 p50_top1=0.3718 p90_top1=0.4724 max_top1=0.9282 empty_ratio=0.0000
+LLM HNM evidence summary | high=1031 low=1314
+LLM HNM evidence notes | low_combined_attr=1284 low_negative_attr=1247 low_positive_attr=1250
+wrote 2345 LLM HNM cases to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_cases_top5.jsonl (type=Creative Work, threshold=0.40)
+[EXTRACT] Organization -> budget_unit=anchors min_rows=1000 max_rows=5000
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+loaded checkpoint: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_rebuild_gpu0_.pkl
+Traceback (most recent call last):
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/extract_llm_hnm_cases.py", line 583, in <module>
+    main()
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/extract_llm_hnm_cases.py", line 490, in main
+    joint_emb, _ = model.joint_emb_generat()
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/model/SGMEA.py", line 242, in joint_emb_generat
+    = self.multimodal_encoder(self.input_idx,
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/model/SGMEA_tools.py", line 158, in forward
+    gph_emb = self.cross_graph_model(self.entity_emb(input_idx), adj)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/model/Tool_model.py", line 70, in forward
+    x = gat_layer(x, adj)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/model/layers.py", line 83, in forward
+    edge_h = torch.cat((h[edge[0, :], :], h[edge[1, :], :]), dim=1)  # edge: 2*D x E
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1.55 GiB. GPU 0 has a total capacity of 23.68 GiB of which 895.75 MiB is free. Process 48471 has 5.97 GiB memory in use. Process 48895 has 16.83 GiB memory in use. Of the allocated memory 5.61 GiB is allocated by PyTorch, and 56.82 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

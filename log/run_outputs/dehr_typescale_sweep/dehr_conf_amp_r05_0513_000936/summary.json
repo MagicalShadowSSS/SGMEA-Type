@@ -1,0 +1,18 @@
+[
+  {
+    "name": "dehr_dehr_conf_amp_r05_0513_000936_FBYG15K_r05_blr5e4_rho0.5-0.7-0.9-1.1_m2.0_gpu3",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_typescale_sweep/dehr_conf_amp_r05_0513_000936/dehr_dehr_conf_amp_r05_0513_000936_FBYG15K_r05_blr5e4_rho0.5-0.7-0.9-1.1_m2.0_gpu3.log",
+    "rho": "0.5003,0.7004,0.9004,1.1004,1.1004,1.0996",
+    "l2r": 0.8016,
+    "r2l": 0.7989,
+    "avg_hits1": 0.80025
+  },
+  {
+    "name": "dehr_dehr_conf_amp_r05_0513_000936_FBDB15K_r05_blr5e4_rho0.5-0.7-0.9-1.1_m2.0_gpu2",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_typescale_sweep/dehr_conf_amp_r05_0513_000936/dehr_dehr_conf_amp_r05_0513_000936_FBDB15K_r05_blr5e4_rho0.5-0.7-0.9-1.1_m2.0_gpu2.log",
+    "rho": "0.5001,0.7002,0.9002,1.1002,1.1002,1.0998",
+    "l2r": 0.7347,
+    "r2l": 0.7419,
+    "avg_hits1": 0.7383
+  }
+]

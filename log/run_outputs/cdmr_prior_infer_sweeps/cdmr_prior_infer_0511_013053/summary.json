@@ -1,0 +1,401 @@
+[
+  {
+    "name": "base_csls1",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/base_csls1_gpu1.log",
+    "l2r": 0.7378,
+    "r2l": 0.743,
+    "avg_hits1": 0.7404
+  },
+  {
+    "name": "base_csls2",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/base_csls2_gpu2.log",
+    "l2r": 0.7361,
+    "r2l": 0.7447,
+    "avg_hits1": 0.7404
+  },
+  {
+    "name": "local_csls3_tau1.10_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau1.10_s1.00_gpu1.log",
+    "l2r": 0.7353,
+    "r2l": 0.7447,
+    "avg_hits1": 0.74
+  },
+  {
+    "name": "local_csls3_tau1.05_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau1.05_s0.90_gpu1.log",
+    "l2r": 0.7347,
+    "r2l": 0.744,
+    "avg_hits1": 0.73935
+  },
+  {
+    "name": "local_csls3_tau1.10_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau1.10_s0.90_gpu0.log",
+    "l2r": 0.7356,
+    "r2l": 0.743,
+    "avg_hits1": 0.7393000000000001
+  },
+  {
+    "name": "local_csls3_tau1.10_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau1.10_s1.10_gpu2.log",
+    "l2r": 0.7344,
+    "r2l": 0.743,
+    "avg_hits1": 0.7387
+  },
+  {
+    "name": "local_csls3_tau1.05_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau1.05_s1.00_gpu2.log",
+    "l2r": 0.7333,
+    "r2l": 0.744,
+    "avg_hits1": 0.73865
+  },
+  {
+    "name": "local_csls3_tau1.00_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau1.00_s0.90_gpu2.log",
+    "l2r": 0.7331,
+    "r2l": 0.7437,
+    "avg_hits1": 0.7384
+  },
+  {
+    "name": "local_csls3_tau1.05_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau1.05_s1.10_gpu3.log",
+    "l2r": 0.7331,
+    "r2l": 0.7425,
+    "avg_hits1": 0.7378
+  },
+  {
+    "name": "base_csls3",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/base_csls3_gpu3.log",
+    "l2r": 0.733,
+    "r2l": 0.7422,
+    "avg_hits1": 0.7376
+  },
+  {
+    "name": "local_csls3_tau1.00_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau1.00_s1.00_gpu3.log",
+    "l2r": 0.733,
+    "r2l": 0.7422,
+    "avg_hits1": 0.7376
+  },
+  {
+    "name": "local_csls3_tau0.95_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau0.95_s0.90_gpu3.log",
+    "l2r": 0.7319,
+    "r2l": 0.7428,
+    "avg_hits1": 0.73735
+  },
+  {
+    "name": "local_csls3_tau1.00_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau1.00_s1.10_gpu0.log",
+    "l2r": 0.7308,
+    "r2l": 0.7409,
+    "avg_hits1": 0.73585
+  },
+  {
+    "name": "local_csls3_tau0.95_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau0.95_s1.00_gpu0.log",
+    "l2r": 0.7307,
+    "r2l": 0.7408,
+    "avg_hits1": 0.73575
+  },
+  {
+    "name": "local_csls3_tau0.90_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau0.90_s0.90_gpu0.log",
+    "l2r": 0.7303,
+    "r2l": 0.7403,
+    "avg_hits1": 0.7353
+  },
+  {
+    "name": "local_csls3_tau0.95_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau0.95_s1.10_gpu1.log",
+    "l2r": 0.7291,
+    "r2l": 0.7384,
+    "avg_hits1": 0.7337499999999999
+  },
+  {
+    "name": "local_csls3_tau0.90_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau0.90_s1.00_gpu1.log",
+    "l2r": 0.7286,
+    "r2l": 0.7386,
+    "avg_hits1": 0.7336
+  },
+  {
+    "name": "local_csls5_tau1.10_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau1.10_s0.90_gpu3.log",
+    "l2r": 0.7268,
+    "r2l": 0.7398,
+    "avg_hits1": 0.7333000000000001
+  },
+  {
+    "name": "local_csls5_tau1.10_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau1.10_s1.00_gpu0.log",
+    "l2r": 0.7254,
+    "r2l": 0.74,
+    "avg_hits1": 0.7327
+  },
+  {
+    "name": "local_csls5_tau1.05_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau1.05_s0.90_gpu0.log",
+    "l2r": 0.7254,
+    "r2l": 0.7381,
+    "avg_hits1": 0.73175
+  },
+  {
+    "name": "local_csls5_tau1.10_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau1.10_s1.10_gpu1.log",
+    "l2r": 0.7243,
+    "r2l": 0.7388,
+    "avg_hits1": 0.73155
+  },
+  {
+    "name": "local_csls3_tau0.90_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls3_tau0.90_s1.10_gpu2.log",
+    "l2r": 0.7266,
+    "r2l": 0.7363,
+    "avg_hits1": 0.7314499999999999
+  },
+  {
+    "name": "local_csls5_tau1.05_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau1.05_s1.00_gpu1.log",
+    "l2r": 0.7241,
+    "r2l": 0.7378,
+    "avg_hits1": 0.73095
+  },
+  {
+    "name": "local_csls5_tau1.00_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau1.00_s0.90_gpu1.log",
+    "l2r": 0.7236,
+    "r2l": 0.7374,
+    "avg_hits1": 0.7305
+  },
+  {
+    "name": "local_csls5_tau1.05_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau1.05_s1.10_gpu2.log",
+    "l2r": 0.7227,
+    "r2l": 0.7363,
+    "avg_hits1": 0.7295
+  },
+  {
+    "name": "base_csls5",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/base_csls5_gpu0.log",
+    "l2r": 0.7215,
+    "r2l": 0.7367,
+    "avg_hits1": 0.7291000000000001
+  },
+  {
+    "name": "local_csls5_tau1.00_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau1.00_s1.00_gpu2.log",
+    "l2r": 0.7215,
+    "r2l": 0.7367,
+    "avg_hits1": 0.7291000000000001
+  },
+  {
+    "name": "local_csls5_tau0.95_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau0.95_s0.90_gpu2.log",
+    "l2r": 0.7216,
+    "r2l": 0.7359,
+    "avg_hits1": 0.72875
+  },
+  {
+    "name": "local_csls5_tau0.95_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau0.95_s1.00_gpu3.log",
+    "l2r": 0.7213,
+    "r2l": 0.7344,
+    "avg_hits1": 0.7278500000000001
+  },
+  {
+    "name": "local_csls5_tau0.90_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau0.90_s0.90_gpu3.log",
+    "l2r": 0.7204,
+    "r2l": 0.7342,
+    "avg_hits1": 0.7273000000000001
+  },
+  {
+    "name": "local_csls5_tau1.00_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau1.00_s1.10_gpu3.log",
+    "l2r": 0.7208,
+    "r2l": 0.7333,
+    "avg_hits1": 0.72705
+  },
+  {
+    "name": "local_csls5_tau0.95_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau0.95_s1.10_gpu0.log",
+    "l2r": 0.7201,
+    "r2l": 0.7311,
+    "avg_hits1": 0.7256
+  },
+  {
+    "name": "local_csls5_tau0.90_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau0.90_s1.00_gpu0.log",
+    "l2r": 0.7191,
+    "r2l": 0.7314,
+    "avg_hits1": 0.72525
+  },
+  {
+    "name": "local_csls5_tau0.90_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls5_tau0.90_s1.10_gpu1.log",
+    "l2r": 0.718,
+    "r2l": 0.7307,
+    "avg_hits1": 0.72435
+  },
+  {
+    "name": "local_csls10_tau1.10_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau1.10_s0.90_gpu2.log",
+    "l2r": 0.7165,
+    "r2l": 0.7316,
+    "avg_hits1": 0.7240500000000001
+  },
+  {
+    "name": "local_csls10_tau1.10_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau1.10_s1.00_gpu3.log",
+    "l2r": 0.7151,
+    "r2l": 0.7316,
+    "avg_hits1": 0.7233499999999999
+  },
+  {
+    "name": "local_csls10_tau1.05_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau1.05_s0.90_gpu3.log",
+    "l2r": 0.7152,
+    "r2l": 0.7307,
+    "avg_hits1": 0.72295
+  },
+  {
+    "name": "local_csls10_tau1.10_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau1.10_s1.10_gpu0.log",
+    "l2r": 0.7146,
+    "r2l": 0.7299,
+    "avg_hits1": 0.7222500000000001
+  },
+  {
+    "name": "local_csls10_tau1.00_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau1.00_s0.90_gpu0.log",
+    "l2r": 0.7146,
+    "r2l": 0.7297,
+    "avg_hits1": 0.7221500000000001
+  },
+  {
+    "name": "local_csls10_tau1.05_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau1.05_s1.00_gpu0.log",
+    "l2r": 0.7146,
+    "r2l": 0.7294,
+    "avg_hits1": 0.722
+  },
+  {
+    "name": "local_csls10_tau0.95_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau0.95_s0.90_gpu1.log",
+    "l2r": 0.7145,
+    "r2l": 0.7282,
+    "avg_hits1": 0.7213499999999999
+  },
+  {
+    "name": "base_csls10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/base_csls10_gpu1.log",
+    "l2r": 0.7135,
+    "r2l": 0.7277,
+    "avg_hits1": 0.7206
+  },
+  {
+    "name": "local_csls10_tau1.00_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau1.00_s1.00_gpu1.log",
+    "l2r": 0.7135,
+    "r2l": 0.7277,
+    "avg_hits1": 0.7206
+  },
+  {
+    "name": "local_csls10_tau1.05_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau1.05_s1.10_gpu1.log",
+    "l2r": 0.7134,
+    "r2l": 0.7274,
+    "avg_hits1": 0.7204
+  },
+  {
+    "name": "dist1_csls3",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/dist1_csls3_gpu2.log",
+    "l2r": 0.7148,
+    "r2l": 0.7247,
+    "avg_hits1": 0.71975
+  },
+  {
+    "name": "local_csls10_tau0.90_s0.90",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau0.90_s0.90_gpu2.log",
+    "l2r": 0.7117,
+    "r2l": 0.7263,
+    "avg_hits1": 0.719
+  },
+  {
+    "name": "local_csls10_tau1.00_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau1.00_s1.10_gpu2.log",
+    "l2r": 0.7112,
+    "r2l": 0.726,
+    "avg_hits1": 0.7186
+  },
+  {
+    "name": "local_csls10_tau0.95_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau0.95_s1.00_gpu2.log",
+    "l2r": 0.7107,
+    "r2l": 0.726,
+    "avg_hits1": 0.71835
+  },
+  {
+    "name": "local_csls10_tau0.90_s1.00",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau0.90_s1.00_gpu3.log",
+    "l2r": 0.7096,
+    "r2l": 0.7255,
+    "avg_hits1": 0.71755
+  },
+  {
+    "name": "local_csls10_tau0.95_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau0.95_s1.10_gpu3.log",
+    "l2r": 0.7089,
+    "r2l": 0.7254,
+    "avg_hits1": 0.71715
+  },
+  {
+    "name": "dist1_csls5",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/dist1_csls5_gpu3.log",
+    "l2r": 0.709,
+    "r2l": 0.7222,
+    "avg_hits1": 0.7156
+  },
+  {
+    "name": "local_csls10_tau0.90_s1.10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/local_csls10_tau0.90_s1.10_gpu0.log",
+    "l2r": 0.7078,
+    "r2l": 0.7216,
+    "avg_hits1": 0.7147
+  },
+  {
+    "name": "base_csls20",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/base_csls20_gpu2.log",
+    "l2r": 0.7023,
+    "r2l": 0.7199,
+    "avg_hits1": 0.7111000000000001
+  },
+  {
+    "name": "dist1_csls10",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/dist1_csls10_gpu0.log",
+    "l2r": 0.6986,
+    "r2l": 0.7165,
+    "avg_hits1": 0.70755
+  },
+  {
+    "name": "base_csls50",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/base_csls50_gpu3.log",
+    "l2r": 0.6944,
+    "r2l": 0.7129,
+    "avg_hits1": 0.70365
+  },
+  {
+    "name": "base_nocsls",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/base_nocsls_gpu0.log",
+    "l2r": 0.6745,
+    "r2l": 0.698,
+    "avg_hits1": 0.68625
+  },
+  {
+    "name": "dist1_nocsls",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/cdmr_prior_infer_sweeps/cdmr_prior_infer_0511_013053/dist1_nocsls_gpu1.log",
+    "l2r": 0.6556,
+    "r2l": 0.6799,
+    "avg_hits1": 0.66775
+  }
+]

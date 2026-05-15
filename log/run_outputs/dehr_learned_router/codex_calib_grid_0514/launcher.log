@@ -1,0 +1,5 @@
+[launch] gpu=0 name=calib_lr5e3_c035_m004_e25 lr=5e-3 clamp=0.35 scale=0.35 margin=0.04 epochs=25 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_learned_router/codex_calib_grid_0514/calib_lr5e3_c035_m004_e25.log
+[launch] gpu=1 name=calib_lr1e2_c025_m004_e25 lr=1e-2 clamp=0.25 scale=0.25 margin=0.04 epochs=25 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_learned_router/codex_calib_grid_0514/calib_lr1e2_c025_m004_e25.log
+[launch] gpu=2 name=calib_lr1e2_c035_m008_e20 lr=1e-2 clamp=0.35 scale=0.35 margin=0.08 epochs=20 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_learned_router/codex_calib_grid_0514/calib_lr1e2_c035_m008_e20.log
+[launch] gpu=3 name=calib_lr2e2_c025_m008_e15 lr=2e-2 clamp=0.25 scale=0.25 margin=0.08 epochs=15 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_learned_router/codex_calib_grid_0514/calib_lr2e2_c025_m008_e15.log
+[done]

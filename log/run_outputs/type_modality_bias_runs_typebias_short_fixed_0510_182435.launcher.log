@@ -1,0 +1,5 @@
+nohup: ignoring input
+[launch] gpu=0 name=typebias_lr1e3_l2_1e2_s025 lr=1e-3 l2=1e-2 scale=0.25 scheduler=fixed log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/type_modality_bias_runs/typebias_short_fixed_0510_182435/typebias_lr1e3_l2_1e2_s025_gpu0.log
+[launch] gpu=1 name=typebias_lr1e3_l2_1e2_s05 lr=1e-3 l2=1e-2 scale=0.5 scheduler=fixed log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/type_modality_bias_runs/typebias_short_fixed_0510_182435/typebias_lr1e3_l2_1e2_s05_gpu1.log
+[launch] gpu=2 name=typebias_lr1e3_l2_1e2_s10 lr=1e-3 l2=1e-2 scale=1.0 scheduler=fixed log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/type_modality_bias_runs/typebias_short_fixed_0510_182435/typebias_lr1e3_l2_1e2_s10_gpu2.log
+[launch] gpu=3 name=typebias_lr1e3_l2_1e1_s025 lr=1e-3 l2=1e-1 scale=0.25 scheduler=fixed log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/type_modality_bias_runs/typebias_short_fixed_0510_182435/typebias_lr1e3_l2_1e1_s025_gpu3.log

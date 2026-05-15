@@ -1,0 +1,44 @@
+[
+  {
+    "name": "baseline_r02_gpu1",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/fbdb_rates_baseline_cdmr/fbdb_rates_cdmr_0511_104108/baseline_r02_gpu1.log",
+    "l2r": 0.5281,
+    "r2l": 0.5298,
+    "avg_hits1": 0.52895
+  },
+  {
+    "name": "baseline_r05_gpu2",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/fbdb_rates_baseline_cdmr/fbdb_rates_cdmr_0511_104108/baseline_r05_gpu2.log",
+    "l2r": 0.7112,
+    "r2l": 0.7187,
+    "avg_hits1": 0.71495
+  },
+  {
+    "name": "baseline_r08_gpu3",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/fbdb_rates_baseline_cdmr/fbdb_rates_cdmr_0511_104108/baseline_r08_gpu3.log",
+    "l2r": 0.8086,
+    "r2l": 0.8058,
+    "avg_hits1": 0.8071999999999999
+  },
+  {
+    "name": "cdmr_r02_gpu1",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/fbdb_rates_baseline_cdmr/fbdb_rates_cdmr_0511_104108/cdmr_r02_gpu1.log",
+    "l2r": 0.5852,
+    "r2l": 0.5945,
+    "avg_hits1": 0.58985
+  },
+  {
+    "name": "cdmr_r05_gpu2",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/fbdb_rates_baseline_cdmr/fbdb_rates_cdmr_0511_104108/cdmr_r05_gpu2.log",
+    "l2r": 0.7325,
+    "r2l": 0.7436,
+    "avg_hits1": 0.7380500000000001
+  },
+  {
+    "name": "cdmr_r08_gpu3",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/fbdb_rates_baseline_cdmr/fbdb_rates_cdmr_0511_104108/cdmr_r08_gpu3.log",
+    "l2r": 0.8245,
+    "r2l": 0.8265,
+    "avg_hits1": 0.8255
+  }
+]

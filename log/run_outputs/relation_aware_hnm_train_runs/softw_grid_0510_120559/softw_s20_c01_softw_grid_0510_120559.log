@@ -1,0 +1,6 @@
+[START] exp_id=softw_s20_c01_softw_grid_0510_120559 mode=soft gpu=1 safe=2.0 close=0.1
+Traceback (most recent call last):
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/main.py", line 20, in <module>
+    from src.loss_upper_bound_probe import run_loss_upper_bound_probe
+ModuleNotFoundError: No module named 'src.loss_upper_bound_probe'
+[FAIL] exp_id=softw_s20_c01_softw_grid_0510_120559 mode=soft gpu=1

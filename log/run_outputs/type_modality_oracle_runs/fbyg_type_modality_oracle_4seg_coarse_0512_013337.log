@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/audit_type_modality_oracle_sweep.py", line 735, in <module>
+    main()
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/audit_type_modality_oracle_sweep.py", line 488, in main
+    torch.cuda.set_device(args.gpu)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/cuda/__init__.py", line 529, in set_device
+    torch._C._cuda_setDevice(device)
+RuntimeError: CUDA error: invalid device ordinal
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+

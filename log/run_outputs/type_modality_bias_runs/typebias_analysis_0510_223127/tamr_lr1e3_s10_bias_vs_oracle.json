@@ -1,0 +1,300 @@
+{
+  "checkpoint": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_tamr_lr1e3_s10_typebias_0510_223127_.pkl",
+  "oracle_json": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/type_modality_oracle_4seg_refine_0510_193727.json",
+  "modal_names": [
+    "img",
+    "attr",
+    "rel",
+    "graph"
+  ],
+  "type_names": [
+    "Person",
+    "Place",
+    "Organization",
+    "Creative Work",
+    "Event",
+    "Entity"
+  ],
+  "learned": {
+    "Person": {
+      "img": {
+        "bias": -0.04709627106785774,
+        "exp_bias": 0.9539955509989312
+      },
+      "attr": {
+        "bias": -0.14316070079803467,
+        "exp_bias": 0.8666147920161702
+      },
+      "rel": {
+        "bias": -0.14340464770793915,
+        "exp_bias": 0.8664034097996479
+      },
+      "graph": {
+        "bias": 0.1489166021347046,
+        "exp_bias": 1.160576195595726
+      }
+    },
+    "Place": {
+      "img": {
+        "bias": 0.10236015170812607,
+        "exp_bias": 1.107782369604391
+      },
+      "attr": {
+        "bias": -0.14127030968666077,
+        "exp_bias": 0.8682545823501922
+      },
+      "rel": {
+        "bias": -0.14022837579250336,
+        "exp_bias": 0.8691597176920094
+      },
+      "graph": {
+        "bias": 0.1469142585992813,
+        "exp_bias": 1.158254648396286
+      }
+    },
+    "Organization": {
+      "img": {
+        "bias": 0.07788318395614624,
+        "exp_bias": 1.0809963735743828
+      },
+      "attr": {
+        "bias": -0.13986515998840332,
+        "exp_bias": 0.8694754675769651
+      },
+      "rel": {
+        "bias": -0.13804064691066742,
+        "exp_bias": 0.8710632849946849
+      },
+      "graph": {
+        "bias": 0.14617466926574707,
+        "exp_bias": 1.1573983323129693
+      }
+    },
+    "Creative Work": {
+      "img": {
+        "bias": -0.16355040669441223,
+        "exp_bias": 0.8491236964041414
+      },
+      "attr": {
+        "bias": -0.13873066008090973,
+        "exp_bias": 0.8704624471727683
+      },
+      "rel": {
+        "bias": -0.1386694610118866,
+        "exp_bias": 0.8705157202942709
+      },
+      "graph": {
+        "bias": 0.14385546743869781,
+        "exp_bias": 1.1547172022286891
+      }
+    },
+    "Event": {
+      "img": {
+        "bias": 0.11000699549913406,
+        "exp_bias": 1.1162858794084602
+      },
+      "attr": {
+        "bias": -0.1393783539533615,
+        "exp_bias": 0.8698988365228205
+      },
+      "rel": {
+        "bias": -0.08559507876634598,
+        "exp_bias": 0.917965859843333
+      },
+      "graph": {
+        "bias": 0.14746786653995514,
+        "exp_bias": 1.1588960448916754
+      }
+    },
+    "Entity": {
+      "img": {
+        "bias": 0.0,
+        "exp_bias": 1.0
+      },
+      "attr": {
+        "bias": 0.0,
+        "exp_bias": 1.0
+      },
+      "rel": {
+        "bias": 0.0,
+        "exp_bias": 1.0
+      },
+      "graph": {
+        "bias": 0.0,
+        "exp_bias": 1.0
+      }
+    }
+  },
+  "oracle_scales": {
+    "Person": {
+      "img": 0.7,
+      "attr": 1.1,
+      "rel": 0.7,
+      "graph": 1.2
+    },
+    "Place": {
+      "img": 0.6,
+      "attr": 0.8,
+      "rel": 0.9,
+      "graph": 1.3
+    },
+    "Organization": {
+      "img": 0.7,
+      "attr": 0.8,
+      "rel": 0.8,
+      "graph": 1.3
+    },
+    "Creative Work": {
+      "img": 0.6,
+      "attr": 1.0,
+      "rel": 0.7,
+      "graph": 1.5
+    }
+  },
+  "rows": [
+    {
+      "type": "Person",
+      "modal": "img",
+      "learned_bias": -0.04709627106785774,
+      "learned_exp_bias": 0.9539955509989312,
+      "oracle_scale": 0.7,
+      "oracle_log_scale": -0.35667494393873245,
+      "same_direction": true
+    },
+    {
+      "type": "Person",
+      "modal": "attr",
+      "learned_bias": -0.14316070079803467,
+      "learned_exp_bias": 0.8666147920161702,
+      "oracle_scale": 1.1,
+      "oracle_log_scale": 0.09531017980432493,
+      "same_direction": false
+    },
+    {
+      "type": "Person",
+      "modal": "rel",
+      "learned_bias": -0.14340464770793915,
+      "learned_exp_bias": 0.8664034097996479,
+      "oracle_scale": 0.7,
+      "oracle_log_scale": -0.35667494393873245,
+      "same_direction": true
+    },
+    {
+      "type": "Person",
+      "modal": "graph",
+      "learned_bias": 0.1489166021347046,
+      "learned_exp_bias": 1.160576195595726,
+      "oracle_scale": 1.2,
+      "oracle_log_scale": 0.1823215567939546,
+      "same_direction": true
+    },
+    {
+      "type": "Place",
+      "modal": "img",
+      "learned_bias": 0.10236015170812607,
+      "learned_exp_bias": 1.107782369604391,
+      "oracle_scale": 0.6,
+      "oracle_log_scale": -0.5108256237659907,
+      "same_direction": false
+    },
+    {
+      "type": "Place",
+      "modal": "attr",
+      "learned_bias": -0.14127030968666077,
+      "learned_exp_bias": 0.8682545823501922,
+      "oracle_scale": 0.8,
+      "oracle_log_scale": -0.2231435513142097,
+      "same_direction": true
+    },
+    {
+      "type": "Place",
+      "modal": "rel",
+      "learned_bias": -0.14022837579250336,
+      "learned_exp_bias": 0.8691597176920094,
+      "oracle_scale": 0.9,
+      "oracle_log_scale": -0.10536051565782628,
+      "same_direction": true
+    },
+    {
+      "type": "Place",
+      "modal": "graph",
+      "learned_bias": 0.1469142585992813,
+      "learned_exp_bias": 1.158254648396286,
+      "oracle_scale": 1.3,
+      "oracle_log_scale": 0.26236426446749106,
+      "same_direction": true
+    },
+    {
+      "type": "Organization",
+      "modal": "img",
+      "learned_bias": 0.07788318395614624,
+      "learned_exp_bias": 1.0809963735743828,
+      "oracle_scale": 0.7,
+      "oracle_log_scale": -0.35667494393873245,
+      "same_direction": false
+    },
+    {
+      "type": "Organization",
+      "modal": "attr",
+      "learned_bias": -0.13986515998840332,
+      "learned_exp_bias": 0.8694754675769651,
+      "oracle_scale": 0.8,
+      "oracle_log_scale": -0.2231435513142097,
+      "same_direction": true
+    },
+    {
+      "type": "Organization",
+      "modal": "rel",
+      "learned_bias": -0.13804064691066742,
+      "learned_exp_bias": 0.8710632849946849,
+      "oracle_scale": 0.8,
+      "oracle_log_scale": -0.2231435513142097,
+      "same_direction": true
+    },
+    {
+      "type": "Organization",
+      "modal": "graph",
+      "learned_bias": 0.14617466926574707,
+      "learned_exp_bias": 1.1573983323129693,
+      "oracle_scale": 1.3,
+      "oracle_log_scale": 0.26236426446749106,
+      "same_direction": true
+    },
+    {
+      "type": "Creative Work",
+      "modal": "img",
+      "learned_bias": -0.16355040669441223,
+      "learned_exp_bias": 0.8491236964041414,
+      "oracle_scale": 0.6,
+      "oracle_log_scale": -0.5108256237659907,
+      "same_direction": true
+    },
+    {
+      "type": "Creative Work",
+      "modal": "attr",
+      "learned_bias": -0.13873066008090973,
+      "learned_exp_bias": 0.8704624471727683,
+      "oracle_scale": 1.0,
+      "oracle_log_scale": 0.0,
+      "same_direction": false
+    },
+    {
+      "type": "Creative Work",
+      "modal": "rel",
+      "learned_bias": -0.1386694610118866,
+      "learned_exp_bias": 0.8705157202942709,
+      "oracle_scale": 0.7,
+      "oracle_log_scale": -0.35667494393873245,
+      "same_direction": true
+    },
+    {
+      "type": "Creative Work",
+      "modal": "graph",
+      "learned_bias": 0.14385546743869781,
+      "learned_exp_bias": 1.1547172022286891,
+      "oracle_scale": 1.5,
+      "oracle_log_scale": 0.4054651081081644,
+      "same_direction": true
+    }
+  ]
+}

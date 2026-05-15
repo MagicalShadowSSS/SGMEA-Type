@@ -1,0 +1,90 @@
+{
+  "fbdb15k_r05": {
+    "full": {
+      "setting": "train_pseudo",
+      "pair_source": "train_pseudo",
+      "pseudo_links": 4510,
+      "val_avg": 0.9053,
+      "h1_avg": 0.7441,
+      "mrr_avg": 0.7970
+    },
+    "train_only": {
+      "pair_source": "train",
+      "pseudo_links": 0,
+      "val_avg": 0.9996,
+      "h1_avg": 0.66655,
+      "mrr_avg": 0.7365,
+      "delta_h1_vs_full": -0.07755
+    },
+    "pseudo_only": {
+      "pair_source": "pseudo",
+      "pseudo_links": 4510,
+      "val_avg": 0.7483,
+      "h1_avg": 0.74405,
+      "mrr_avg": 0.7970,
+      "delta_h1_vs_full": -0.00005
+    },
+    "pairwise_only": {
+      "val_avg": 0.9015,
+      "h1_avg": 0.7438,
+      "mrr_avg": 0.7965,
+      "delta_h1_vs_full": -0.0003
+    },
+    "stats_no_pairwise": {
+      "val_avg": 0.9053,
+      "h1_avg": 0.7441,
+      "mrr_avg": 0.7970,
+      "delta_h1_vs_full": 0.0
+    },
+    "drop_projected_token": {
+      "val_avg": 0.8992,
+      "h1_avg": 0.7434,
+      "mrr_avg": 0.7965,
+      "delta_h1_vs_full": -0.0007
+    }
+  },
+  "fbyg15k_r05": {
+    "full": {
+      "setting": "train_pseudo",
+      "pair_source": "train_pseudo",
+      "pseudo_links": 4324,
+      "val_avg": 0.9202,
+      "h1_avg": 0.82395,
+      "mrr_avg": 0.8670
+    },
+    "train_only": {
+      "pair_source": "train",
+      "pseudo_links": 0,
+      "val_avg": 1.0,
+      "h1_avg": 0.6801,
+      "mrr_avg": 0.7530,
+      "delta_h1_vs_full": -0.14385
+    },
+    "pseudo_only": {
+      "pair_source": "pseudo",
+      "pseudo_links": 4324,
+      "val_avg": 0.8058,
+      "h1_avg": 0.82565,
+      "mrr_avg": 0.8675,
+      "delta_h1_vs_full": 0.0017
+    },
+    "pairwise_only": {
+      "val_avg": 0.9193,
+      "h1_avg": 0.8239,
+      "mrr_avg": 0.8665,
+      "delta_h1_vs_full": -0.00005
+    },
+    "stats_no_pairwise": {
+      "val_avg": 0.9163,
+      "h1_avg": 0.82165,
+      "mrr_avg": 0.8655,
+      "delta_h1_vs_full": -0.0023
+    },
+    "drop_projected_token": {
+      "val_avg": 0.9174,
+      "h1_avg": 0.8213,
+      "mrr_avg": 0.8650,
+      "delta_h1_vs_full": -0.00265
+    }
+  }
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "name": "dehr_dehr_completion_a07_fbdb_r05_0513_013345_FBDB15K_r05_blr5e4_rho0.5-0.7-0.9-1.1_m2.0_gpu2",
+    "log": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dehr_typescale_sweep/dehr_completion_a07_fbdb_r05_0513_013345/dehr_dehr_completion_a07_fbdb_r05_0513_013345_FBDB15K_r05_blr5e4_rho0.5-0.7-0.9-1.1_m2.0_gpu2.log",
+    "rho": "0.5021,0.7026,0.9028,1.1028,1.1028,1.0970",
+    "l2r": 0.7333,
+    "r2l": 0.7425,
+    "avg_hits1": 0.7379
+  }
+]

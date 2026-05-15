@@ -1,0 +1,2575 @@
+nohup: ignoring input
+============================================================
+[PIPELINE] FBDB Relation-Aware HNM Full
+[CODE_ROOT] /gly/tongqiang/dongyufeng/Mode-Test/SGMEA
+[DATA_ROOT] /gly/tongqiang/dongyufeng/data/mmkg
+[DATA_CHOICE] FBDB15K
+[DATA_SPLIT] norm
+[DATA_RATE] 0.5
+[CKPT_NAME] SGMEA_FBDB15K_0.5_rebuild_gpu0_
+[TYPE_JSONL_FIXED] /gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl
+[OUT_DIR] /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm
+[LLM_PATH] /gly/tongqiang/lxwlxwlxw/HomeBenchReproduction/models/llama3-8b-Instruct
+[GPU_IDS] 0,1,2,3
+[SINGLE_GPU] 0
+[LLM_HNM_TOPN] 5
+[HNM_BUDGET_UNIT] anchors
+[HNM_MIN_CASES] 200
+[HNM_MAX_CASES] 1000
+[HNM_THRESHOLD] 0.40
+[HNM_FALLBACK_THRESHOLD] 0.35
+[HNM_WRITE_QUALITY] all
+[LABEL_DISTRIBUTED] 1
+[LABEL_MULTI_GPU_MIN_CASES] 1
+[KEEP_STATUSES] closely_related,safe_negative
+[KEEP_COARSE_TYPES] Person,Place,Creative Work,Organization
+[PRETRAIN_MARGIN_BASE] 0.5
+[PRETRAIN_MARGIN_SWEEP] 0.2,0.5,0.6,0.7,0.8,1.0
+============================================================
+[STAGE 1] Run relation-aware HNM data pipeline
+============================================================
+[PIPELINE] Phase 5 Relation-Aware HNM Data
+[CODE_ROOT] /gly/tongqiang/dongyufeng/Mode-Test/SGMEA
+[DATA_ROOT] /gly/tongqiang/dongyufeng/data/mmkg
+[DATA_CHOICE] FBDB15K
+[DATA_SPLIT] norm
+[DATA_RATE] 0.5
+[CKPT_NAME] SGMEA_FBDB15K_0.5_rebuild_gpu0_
+[TYPE_JSONL_FIXED] /gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl
+[OUT_DIR] /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm
+[LLM_PATH] /gly/tongqiang/lxwlxwlxw/HomeBenchReproduction/models/llama3-8b-Instruct
+[SINGLE_GPU] 0
+[GPU_IDS] 0,1,2,3
+[RESUME] 0
+[LLM_HNM_TOPN] 5
+[HNM_BUDGET_UNIT] anchors
+[HNM_MIN_CASES] 200
+[HNM_MAX_CASES] 1000
+[EFFECTIVE_HNM_MIN_ROWS] 1000
+[EFFECTIVE_HNM_MAX_ROWS] 5000
+[HNM_TYPES] Person,Place,Creative Work,Organization
+[LABEL_DISTRIBUTED] 1
+[LABEL_MULTI_GPU_MIN_CASES] 1
+============================================================
+[EXTRACT] Person -> budget_unit=anchors min_rows=1000 max_rows=5000
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+loaded checkpoint: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_rebuild_gpu0_.pkl
+TAGHNMCache[joint][right][Person] rows=2269 avg_valid=32.0000 avg_sim=0.2883 avg_top1=0.3609 avg_topk=0.2883 p50_top1=0.3562 p90_top1=0.4239 max_top1=0.6562 empty_ratio=0.0000
+TAGHNMCache[joint][right][Organization] rows=834 avg_valid=32.0000 avg_sim=0.3412 avg_top1=0.4194 avg_topk=0.3412 p50_top1=0.4149 p90_top1=0.5024 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][right][Place] rows=1286 avg_valid=32.0000 avg_sim=0.3181 avg_top1=0.4069 avg_topk=0.3181 p50_top1=0.4019 p90_top1=0.4949 max_top1=0.8182 empty_ratio=0.0000
+TAGHNMCache[joint][right][Creative Work] rows=1135 avg_valid=32.0000 avg_sim=0.2903 avg_top1=0.3619 avg_topk=0.2903 p50_top1=0.3501 p90_top1=0.4359 max_top1=0.5652 empty_ratio=0.0000
+TAGHNMCache[joint][right][overall] rows=5524 avg_valid=32.0000 avg_sim=0.3036 avg_top1=0.3807 avg_topk=0.3036 p50_top1=0.3703 p90_top1=0.4682 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Person] rows=2197 avg_valid=32.0000 avg_sim=0.2848 avg_top1=0.3582 avg_topk=0.2848 p50_top1=0.3563 p90_top1=0.4318 max_top1=0.6098 empty_ratio=0.0000
+TAGHNMCache[joint][left][Organization] rows=955 avg_valid=32.0000 avg_sim=0.3304 avg_top1=0.4063 avg_topk=0.3304 p50_top1=0.4023 p90_top1=0.4958 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Place] rows=1249 avg_valid=32.0000 avg_sim=0.3218 avg_top1=0.4161 avg_topk=0.3218 p50_top1=0.4147 p90_top1=0.5069 max_top1=0.8548 empty_ratio=0.0000
+TAGHNMCache[joint][left][Creative Work] rows=1250 avg_valid=32.0000 avg_sim=0.2842 avg_top1=0.3504 avg_topk=0.2842 p50_top1=0.3519 p90_top1=0.4341 max_top1=0.5857 empty_ratio=0.0000
+TAGHNMCache[joint][left][overall] rows=5651 avg_valid=32.0000 avg_sim=0.3005 avg_top1=0.3774 avg_topk=0.3005 p50_top1=0.3718 p90_top1=0.4724 max_top1=0.9282 empty_ratio=0.0000
+LLM HNM evidence summary | high=1561 low=2709
+LLM HNM evidence notes | low_combined_attr=2314 low_negative_attr=2240 low_positive_attr=2210
+wrote 4270 LLM HNM cases to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_cases_top5.jsonl (type=Person, threshold=0.40)
+[EXTRACT] Place -> budget_unit=anchors min_rows=1000 max_rows=5000
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+loaded checkpoint: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_rebuild_gpu0_.pkl
+TAGHNMCache[joint][right][Person] rows=2269 avg_valid=32.0000 avg_sim=0.2883 avg_top1=0.3609 avg_topk=0.2883 p50_top1=0.3562 p90_top1=0.4239 max_top1=0.6562 empty_ratio=0.0000
+TAGHNMCache[joint][right][Organization] rows=834 avg_valid=32.0000 avg_sim=0.3412 avg_top1=0.4194 avg_topk=0.3412 p50_top1=0.4149 p90_top1=0.5024 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][right][Place] rows=1286 avg_valid=32.0000 avg_sim=0.3181 avg_top1=0.4069 avg_topk=0.3181 p50_top1=0.4019 p90_top1=0.4949 max_top1=0.8182 empty_ratio=0.0000
+TAGHNMCache[joint][right][Creative Work] rows=1135 avg_valid=32.0000 avg_sim=0.2903 avg_top1=0.3619 avg_topk=0.2903 p50_top1=0.3501 p90_top1=0.4359 max_top1=0.5652 empty_ratio=0.0000
+TAGHNMCache[joint][right][overall] rows=5524 avg_valid=32.0000 avg_sim=0.3036 avg_top1=0.3807 avg_topk=0.3036 p50_top1=0.3703 p90_top1=0.4682 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Person] rows=2197 avg_valid=32.0000 avg_sim=0.2848 avg_top1=0.3582 avg_topk=0.2848 p50_top1=0.3563 p90_top1=0.4318 max_top1=0.6098 empty_ratio=0.0000
+TAGHNMCache[joint][left][Organization] rows=955 avg_valid=32.0000 avg_sim=0.3304 avg_top1=0.4063 avg_topk=0.3304 p50_top1=0.4023 p90_top1=0.4958 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Place] rows=1249 avg_valid=32.0000 avg_sim=0.3218 avg_top1=0.4161 avg_topk=0.3218 p50_top1=0.4147 p90_top1=0.5069 max_top1=0.8548 empty_ratio=0.0000
+TAGHNMCache[joint][left][Creative Work] rows=1250 avg_valid=32.0000 avg_sim=0.2842 avg_top1=0.3504 avg_topk=0.2842 p50_top1=0.3519 p90_top1=0.4341 max_top1=0.5857 empty_ratio=0.0000
+TAGHNMCache[joint][left][overall] rows=5651 avg_valid=32.0000 avg_sim=0.3005 avg_top1=0.3774 avg_topk=0.3005 p50_top1=0.3718 p90_top1=0.4724 max_top1=0.9282 empty_ratio=0.0000
+LLM HNM evidence summary | high=4379 low=621
+LLM HNM evidence notes | low_combined_attr=409 low_negative_attr=436 low_positive_attr=445
+wrote 5000 LLM HNM cases to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_cases_top5.jsonl (type=Place, threshold=0.40)
+[EXTRACT] Creative Work -> budget_unit=anchors min_rows=1000 max_rows=5000
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+loaded checkpoint: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_rebuild_gpu0_.pkl
+TAGHNMCache[joint][right][Person] rows=2269 avg_valid=32.0000 avg_sim=0.2883 avg_top1=0.3609 avg_topk=0.2883 p50_top1=0.3562 p90_top1=0.4239 max_top1=0.6562 empty_ratio=0.0000
+TAGHNMCache[joint][right][Organization] rows=834 avg_valid=32.0000 avg_sim=0.3412 avg_top1=0.4194 avg_topk=0.3412 p50_top1=0.4149 p90_top1=0.5024 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][right][Place] rows=1286 avg_valid=32.0000 avg_sim=0.3181 avg_top1=0.4069 avg_topk=0.3181 p50_top1=0.4019 p90_top1=0.4949 max_top1=0.8182 empty_ratio=0.0000
+TAGHNMCache[joint][right][Creative Work] rows=1135 avg_valid=32.0000 avg_sim=0.2903 avg_top1=0.3619 avg_topk=0.2903 p50_top1=0.3501 p90_top1=0.4359 max_top1=0.5652 empty_ratio=0.0000
+TAGHNMCache[joint][right][overall] rows=5524 avg_valid=32.0000 avg_sim=0.3036 avg_top1=0.3807 avg_topk=0.3036 p50_top1=0.3703 p90_top1=0.4682 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Person] rows=2197 avg_valid=32.0000 avg_sim=0.2848 avg_top1=0.3582 avg_topk=0.2848 p50_top1=0.3563 p90_top1=0.4318 max_top1=0.6098 empty_ratio=0.0000
+TAGHNMCache[joint][left][Organization] rows=955 avg_valid=32.0000 avg_sim=0.3304 avg_top1=0.4063 avg_topk=0.3304 p50_top1=0.4023 p90_top1=0.4958 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Place] rows=1249 avg_valid=32.0000 avg_sim=0.3218 avg_top1=0.4161 avg_topk=0.3218 p50_top1=0.4147 p90_top1=0.5069 max_top1=0.8548 empty_ratio=0.0000
+TAGHNMCache[joint][left][Creative Work] rows=1250 avg_valid=32.0000 avg_sim=0.2842 avg_top1=0.3504 avg_topk=0.2842 p50_top1=0.3519 p90_top1=0.4341 max_top1=0.5857 empty_ratio=0.0000
+TAGHNMCache[joint][left][overall] rows=5651 avg_valid=32.0000 avg_sim=0.3005 avg_top1=0.3774 avg_topk=0.3005 p50_top1=0.3718 p90_top1=0.4724 max_top1=0.9282 empty_ratio=0.0000
+LLM HNM evidence summary | high=1031 low=1314
+LLM HNM evidence notes | low_combined_attr=1284 low_negative_attr=1247 low_positive_attr=1250
+wrote 2345 LLM HNM cases to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_cases_top5.jsonl (type=Creative Work, threshold=0.40)
+[EXTRACT] Organization -> budget_unit=anchors min_rows=1000 max_rows=5000
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+loaded checkpoint: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_rebuild_gpu0_.pkl
+TAGHNMCache[joint][right][Person] rows=2269 avg_valid=32.0000 avg_sim=0.2883 avg_top1=0.3609 avg_topk=0.2883 p50_top1=0.3562 p90_top1=0.4239 max_top1=0.6562 empty_ratio=0.0000
+TAGHNMCache[joint][right][Organization] rows=834 avg_valid=32.0000 avg_sim=0.3412 avg_top1=0.4194 avg_topk=0.3412 p50_top1=0.4149 p90_top1=0.5024 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][right][Place] rows=1286 avg_valid=32.0000 avg_sim=0.3181 avg_top1=0.4069 avg_topk=0.3181 p50_top1=0.4019 p90_top1=0.4949 max_top1=0.8182 empty_ratio=0.0000
+TAGHNMCache[joint][right][Creative Work] rows=1135 avg_valid=32.0000 avg_sim=0.2903 avg_top1=0.3619 avg_topk=0.2903 p50_top1=0.3501 p90_top1=0.4359 max_top1=0.5652 empty_ratio=0.0000
+TAGHNMCache[joint][right][overall] rows=5524 avg_valid=32.0000 avg_sim=0.3036 avg_top1=0.3807 avg_topk=0.3036 p50_top1=0.3703 p90_top1=0.4682 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Person] rows=2197 avg_valid=32.0000 avg_sim=0.2848 avg_top1=0.3582 avg_topk=0.2848 p50_top1=0.3563 p90_top1=0.4318 max_top1=0.6098 empty_ratio=0.0000
+TAGHNMCache[joint][left][Organization] rows=955 avg_valid=32.0000 avg_sim=0.3304 avg_top1=0.4063 avg_topk=0.3304 p50_top1=0.4023 p90_top1=0.4958 max_top1=0.9282 empty_ratio=0.0000
+TAGHNMCache[joint][left][Place] rows=1249 avg_valid=32.0000 avg_sim=0.3218 avg_top1=0.4161 avg_topk=0.3218 p50_top1=0.4147 p90_top1=0.5069 max_top1=0.8548 empty_ratio=0.0000
+TAGHNMCache[joint][left][Creative Work] rows=1250 avg_valid=32.0000 avg_sim=0.2842 avg_top1=0.3504 avg_topk=0.2842 p50_top1=0.3519 p90_top1=0.4341 max_top1=0.5857 empty_ratio=0.0000
+TAGHNMCache[joint][left][overall] rows=5651 avg_valid=32.0000 avg_sim=0.3005 avg_top1=0.3774 avg_topk=0.3005 p50_top1=0.3718 p90_top1=0.4724 max_top1=0.9282 empty_ratio=0.0000
+LLM HNM evidence summary | high=1364 low=3551
+LLM HNM evidence notes | low_combined_attr=3176 low_negative_attr=3214 low_positive_attr=2975
+wrote 4915 LLM HNM cases to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_organization_train_hnm_cases_top5.jsonl (type=Organization, threshold=0.40)
+[LABEL] person
+[LABEL] person -> multi-gpu (0,1,2,3) because case_count=4270
+[INFO] Input: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_cases_top5.jsonl
+[INFO] Output: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_labels_top5.jsonl
+[INFO] Summary: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_labels_top5_summary.json
+[INFO] GPUs: 0,1,2,3
+[INFO] Quality filter: all
+[INFO] Max cases: 10000000
+[INFO] Resume: 0
+[INFO] Splitting input into anchor-group-balanced chunks...
+[INFO] chunk 0: anchor_groups=214 cases=1070 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_person_train_hnm_labels_top5/chunk_0.jsonl
+[INFO] chunk 1: anchor_groups=214 cases=1070 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_person_train_hnm_labels_top5/chunk_1.jsonl
+[INFO] chunk 2: anchor_groups=213 cases=1065 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_person_train_hnm_labels_top5/chunk_2.jsonl
+[INFO] chunk 3: anchor_groups=213 cases=1065 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_person_train_hnm_labels_top5/chunk_3.jsonl
+[START] chunk=3 gpu=3
+[START] chunk=2 gpu=2
+[START] chunk=1 gpu=1
+[START] chunk=0 gpu=0
+[PROGRESS] labeled_rows=0/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=22/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=55/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=86/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=120/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=155/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=185/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=217/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=251/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=284/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=315/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=346/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=380/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=413/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=446/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=476/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=509/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=539/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=572/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=605/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=638/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=668/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=703/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=734/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=766/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=797/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=830/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=861/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=893/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=928/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=959/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=993/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1026/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1059/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1092/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1124/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1155/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1189/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1221/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1256/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1287/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1320/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1352/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1384/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1418/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1448/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1481/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1513/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1545/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1579/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1612/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1644/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1674/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1707/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1739/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1774/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1807/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1838/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1869/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1900/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1933/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1964/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=1997/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2029/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2062/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2096/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2127/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2160/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2192/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2224/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2259/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2294/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2325/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2356/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2387/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2417/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2451/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2485/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2518/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2551/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2584/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2617/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2648/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2680/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2714/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2748/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2781/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2815/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2848/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2880/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2911/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2943/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=2976/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3009/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3041/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3074/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3107/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3140/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3172/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3204/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3237/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3268/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3299/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3332/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3364/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3397/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3430/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3465/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3496/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3528/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3560/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3593/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3623/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3654/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3687/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3720/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3751/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3784/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3815/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3847/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3879/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3909/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3941/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=3972/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=4004/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=4037/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=4069/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=4101/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=4132/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=4167/4270 active_pids=95387 95388 95389 95391
+[DONE] chunk=1 gpu=1
+[PROGRESS] labeled_rows=4196/4270 active_pids=95387 95388 95389 95391
+[DONE] chunk=0 gpu=0
+[PROGRESS] labeled_rows=4215/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=4231/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=4246/4270 active_pids=95387 95388 95389 95391
+[DONE] chunk=3 gpu=3
+[PROGRESS] labeled_rows=4255/4270 active_pids=95387 95388 95389 95391
+[PROGRESS] labeled_rows=4263/4270 active_pids=95387 95388 95389 95391
+[DONE] chunk=2 gpu=2
+[PROGRESS] labeled_rows=4270/4270 active_pids=95387 95388 95389 95391
+[INFO] Merging chunk outputs...
+[INFO] merged rows: 4270
+[INFO] merged output: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_labels_top5.jsonl
+[INFO] merged summary: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_labels_top5_summary.json
+[INFO] Multi-GPU relation-aware HNM labeling finished.
+[LABEL] place
+[LABEL] place -> multi-gpu (0,1,2,3) because case_count=5000
+[INFO] Input: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_cases_top5.jsonl
+[INFO] Output: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_labels_top5.jsonl
+[INFO] Summary: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_labels_top5_summary.json
+[INFO] GPUs: 0,1,2,3
+[INFO] Quality filter: all
+[INFO] Max cases: 10000000
+[INFO] Resume: 0
+[INFO] Splitting input into anchor-group-balanced chunks...
+[INFO] chunk 0: anchor_groups=250 cases=1250 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_place_train_hnm_labels_top5/chunk_0.jsonl
+[INFO] chunk 1: anchor_groups=250 cases=1250 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_place_train_hnm_labels_top5/chunk_1.jsonl
+[INFO] chunk 2: anchor_groups=250 cases=1250 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_place_train_hnm_labels_top5/chunk_2.jsonl
+[INFO] chunk 3: anchor_groups=250 cases=1250 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_place_train_hnm_labels_top5/chunk_3.jsonl
+[START] chunk=0 gpu=0
+[START] chunk=1 gpu=1
+[START] chunk=3 gpu=3
+[START] chunk=2 gpu=2
+[PROGRESS] labeled_rows=0/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=23/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=56/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=86/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=120/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=153/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=187/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=221/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=254/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=289/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=322/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=354/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=389/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=421/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=455/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=488/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=520/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=553/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=586/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=620/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=654/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=684/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=717/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=751/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=785/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=817/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=850/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=884/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=918/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=951/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=985/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1020/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1053/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1085/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1120/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1153/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1186/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1219/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1254/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1286/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1318/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1349/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1382/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1413/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1446/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1479/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1511/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1541/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1575/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1608/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1641/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1672/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1705/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1737/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1769/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1803/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1836/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1869/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1901/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1935/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=1966/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2000/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2031/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2063/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2096/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2128/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2163/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2196/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2229/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2262/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2295/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2328/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2362/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2395/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2428/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2460/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2494/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2528/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2561/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2591/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2624/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2658/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2690/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2721/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2755/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2786/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2820/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2852/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2884/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2920/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2953/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=2984/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3018/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3051/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3082/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3116/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3148/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3181/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3215/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3250/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3282/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3315/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3347/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3379/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3411/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3442/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3474/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3509/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3542/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3574/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3606/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3637/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3670/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3702/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3736/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3768/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3802/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3833/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3866/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3899/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3931/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3964/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=3996/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4030/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4064/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4096/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4131/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4165/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4196/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4229/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4262/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4293/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4325/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4358/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4391/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4425/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4458/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4490/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4521/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4556/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4588/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4620/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4653/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4686/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4720/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4751/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4782/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4817/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4850/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4882/5000 active_pids=3055 3056 3057 3059
+[DONE] chunk=0 gpu=0
+[PROGRESS] labeled_rows=4911/5000 active_pids=3055 3056 3057 3059
+[DONE] chunk=1 gpu=1
+[PROGRESS] labeled_rows=4932/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4948/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4964/5000 active_pids=3055 3056 3057 3059
+[DONE] chunk=3 gpu=3
+[PROGRESS] labeled_rows=4975/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4982/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4990/5000 active_pids=3055 3056 3057 3059
+[PROGRESS] labeled_rows=4998/5000 active_pids=3055 3056 3057 3059
+[DONE] chunk=2 gpu=2
+[PROGRESS] labeled_rows=5000/5000 active_pids=3055 3056 3057 3059
+[INFO] Merging chunk outputs...
+[INFO] merged rows: 5000
+[INFO] merged output: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_labels_top5.jsonl
+[INFO] merged summary: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_labels_top5_summary.json
+[INFO] Multi-GPU relation-aware HNM labeling finished.
+[LABEL] creative_work
+[LABEL] creative_work -> multi-gpu (0,1,2,3) because case_count=2345
+[INFO] Input: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_cases_top5.jsonl
+[INFO] Output: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_labels_top5.jsonl
+[INFO] Summary: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_labels_top5_summary.json
+[INFO] GPUs: 0,1,2,3
+[INFO] Quality filter: all
+[INFO] Max cases: 10000000
+[INFO] Resume: 0
+[INFO] Splitting input into anchor-group-balanced chunks...
+[INFO] chunk 0: anchor_groups=118 cases=590 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_creative_work_train_hnm_labels_top5/chunk_0.jsonl
+[INFO] chunk 1: anchor_groups=117 cases=585 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_creative_work_train_hnm_labels_top5/chunk_1.jsonl
+[INFO] chunk 2: anchor_groups=117 cases=585 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_creative_work_train_hnm_labels_top5/chunk_2.jsonl
+[INFO] chunk 3: anchor_groups=117 cases=585 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_creative_work_train_hnm_labels_top5/chunk_3.jsonl
+[START] chunk=3 gpu=3
+[START] chunk=2 gpu=2
+[START] chunk=0 gpu=0
+[START] chunk=1 gpu=1
+[PROGRESS] labeled_rows=0/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=23/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=55/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=88/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=123/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=157/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=189/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=223/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=256/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=288/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=323/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=356/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=388/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=422/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=455/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=487/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=520/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=552/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=583/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=617/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=650/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=684/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=718/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=749/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=784/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=815/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=849/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=883/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=916/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=949/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=981/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1016/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1049/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1082/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1114/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1148/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1183/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1215/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1249/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1281/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1312/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1344/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1376/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1411/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1444/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1478/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1511/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1543/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1575/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1608/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1638/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1671/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1706/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1738/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1772/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1806/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1837/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1869/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1904/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1936/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1969/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=1999/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=2032/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=2063/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=2095/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=2128/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=2162/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=2198/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=2230/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=2264/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=2298/2345 active_pids=8941 8942 8943 8945
+[DONE] chunk=1 gpu=1
+[DONE] chunk=0 gpu=0
+[PROGRESS] labeled_rows=2325/2345 active_pids=8941 8942 8943 8945
+[PROGRESS] labeled_rows=2339/2345 active_pids=8941 8942 8943 8945
+[DONE] chunk=3 gpu=3
+[DONE] chunk=2 gpu=2
+[PROGRESS] labeled_rows=2345/2345 active_pids=8941 8942 8943 8945
+[INFO] Merging chunk outputs...
+[INFO] merged rows: 2345
+[INFO] merged output: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_labels_top5.jsonl
+[INFO] merged summary: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_labels_top5_summary.json
+[INFO] Multi-GPU relation-aware HNM labeling finished.
+[LABEL] organization
+[LABEL] organization -> multi-gpu (0,1,2,3) because case_count=4915
+[INFO] Input: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_organization_train_hnm_cases_top5.jsonl
+[INFO] Output: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_organization_train_hnm_labels_top5.jsonl
+[INFO] Summary: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_organization_train_hnm_labels_top5_summary.json
+[INFO] GPUs: 0,1,2,3
+[INFO] Quality filter: all
+[INFO] Max cases: 10000000
+[INFO] Resume: 0
+[INFO] Splitting input into anchor-group-balanced chunks...
+[INFO] chunk 0: anchor_groups=246 cases=1230 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_organization_train_hnm_labels_top5/chunk_0.jsonl
+[INFO] chunk 1: anchor_groups=246 cases=1230 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_organization_train_hnm_labels_top5/chunk_1.jsonl
+[INFO] chunk 2: anchor_groups=246 cases=1230 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_organization_train_hnm_labels_top5/chunk_2.jsonl
+[INFO] chunk 3: anchor_groups=245 cases=1225 -> /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_hnm_label_chunks_FBDB15K_05_organization_train_hnm_labels_top5/chunk_3.jsonl
+[START] chunk=3 gpu=3
+[START] chunk=0 gpu=0
+[START] chunk=2 gpu=2
+[START] chunk=1 gpu=1
+[PROGRESS] labeled_rows=0/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=24/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=56/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=90/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=123/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=158/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=192/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=225/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=258/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=290/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=323/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=359/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=392/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=425/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=458/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=492/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=526/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=559/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=590/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=622/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=657/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=692/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=725/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=757/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=793/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=825/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=859/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=891/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=926/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=958/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=992/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1026/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1059/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1092/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1126/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1159/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1194/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1229/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1261/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1295/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1328/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1363/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1396/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1429/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1461/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1494/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1527/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1562/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1596/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1630/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1662/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1698/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1730/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1764/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1798/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1830/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1865/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1900/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1932/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=1967/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2000/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2031/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2064/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2097/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2130/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2165/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2200/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2233/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2268/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2301/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2336/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2368/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2401/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2432/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2464/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2495/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2526/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2556/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2587/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2616/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2642/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2670/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2697/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2724/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2746/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2770/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2793/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2813/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2839/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2865/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2890/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2913/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2936/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2959/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=2982/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3004/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3025/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3047/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3070/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3091/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3114/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3133/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3154/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3177/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3200/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3223/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3242/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3265/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3288/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3310/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3332/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3353/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3375/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3395/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3414/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3434/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3454/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3475/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3493/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3514/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3536/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3557/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3576/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3596/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3617/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3638/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3657/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3680/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3708/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3737/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3767/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3794/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3823/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3852/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3881/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3908/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3939/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3967/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=3996/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4024/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4053/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4081/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4110/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4138/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4169/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4198/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4225/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4254/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4278/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4299/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4321/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4341/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4362/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4383/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4402/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4424/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4445/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4464/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4483/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4505/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4525/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4545/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4565/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4588/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4608/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4628/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4647/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4668/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4689/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4710/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4731/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4750/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4770/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4790/4915 active_pids=12022 12023 12024 12025
+[DONE] chunk=1 gpu=1
+[PROGRESS] labeled_rows=4808/4915 active_pids=12022 12023 12024 12025
+[DONE] chunk=0 gpu=0
+[PROGRESS] labeled_rows=4820/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4830/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4839/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4850/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4860/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4871/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4881/4915 active_pids=12022 12023 12024 12025
+[DONE] chunk=3 gpu=3
+[PROGRESS] labeled_rows=4888/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4893/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4898/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4904/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4909/4915 active_pids=12022 12023 12024 12025
+[PROGRESS] labeled_rows=4914/4915 active_pids=12022 12023 12024 12025
+[DONE] chunk=2 gpu=2
+[PROGRESS] labeled_rows=4915/4915 active_pids=12022 12023 12024 12025
+[INFO] Merging chunk outputs...
+[INFO] merged rows: 4915
+[INFO] merged output: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_organization_train_hnm_labels_top5.jsonl
+[INFO] merged summary: /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_organization_train_hnm_labels_top5_summary.json
+[INFO] Multi-GPU relation-aware HNM labeling finished.
+[AUDIT] person
+===== Relation-Aware HNM Label Audit =====
+{
+  "row_count": 4270,
+  "relationship_status_counts": {
+    "closely_related": 2134,
+    "safe_negative": 2134,
+    "unknown": 2
+  },
+  "evidence_quality_counts": {
+    "high": 1561,
+    "low": 2709
+  },
+  "high_conf_threshold": 0.8,
+  "high_conf_status_counts": {
+    "closely_related": 1979,
+    "safe_negative": 1985
+  },
+  "coarse_type_breakdown": {
+    "Person": {
+      "closely_related": 2134,
+      "safe_negative": 2134,
+      "unknown": 2
+    }
+  },
+  "confidence_by_status": {
+    "closely_related": {
+      "count": 2134,
+      "min": 0.293432,
+      "max": 0.95,
+      "mean": 0.912223,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "safe_negative": {
+      "count": 2134,
+      "min": 0.312111,
+      "max": 0.99,
+      "mean": 0.914556,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "unknown": {
+      "count": 2,
+      "min": 0.0,
+      "max": 0.35,
+      "mean": 0.175,
+      "median": 0.175,
+      "p25": 0.0875,
+      "p75": 0.2625
+    }
+  },
+  "confidence_by_coarse_type": {
+    "Person": {
+      "count": 4270,
+      "min": 0.0,
+      "max": 0.99,
+      "mean": 0.913044,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    }
+  },
+  "confidence_by_evidence_quality": {
+    "high": {
+      "count": 1561,
+      "min": 0.312111,
+      "max": 0.99,
+      "mean": 0.920567,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "low": {
+      "count": 2709,
+      "min": 0.0,
+      "max": 0.99,
+      "mean": 0.908708,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    }
+  },
+  "confidence_bucket_by_status": {
+    "closely_related": {
+      "0.9-1.0": 1970,
+      "<0.5": 137,
+      "0.5-0.6": 14,
+      "0.8-0.9": 9,
+      "0.7-0.8": 3,
+      "0.6-0.7": 1
+    },
+    "safe_negative": {
+      "0.9-1.0": 1982,
+      "0.5-0.6": 14,
+      "<0.5": 133,
+      "0.8-0.9": 3,
+      "0.7-0.8": 2
+    },
+    "unknown": {
+      "<0.5": 2
+    }
+  },
+  "known_full_ill_hit_by_status": {
+    "closely_related": {
+      "0": 2134
+    },
+    "safe_negative": {
+      "0": 2134
+    },
+    "unknown": {
+      "0": 2
+    }
+  },
+  "same_entity_summary": {
+    "count": 0,
+    "known_full_ill_hit_0": 0,
+    "known_full_ill_hit_1": 0,
+    "known_full_ill_hit_rate": 0.0,
+    "by_coarse_type": {}
+  },
+  "cases_jsonl": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_cases_top5.jsonl",
+  "labels_jsonl": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_labels_top5.jsonl",
+  "input_case_count": 4270,
+  "input_label_count": 4270,
+  "missing_label_joins": 0
+}
+saved same_entity rows to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_same_entity_top5.jsonl
+[AUDIT] place
+===== Relation-Aware HNM Label Audit =====
+{
+  "row_count": 5000,
+  "relationship_status_counts": {
+    "closely_related": 3240,
+    "safe_negative": 1757,
+    "same_entity": 2,
+    "unknown": 1
+  },
+  "evidence_quality_counts": {
+    "low": 621,
+    "high": 4379
+  },
+  "high_conf_threshold": 0.8,
+  "high_conf_status_counts": {
+    "closely_related": 3186,
+    "safe_negative": 1744,
+    "same_entity": 2
+  },
+  "coarse_type_breakdown": {
+    "Place": {
+      "closely_related": 3240,
+      "safe_negative": 1757,
+      "same_entity": 2,
+      "unknown": 1
+    }
+  },
+  "confidence_by_status": {
+    "closely_related": {
+      "count": 3240,
+      "min": 0.363811,
+      "max": 0.95,
+      "mean": 0.941861,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "safe_negative": {
+      "count": 1757,
+      "min": 0.362894,
+      "max": 0.99,
+      "mean": 0.946504,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "same_entity": {
+      "count": 2,
+      "min": 0.95,
+      "max": 0.95,
+      "mean": 0.95,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "unknown": {
+      "count": 1,
+      "min": 0.0,
+      "max": 0.0,
+      "mean": 0.0,
+      "median": 0.0,
+      "p25": 0.0,
+      "p75": 0.0
+    }
+  },
+  "confidence_by_coarse_type": {
+    "Place": {
+      "count": 5000,
+      "min": 0.0,
+      "max": 0.99,
+      "mean": 0.943308,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    }
+  },
+  "confidence_by_evidence_quality": {
+    "low": {
+      "count": 621,
+      "min": 0.407105,
+      "max": 0.99,
+      "mean": 0.936986,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "high": {
+      "count": 4379,
+      "min": 0.0,
+      "max": 0.99,
+      "mean": 0.944204,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    }
+  },
+  "confidence_bucket_by_status": {
+    "closely_related": {
+      "0.9-1.0": 3178,
+      "0.5-0.6": 14,
+      "<0.5": 39,
+      "0.8-0.9": 8,
+      "0.7-0.8": 1
+    },
+    "safe_negative": {
+      "0.9-1.0": 1743,
+      "<0.5": 11,
+      "0.8-0.9": 1,
+      "0.5-0.6": 2
+    },
+    "same_entity": {
+      "0.9-1.0": 2
+    },
+    "unknown": {
+      "<0.5": 1
+    }
+  },
+  "known_full_ill_hit_by_status": {
+    "closely_related": {
+      "0": 3240
+    },
+    "safe_negative": {
+      "0": 1757
+    },
+    "same_entity": {
+      "0": 2
+    },
+    "unknown": {
+      "0": 1
+    }
+  },
+  "same_entity_summary": {
+    "count": 2,
+    "known_full_ill_hit_0": 2,
+    "known_full_ill_hit_1": 0,
+    "known_full_ill_hit_rate": 0.0,
+    "by_coarse_type": {
+      "Place": {
+        "count": 2,
+        "known_full_ill_hit_0": 2,
+        "known_full_ill_hit_1": 0,
+        "known_full_ill_hit_rate": 0.0
+      }
+    }
+  },
+  "cases_jsonl": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_cases_top5.jsonl",
+  "labels_jsonl": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_labels_top5.jsonl",
+  "input_case_count": 5000,
+  "input_label_count": 5000,
+  "missing_label_joins": 0
+}
+saved same_entity rows to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_same_entity_top5.jsonl
+[AUDIT] creative_work
+===== Relation-Aware HNM Label Audit =====
+{
+  "row_count": 2345,
+  "relationship_status_counts": {
+    "safe_negative": 1151,
+    "closely_related": 1190,
+    "unknown": 4
+  },
+  "evidence_quality_counts": {
+    "low": 1314,
+    "high": 1031
+  },
+  "high_conf_threshold": 0.8,
+  "high_conf_status_counts": {
+    "safe_negative": 1142,
+    "closely_related": 1172
+  },
+  "coarse_type_breakdown": {
+    "Creative Work": {
+      "safe_negative": 1151,
+      "closely_related": 1190,
+      "unknown": 4
+    }
+  },
+  "confidence_by_status": {
+    "safe_negative": {
+      "count": 1151,
+      "min": 0.415256,
+      "max": 0.99,
+      "mean": 0.945957,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "closely_related": {
+      "count": 1190,
+      "min": 0.402079,
+      "max": 0.99,
+      "mean": 0.941636,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "unknown": {
+      "count": 4,
+      "min": 0.0,
+      "max": 0.0,
+      "mean": 0.0,
+      "median": 0.0,
+      "p25": 0.0,
+      "p75": 0.0
+    }
+  },
+  "confidence_by_coarse_type": {
+    "Creative Work": {
+      "count": 2345,
+      "min": 0.0,
+      "max": 0.99,
+      "mean": 0.942151,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    }
+  },
+  "confidence_by_evidence_quality": {
+    "low": {
+      "count": 1314,
+      "min": 0.0,
+      "max": 0.99,
+      "mean": 0.938777,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "high": {
+      "count": 1031,
+      "min": 0.0,
+      "max": 0.99,
+      "mean": 0.946451,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    }
+  },
+  "confidence_bucket_by_status": {
+    "safe_negative": {
+      "0.9-1.0": 1139,
+      "0.8-0.9": 3,
+      "0.5-0.6": 3,
+      "<0.5": 6
+    },
+    "closely_related": {
+      "0.7-0.8": 1,
+      "0.9-1.0": 1163,
+      "0.5-0.6": 4,
+      "<0.5": 13,
+      "0.8-0.9": 9
+    },
+    "unknown": {
+      "<0.5": 4
+    }
+  },
+  "known_full_ill_hit_by_status": {
+    "safe_negative": {
+      "0": 1151
+    },
+    "closely_related": {
+      "0": 1190
+    },
+    "unknown": {
+      "0": 4
+    }
+  },
+  "same_entity_summary": {
+    "count": 0,
+    "known_full_ill_hit_0": 0,
+    "known_full_ill_hit_1": 0,
+    "known_full_ill_hit_rate": 0.0,
+    "by_coarse_type": {}
+  },
+  "cases_jsonl": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_cases_top5.jsonl",
+  "labels_jsonl": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_labels_top5.jsonl",
+  "input_case_count": 2345,
+  "input_label_count": 2345,
+  "missing_label_joins": 0
+}
+saved same_entity rows to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_same_entity_top5.jsonl
+[AUDIT] organization
+===== Relation-Aware HNM Label Audit =====
+{
+  "row_count": 4915,
+  "relationship_status_counts": {
+    "closely_related": 2280,
+    "safe_negative": 2631,
+    "unknown": 2,
+    "same_entity": 2
+  },
+  "evidence_quality_counts": {
+    "low": 3551,
+    "high": 1364
+  },
+  "high_conf_threshold": 0.8,
+  "high_conf_status_counts": {
+    "closely_related": 2210,
+    "safe_negative": 2534,
+    "same_entity": 2
+  },
+  "coarse_type_breakdown": {
+    "Organization": {
+      "closely_related": 2280,
+      "safe_negative": 2631,
+      "unknown": 2,
+      "same_entity": 2
+    }
+  },
+  "confidence_by_status": {
+    "closely_related": {
+      "count": 2280,
+      "min": 0.388186,
+      "max": 0.95,
+      "mean": 0.934832,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "safe_negative": {
+      "count": 2631,
+      "min": 0.36211,
+      "max": 0.99,
+      "mean": 0.931011,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "unknown": {
+      "count": 2,
+      "min": 0.409782,
+      "max": 0.5,
+      "mean": 0.454891,
+      "median": 0.454891,
+      "p25": 0.432337,
+      "p75": 0.477445
+    },
+    "same_entity": {
+      "count": 2,
+      "min": 0.95,
+      "max": 1.0,
+      "mean": 0.975,
+      "median": 0.975,
+      "p25": 0.9625,
+      "p75": 0.9875
+    }
+  },
+  "confidence_by_coarse_type": {
+    "Organization": {
+      "count": 4915,
+      "min": 0.36211,
+      "max": 1.0,
+      "mean": 0.932608,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    }
+  },
+  "confidence_by_evidence_quality": {
+    "low": {
+      "count": 3551,
+      "min": 0.36211,
+      "max": 1.0,
+      "mean": 0.931002,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    },
+    "high": {
+      "count": 1364,
+      "min": 0.373784,
+      "max": 0.95,
+      "mean": 0.936786,
+      "median": 0.95,
+      "p25": 0.95,
+      "p75": 0.95
+    }
+  },
+  "confidence_bucket_by_status": {
+    "closely_related": {
+      "0.9-1.0": 2207,
+      "<0.5": 59,
+      "0.8-0.9": 3,
+      "0.5-0.6": 7,
+      "0.7-0.8": 3,
+      "0.6-0.7": 1
+    },
+    "safe_negative": {
+      "0.9-1.0": 2530,
+      "<0.5": 86,
+      "0.5-0.6": 10,
+      "0.8-0.9": 4,
+      "0.6-0.7": 1
+    },
+    "unknown": {
+      "<0.5": 1,
+      "0.5-0.6": 1
+    },
+    "same_entity": {
+      "0.9-1.0": 2
+    }
+  },
+  "known_full_ill_hit_by_status": {
+    "closely_related": {
+      "0": 2280
+    },
+    "safe_negative": {
+      "0": 2631
+    },
+    "unknown": {
+      "0": 2
+    },
+    "same_entity": {
+      "0": 2
+    }
+  },
+  "same_entity_summary": {
+    "count": 2,
+    "known_full_ill_hit_0": 2,
+    "known_full_ill_hit_1": 0,
+    "known_full_ill_hit_rate": 0.0,
+    "by_coarse_type": {
+      "Organization": {
+        "count": 2,
+        "known_full_ill_hit_0": 2,
+        "known_full_ill_hit_1": 0,
+        "known_full_ill_hit_rate": 0.0
+      }
+    }
+  },
+  "cases_jsonl": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_organization_train_hnm_cases_top5.jsonl",
+  "labels_jsonl": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_organization_train_hnm_labels_top5.jsonl",
+  "input_case_count": 4915,
+  "input_label_count": 4915,
+  "missing_label_joins": 0
+}
+saved same_entity rows to /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_organization_train_hnm_same_entity_top5.jsonl
+[DONE] Phase 5 relation-aware HNM data pipeline finished.
+[STAGE 2] Build unified relation-aware HNM cache
+===== Relation-Aware HNM Cache Built =====
+{
+  "labels_jsonls": [
+    "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_person_train_hnm_labels_top5.jsonl",
+    "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_place_train_hnm_labels_top5.jsonl",
+    "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_creative_work_train_hnm_labels_top5.jsonl",
+    "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/FBDB15K_0.5_organization_train_hnm_labels_top5.jsonl"
+  ],
+  "keep_statuses": [
+    "closely_related",
+    "safe_negative"
+  ],
+  "keep_coarse_types": [
+    "Creative Work",
+    "Organization",
+    "Person",
+    "Place"
+  ],
+  "quality_filter": "all",
+  "min_confidence": 0.0,
+  "dedupe_by": "anchor_candidate_direction",
+  "input_row_count": 16530,
+  "dropped_reason_counts": {
+    "status:unknown": 9,
+    "status:same_entity": 4
+  },
+  "kept_summary": {
+    "row_count": 16517,
+    "status_counts": {
+      "closely_related": 8844,
+      "safe_negative": 7673
+    },
+    "coarse_type_breakdown": {
+      "Person": {
+        "closely_related": 2134,
+        "safe_negative": 2134
+      },
+      "Place": {
+        "closely_related": 3240,
+        "safe_negative": 1757
+      },
+      "Creative Work": {
+        "safe_negative": 1151,
+        "closely_related": 1190
+      },
+      "Organization": {
+        "closely_related": 2280,
+        "safe_negative": 2631
+      }
+    },
+    "direction_counts": {
+      "left_to_right": 7907,
+      "right_to_left": 8610
+    },
+    "evidence_quality_counts": {
+      "high": 8331,
+      "low": 8186
+    },
+    "confidence_summary": {
+      "min": 0.293432,
+      "max": 0.99,
+      "mean": 0.932569,
+      "median": 0.95
+    },
+    "unique_anchor_count": 3306,
+    "unique_candidate_count": 7918,
+    "unique_anchor_candidate_direction_count": 16517
+  }
+}
+[STAGE 3] Run pretrain-side cache adequacy audit
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+loading raw data...
+===== Relation-Aware HNM Pretrain Audit =====
+{
+  "cache_jsonl": "/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/train_relation_hnm/relation_aware_hnm_cache_top5.jsonl",
+  "focus_coarse_types": [
+    "Creative Work",
+    "Organization",
+    "Person",
+    "Place"
+  ],
+  "coverage": {
+    "train_anchor_count": 12844,
+    "covered_anchor_count": 3306,
+    "covered_anchor_rate": 0.257396,
+    "cache_row_count": 16517,
+    "cache_status_counts": {
+      "closely_related": 8844,
+      "safe_negative": 7673
+    },
+    "cache_direction_counts": {
+      "left_to_right": 7907,
+      "right_to_left": 8610
+    },
+    "cache_coarse_type_breakdown": {
+      "Person": {
+        "closely_related": 2134,
+        "safe_negative": 2134
+      },
+      "Place": {
+        "closely_related": 3240,
+        "safe_negative": 1757
+      },
+      "Creative Work": {
+        "safe_negative": 1151,
+        "closely_related": 1190
+      },
+      "Organization": {
+        "closely_related": 2280,
+        "safe_negative": 2631
+      }
+    },
+    "per_anchor_relation_row_stats": {
+      "min": 4,
+      "max": 5,
+      "mean": 4.996068,
+      "median": 5.0
+    },
+    "per_anchor_close_stats": {
+      "min": 0,
+      "max": 5,
+      "mean": 2.675136,
+      "median": 3.0
+    },
+    "per_anchor_safe_stats": {
+      "min": 0,
+      "max": 5,
+      "mean": 2.320932,
+      "median": 2.0
+    },
+    "directional_anchor_coverage": {
+      "left_to_right": {
+        "covered_anchor_count": 1582
+      },
+      "right_to_left": {
+        "covered_anchor_count": 1724
+      }
+    },
+    "coarse_type_anchor_coverage": {
+      "Person": {
+        "train_anchor_count": 4466,
+        "covered_anchor_count": 854,
+        "covered_anchor_rate": 0.191223
+      },
+      "Place": {
+        "train_anchor_count": 2535,
+        "covered_anchor_count": 1000,
+        "covered_anchor_rate": 0.394477
+      },
+      "Creative Work": {
+        "train_anchor_count": 2385,
+        "covered_anchor_count": 469,
+        "covered_anchor_rate": 0.196646
+      },
+      "Organization": {
+        "train_anchor_count": 1789,
+        "covered_anchor_count": 983,
+        "covered_anchor_rate": 0.549469
+      }
+    },
+    "train_anchor_count_by_type": {
+      "Creative Work": 2385,
+      "Person": 4466,
+      "Organization": 1789,
+      "Entity": 1394,
+      "Event": 275,
+      "Place": 2535
+    },
+    "exposure_estimate": {
+      "train_pair_row_count": 6423,
+      "estimated_batches_per_epoch": 4,
+      "covered_pair_rows_per_epoch": 2196,
+      "covered_pair_row_rate": 0.341896,
+      "covered_pair_rows_ltr_per_epoch": 1582,
+      "covered_pair_rows_rtl_per_epoch": 1724,
+      "estimated_relation_rows_per_batch": 4129.25,
+      "estimated_hit_pair_rows_per_batch": 549.0
+    }
+  },
+  "degree_summary": {
+    "train_anchor_degree_quantiles": {
+      "q_low": 8.0,
+      "q_high": 55.0
+    },
+    "covered_anchor_degree_stats": {
+      "min": 1,
+      "max": 1937,
+      "mean": 36.112825,
+      "median": 18.0
+    },
+    "covered_anchor_degree_buckets": {
+      "low": 844,
+      "medium": 1819,
+      "high": 643
+    }
+  },
+  "filter_simulation": {
+    "all": {
+      "row_count": 16517,
+      "status_counts": {
+        "closely_related": 8844,
+        "safe_negative": 7673
+      },
+      "direction_counts": {
+        "left_to_right": 7907,
+        "right_to_left": 8610
+      },
+      "coarse_type_breakdown": {
+        "Person": {
+          "closely_related": 2134,
+          "safe_negative": 2134
+        },
+        "Place": {
+          "closely_related": 3240,
+          "safe_negative": 1757
+        },
+        "Creative Work": {
+          "safe_negative": 1151,
+          "closely_related": 1190
+        },
+        "Organization": {
+          "closely_related": 2280,
+          "safe_negative": 2631
+        }
+      },
+      "unique_anchor_count": 3306
+    },
+    "high_quality": {
+      "row_count": 8331,
+      "status_counts": {
+        "closely_related": 4719,
+        "safe_negative": 3612
+      },
+      "direction_counts": {
+        "left_to_right": 4814,
+        "right_to_left": 3517
+      },
+      "coarse_type_breakdown": {
+        "Person": {
+          "closely_related": 724,
+          "safe_negative": 837
+        },
+        "Place": {
+          "closely_related": 2819,
+          "safe_negative": 1558
+        },
+        "Creative Work": {
+          "safe_negative": 507,
+          "closely_related": 523
+        },
+        "Organization": {
+          "safe_negative": 710,
+          "closely_related": 653
+        }
+      },
+      "unique_anchor_count": 1845
+    },
+    "conf_ge_0.8": {
+      "row_count": 15952,
+      "status_counts": {
+        "closely_related": 8547,
+        "safe_negative": 7405
+      },
+      "direction_counts": {
+        "left_to_right": 7732,
+        "right_to_left": 8220
+      },
+      "coarse_type_breakdown": {
+        "Person": {
+          "closely_related": 1979,
+          "safe_negative": 1985
+        },
+        "Place": {
+          "closely_related": 3186,
+          "safe_negative": 1744
+        },
+        "Creative Work": {
+          "safe_negative": 1142,
+          "closely_related": 1172
+        },
+        "Organization": {
+          "closely_related": 2210,
+          "safe_negative": 2534
+        }
+      },
+      "unique_anchor_count": 3306
+    },
+    "conf_ge_0.9": {
+      "row_count": 15912,
+      "status_counts": {
+        "closely_related": 8518,
+        "safe_negative": 7394
+      },
+      "direction_counts": {
+        "left_to_right": 7714,
+        "right_to_left": 8198
+      },
+      "coarse_type_breakdown": {
+        "Person": {
+          "closely_related": 1970,
+          "safe_negative": 1982
+        },
+        "Place": {
+          "closely_related": 3178,
+          "safe_negative": 1743
+        },
+        "Creative Work": {
+          "safe_negative": 1139,
+          "closely_related": 1163
+        },
+        "Organization": {
+          "closely_related": 2207,
+          "safe_negative": 2530
+        }
+      },
+      "unique_anchor_count": 3306
+    }
+  },
+  "gt_rank_profile": {
+    "count": 16517,
+    "top1_error_count": 15,
+    "top1_error_rate": 0.000908,
+    "mean_gt_rank": 1.000908,
+    "median_gt_rank": 1.0,
+    "positive_distance_stats": {
+      "count": 16517,
+      "min": 0.116762,
+      "max": 1.135084,
+      "mean": 0.637241,
+      "median": 0.635184
+    },
+    "candidate_distance_stats": {
+      "count": 16517,
+      "min": 0.143525,
+      "max": 1.653703,
+      "mean": 1.180824,
+      "median": 1.186411
+    },
+    "margin_delta_stats": {
+      "count": 16517,
+      "min": -0.082469,
+      "max": 1.172573,
+      "mean": 0.543582,
+      "median": 0.546048
+    },
+    "margin_base": 0.5,
+    "margin_violation_count": 5754,
+    "margin_violation_rate": 0.348368,
+    "rank1_but_margin_violated_count": 5743,
+    "recoverable_anchor_count": 2263,
+    "recoverable_anchor_rate": 0.13701,
+    "rank_buckets": {
+      "rank_1": 16502,
+      "rank_2_5": 15,
+      "rank_6_10": 0,
+      "rank_gt_10": 0
+    },
+    "direction_breakdown": {
+      "left_to_right": {
+        "count": 7907,
+        "top1_error_count": 5,
+        "mean_gt_rank": 1.000632,
+        "top1_error_rate": 0.000632
+      },
+      "right_to_left": {
+        "count": 8610,
+        "top1_error_count": 10,
+        "mean_gt_rank": 1.001161,
+        "top1_error_rate": 0.001161
+      }
+    },
+    "coarse_type_breakdown": {
+      "Person": {
+        "count": 4268,
+        "top1_error_count": 0,
+        "margin_violation_count": 739,
+        "mean_gt_rank": 1.0,
+        "mean_margin_delta": 0.610897,
+        "top1_error_rate": 0.0,
+        "margin_violation_rate": 0.173149
+      },
+      "Place": {
+        "count": 4997,
+        "top1_error_count": 5,
+        "margin_violation_count": 2207,
+        "mean_gt_rank": 1.001001,
+        "mean_margin_delta": 0.515435,
+        "top1_error_rate": 0.001001,
+        "margin_violation_rate": 0.441665
+      },
+      "Creative Work": {
+        "count": 2341,
+        "top1_error_count": 0,
+        "margin_violation_count": 897,
+        "mean_gt_rank": 1.0,
+        "mean_margin_delta": 0.524333,
+        "top1_error_rate": 0.0,
+        "margin_violation_rate": 0.38317
+      },
+      "Organization": {
+        "count": 4911,
+        "top1_error_count": 10,
+        "margin_violation_count": 1911,
+        "mean_gt_rank": 1.002036,
+        "mean_margin_delta": 0.522896,
+        "top1_error_rate": 0.002036,
+        "margin_violation_rate": 0.389126
+      }
+    },
+    "status_breakdown": {
+      "closely_related": {
+        "count": 8844,
+        "top1_error_count": 9,
+        "margin_violation_count": 3666,
+        "mean_gt_rank": 1.001018,
+        "mean_margin_delta": 0.524475,
+        "top1_error_rate": 0.001018,
+        "margin_violation_rate": 0.414518
+      },
+      "safe_negative": {
+        "count": 7673,
+        "top1_error_count": 6,
+        "margin_violation_count": 2088,
+        "mean_gt_rank": 1.000782,
+        "mean_margin_delta": 0.565605,
+        "top1_error_rate": 0.000782,
+        "margin_violation_rate": 0.272123
+      }
+    }
+  },
+  "margin_base_sweep": {
+    "0.2": {
+      "count": 16517,
+      "top1_error_count": 15,
+      "top1_error_rate": 0.000908,
+      "mean_gt_rank": 1.000908,
+      "median_gt_rank": 1.0,
+      "positive_distance_stats": {
+        "count": 16517,
+        "min": 0.116762,
+        "max": 1.135084,
+        "mean": 0.637241,
+        "median": 0.635184
+      },
+      "candidate_distance_stats": {
+        "count": 16517,
+        "min": 0.143525,
+        "max": 1.653703,
+        "mean": 1.180824,
+        "median": 1.186411
+      },
+      "margin_delta_stats": {
+        "count": 16517,
+        "min": -0.082469,
+        "max": 1.172573,
+        "mean": 0.543582,
+        "median": 0.546048
+      },
+      "margin_base": 0.2,
+      "margin_violation_count": 100,
+      "margin_violation_rate": 0.006054,
+      "rank1_but_margin_violated_count": 97,
+      "recoverable_anchor_count": 71,
+      "recoverable_anchor_rate": 0.004299,
+      "rank_buckets": {
+        "rank_1": 16502,
+        "rank_2_5": 15,
+        "rank_6_10": 0,
+        "rank_gt_10": 0
+      },
+      "direction_breakdown": {
+        "left_to_right": {
+          "count": 7907,
+          "top1_error_count": 5,
+          "mean_gt_rank": 1.000632,
+          "top1_error_rate": 0.000632
+        },
+        "right_to_left": {
+          "count": 8610,
+          "top1_error_count": 10,
+          "mean_gt_rank": 1.001161,
+          "top1_error_rate": 0.001161
+        }
+      },
+      "coarse_type_breakdown": {
+        "Person": {
+          "count": 4268,
+          "top1_error_count": 0,
+          "margin_violation_count": 19,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.610897,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.004452
+        },
+        "Place": {
+          "count": 4997,
+          "top1_error_count": 5,
+          "margin_violation_count": 26,
+          "mean_gt_rank": 1.001001,
+          "mean_margin_delta": 0.515435,
+          "top1_error_rate": 0.001001,
+          "margin_violation_rate": 0.005203
+        },
+        "Creative Work": {
+          "count": 2341,
+          "top1_error_count": 0,
+          "margin_violation_count": 16,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.524333,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.006835
+        },
+        "Organization": {
+          "count": 4911,
+          "top1_error_count": 10,
+          "margin_violation_count": 39,
+          "mean_gt_rank": 1.002036,
+          "mean_margin_delta": 0.522896,
+          "top1_error_rate": 0.002036,
+          "margin_violation_rate": 0.007941
+        }
+      },
+      "status_breakdown": {
+        "closely_related": {
+          "count": 8844,
+          "top1_error_count": 9,
+          "margin_violation_count": 62,
+          "mean_gt_rank": 1.001018,
+          "mean_margin_delta": 0.524475,
+          "top1_error_rate": 0.001018,
+          "margin_violation_rate": 0.00701
+        },
+        "safe_negative": {
+          "count": 7673,
+          "top1_error_count": 6,
+          "margin_violation_count": 38,
+          "mean_gt_rank": 1.000782,
+          "mean_margin_delta": 0.565605,
+          "top1_error_rate": 0.000782,
+          "margin_violation_rate": 0.004952
+        }
+      }
+    },
+    "0.5": {
+      "count": 16517,
+      "top1_error_count": 15,
+      "top1_error_rate": 0.000908,
+      "mean_gt_rank": 1.000908,
+      "median_gt_rank": 1.0,
+      "positive_distance_stats": {
+        "count": 16517,
+        "min": 0.116762,
+        "max": 1.135084,
+        "mean": 0.637241,
+        "median": 0.635184
+      },
+      "candidate_distance_stats": {
+        "count": 16517,
+        "min": 0.143525,
+        "max": 1.653703,
+        "mean": 1.180824,
+        "median": 1.186411
+      },
+      "margin_delta_stats": {
+        "count": 16517,
+        "min": -0.082469,
+        "max": 1.172573,
+        "mean": 0.543582,
+        "median": 0.546048
+      },
+      "margin_base": 0.5,
+      "margin_violation_count": 5754,
+      "margin_violation_rate": 0.348368,
+      "rank1_but_margin_violated_count": 5743,
+      "recoverable_anchor_count": 2263,
+      "recoverable_anchor_rate": 0.13701,
+      "rank_buckets": {
+        "rank_1": 16502,
+        "rank_2_5": 15,
+        "rank_6_10": 0,
+        "rank_gt_10": 0
+      },
+      "direction_breakdown": {
+        "left_to_right": {
+          "count": 7907,
+          "top1_error_count": 5,
+          "mean_gt_rank": 1.000632,
+          "top1_error_rate": 0.000632
+        },
+        "right_to_left": {
+          "count": 8610,
+          "top1_error_count": 10,
+          "mean_gt_rank": 1.001161,
+          "top1_error_rate": 0.001161
+        }
+      },
+      "coarse_type_breakdown": {
+        "Person": {
+          "count": 4268,
+          "top1_error_count": 0,
+          "margin_violation_count": 739,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.610897,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.173149
+        },
+        "Place": {
+          "count": 4997,
+          "top1_error_count": 5,
+          "margin_violation_count": 2207,
+          "mean_gt_rank": 1.001001,
+          "mean_margin_delta": 0.515435,
+          "top1_error_rate": 0.001001,
+          "margin_violation_rate": 0.441665
+        },
+        "Creative Work": {
+          "count": 2341,
+          "top1_error_count": 0,
+          "margin_violation_count": 897,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.524333,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.38317
+        },
+        "Organization": {
+          "count": 4911,
+          "top1_error_count": 10,
+          "margin_violation_count": 1911,
+          "mean_gt_rank": 1.002036,
+          "mean_margin_delta": 0.522896,
+          "top1_error_rate": 0.002036,
+          "margin_violation_rate": 0.389126
+        }
+      },
+      "status_breakdown": {
+        "closely_related": {
+          "count": 8844,
+          "top1_error_count": 9,
+          "margin_violation_count": 3666,
+          "mean_gt_rank": 1.001018,
+          "mean_margin_delta": 0.524475,
+          "top1_error_rate": 0.001018,
+          "margin_violation_rate": 0.414518
+        },
+        "safe_negative": {
+          "count": 7673,
+          "top1_error_count": 6,
+          "margin_violation_count": 2088,
+          "mean_gt_rank": 1.000782,
+          "mean_margin_delta": 0.565605,
+          "top1_error_rate": 0.000782,
+          "margin_violation_rate": 0.272123
+        }
+      }
+    },
+    "0.6": {
+      "count": 16517,
+      "top1_error_count": 15,
+      "top1_error_rate": 0.000908,
+      "mean_gt_rank": 1.000908,
+      "median_gt_rank": 1.0,
+      "positive_distance_stats": {
+        "count": 16517,
+        "min": 0.116762,
+        "max": 1.135084,
+        "mean": 0.637241,
+        "median": 0.635184
+      },
+      "candidate_distance_stats": {
+        "count": 16517,
+        "min": 0.143525,
+        "max": 1.653703,
+        "mean": 1.180824,
+        "median": 1.186411
+      },
+      "margin_delta_stats": {
+        "count": 16517,
+        "min": -0.082469,
+        "max": 1.172573,
+        "mean": 0.543582,
+        "median": 0.546048
+      },
+      "margin_base": 0.6,
+      "margin_violation_count": 11322,
+      "margin_violation_rate": 0.685476,
+      "rank1_but_margin_violated_count": 11311,
+      "recoverable_anchor_count": 3055,
+      "recoverable_anchor_rate": 0.184961,
+      "rank_buckets": {
+        "rank_1": 16502,
+        "rank_2_5": 15,
+        "rank_6_10": 0,
+        "rank_gt_10": 0
+      },
+      "direction_breakdown": {
+        "left_to_right": {
+          "count": 7907,
+          "top1_error_count": 5,
+          "mean_gt_rank": 1.000632,
+          "top1_error_rate": 0.000632
+        },
+        "right_to_left": {
+          "count": 8610,
+          "top1_error_count": 10,
+          "mean_gt_rank": 1.001161,
+          "top1_error_rate": 0.001161
+        }
+      },
+      "coarse_type_breakdown": {
+        "Person": {
+          "count": 4268,
+          "top1_error_count": 0,
+          "margin_violation_count": 1843,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.610897,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.431818
+        },
+        "Place": {
+          "count": 4997,
+          "top1_error_count": 5,
+          "margin_violation_count": 3872,
+          "mean_gt_rank": 1.001001,
+          "mean_margin_delta": 0.515435,
+          "top1_error_rate": 0.001001,
+          "margin_violation_rate": 0.774865
+        },
+        "Creative Work": {
+          "count": 2341,
+          "top1_error_count": 0,
+          "margin_violation_count": 1734,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.524333,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.740709
+        },
+        "Organization": {
+          "count": 4911,
+          "top1_error_count": 10,
+          "margin_violation_count": 3873,
+          "mean_gt_rank": 1.002036,
+          "mean_margin_delta": 0.522896,
+          "top1_error_rate": 0.002036,
+          "margin_violation_rate": 0.788638
+        }
+      },
+      "status_breakdown": {
+        "closely_related": {
+          "count": 8844,
+          "top1_error_count": 9,
+          "margin_violation_count": 6525,
+          "mean_gt_rank": 1.001018,
+          "mean_margin_delta": 0.524475,
+          "top1_error_rate": 0.001018,
+          "margin_violation_rate": 0.737788
+        },
+        "safe_negative": {
+          "count": 7673,
+          "top1_error_count": 6,
+          "margin_violation_count": 4797,
+          "mean_gt_rank": 1.000782,
+          "mean_margin_delta": 0.565605,
+          "top1_error_rate": 0.000782,
+          "margin_violation_rate": 0.625179
+        }
+      }
+    },
+    "0.7": {
+      "count": 16517,
+      "top1_error_count": 15,
+      "top1_error_rate": 0.000908,
+      "mean_gt_rank": 1.000908,
+      "median_gt_rank": 1.0,
+      "positive_distance_stats": {
+        "count": 16517,
+        "min": 0.116762,
+        "max": 1.135084,
+        "mean": 0.637241,
+        "median": 0.635184
+      },
+      "candidate_distance_stats": {
+        "count": 16517,
+        "min": 0.143525,
+        "max": 1.653703,
+        "mean": 1.180824,
+        "median": 1.186411
+      },
+      "margin_delta_stats": {
+        "count": 16517,
+        "min": -0.082469,
+        "max": 1.172573,
+        "mean": 0.543582,
+        "median": 0.546048
+      },
+      "margin_base": 0.7,
+      "margin_violation_count": 14882,
+      "margin_violation_rate": 0.901011,
+      "rank1_but_margin_violated_count": 14870,
+      "recoverable_anchor_count": 3273,
+      "recoverable_anchor_rate": 0.198159,
+      "rank_buckets": {
+        "rank_1": 16502,
+        "rank_2_5": 15,
+        "rank_6_10": 0,
+        "rank_gt_10": 0
+      },
+      "direction_breakdown": {
+        "left_to_right": {
+          "count": 7907,
+          "top1_error_count": 5,
+          "mean_gt_rank": 1.000632,
+          "top1_error_rate": 0.000632
+        },
+        "right_to_left": {
+          "count": 8610,
+          "top1_error_count": 10,
+          "mean_gt_rank": 1.001161,
+          "top1_error_rate": 0.001161
+        }
+      },
+      "coarse_type_breakdown": {
+        "Person": {
+          "count": 4268,
+          "top1_error_count": 0,
+          "margin_violation_count": 3252,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.610897,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.761949
+        },
+        "Place": {
+          "count": 4997,
+          "top1_error_count": 5,
+          "margin_violation_count": 4711,
+          "mean_gt_rank": 1.001001,
+          "mean_margin_delta": 0.515435,
+          "top1_error_rate": 0.001001,
+          "margin_violation_rate": 0.942766
+        },
+        "Creative Work": {
+          "count": 2341,
+          "top1_error_count": 0,
+          "margin_violation_count": 2256,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.524333,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.963691
+        },
+        "Organization": {
+          "count": 4911,
+          "top1_error_count": 10,
+          "margin_violation_count": 4663,
+          "mean_gt_rank": 1.002036,
+          "mean_margin_delta": 0.522896,
+          "top1_error_rate": 0.002036,
+          "margin_violation_rate": 0.949501
+        }
+      },
+      "status_breakdown": {
+        "closely_related": {
+          "count": 8844,
+          "top1_error_count": 9,
+          "margin_violation_count": 8150,
+          "mean_gt_rank": 1.001018,
+          "mean_margin_delta": 0.524475,
+          "top1_error_rate": 0.001018,
+          "margin_violation_rate": 0.921529
+        },
+        "safe_negative": {
+          "count": 7673,
+          "top1_error_count": 6,
+          "margin_violation_count": 6732,
+          "mean_gt_rank": 1.000782,
+          "mean_margin_delta": 0.565605,
+          "top1_error_rate": 0.000782,
+          "margin_violation_rate": 0.877362
+        }
+      }
+    },
+    "0.8": {
+      "count": 16517,
+      "top1_error_count": 15,
+      "top1_error_rate": 0.000908,
+      "mean_gt_rank": 1.000908,
+      "median_gt_rank": 1.0,
+      "positive_distance_stats": {
+        "count": 16517,
+        "min": 0.116762,
+        "max": 1.135084,
+        "mean": 0.637241,
+        "median": 0.635184
+      },
+      "candidate_distance_stats": {
+        "count": 16517,
+        "min": 0.143525,
+        "max": 1.653703,
+        "mean": 1.180824,
+        "median": 1.186411
+      },
+      "margin_delta_stats": {
+        "count": 16517,
+        "min": -0.082469,
+        "max": 1.172573,
+        "mean": 0.543582,
+        "median": 0.546048
+      },
+      "margin_base": 0.8,
+      "margin_violation_count": 16169,
+      "margin_violation_rate": 0.978931,
+      "rank1_but_margin_violated_count": 16157,
+      "recoverable_anchor_count": 3301,
+      "recoverable_anchor_rate": 0.199855,
+      "rank_buckets": {
+        "rank_1": 16502,
+        "rank_2_5": 15,
+        "rank_6_10": 0,
+        "rank_gt_10": 0
+      },
+      "direction_breakdown": {
+        "left_to_right": {
+          "count": 7907,
+          "top1_error_count": 5,
+          "mean_gt_rank": 1.000632,
+          "top1_error_rate": 0.000632
+        },
+        "right_to_left": {
+          "count": 8610,
+          "top1_error_count": 10,
+          "mean_gt_rank": 1.001161,
+          "top1_error_rate": 0.001161
+        }
+      },
+      "coarse_type_breakdown": {
+        "Person": {
+          "count": 4268,
+          "top1_error_count": 0,
+          "margin_violation_count": 4062,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.610897,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.951734
+        },
+        "Place": {
+          "count": 4997,
+          "top1_error_count": 5,
+          "margin_violation_count": 4954,
+          "mean_gt_rank": 1.001001,
+          "mean_margin_delta": 0.515435,
+          "top1_error_rate": 0.001001,
+          "margin_violation_rate": 0.991395
+        },
+        "Creative Work": {
+          "count": 2341,
+          "top1_error_count": 0,
+          "margin_violation_count": 2326,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.524333,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.993592
+        },
+        "Organization": {
+          "count": 4911,
+          "top1_error_count": 10,
+          "margin_violation_count": 4827,
+          "mean_gt_rank": 1.002036,
+          "mean_margin_delta": 0.522896,
+          "top1_error_rate": 0.002036,
+          "margin_violation_rate": 0.982896
+        }
+      },
+      "status_breakdown": {
+        "closely_related": {
+          "count": 8844,
+          "top1_error_count": 9,
+          "margin_violation_count": 8714,
+          "mean_gt_rank": 1.001018,
+          "mean_margin_delta": 0.524475,
+          "top1_error_rate": 0.001018,
+          "margin_violation_rate": 0.985301
+        },
+        "safe_negative": {
+          "count": 7673,
+          "top1_error_count": 6,
+          "margin_violation_count": 7455,
+          "mean_gt_rank": 1.000782,
+          "mean_margin_delta": 0.565605,
+          "top1_error_rate": 0.000782,
+          "margin_violation_rate": 0.971589
+        }
+      }
+    },
+    "1": {
+      "count": 16517,
+      "top1_error_count": 15,
+      "top1_error_rate": 0.000908,
+      "mean_gt_rank": 1.000908,
+      "median_gt_rank": 1.0,
+      "positive_distance_stats": {
+        "count": 16517,
+        "min": 0.116762,
+        "max": 1.135084,
+        "mean": 0.637241,
+        "median": 0.635184
+      },
+      "candidate_distance_stats": {
+        "count": 16517,
+        "min": 0.143525,
+        "max": 1.653703,
+        "mean": 1.180824,
+        "median": 1.186411
+      },
+      "margin_delta_stats": {
+        "count": 16517,
+        "min": -0.082469,
+        "max": 1.172573,
+        "mean": 0.543582,
+        "median": 0.546048
+      },
+      "margin_base": 1.0,
+      "margin_violation_count": 16505,
+      "margin_violation_rate": 0.999273,
+      "rank1_but_margin_violated_count": 16490,
+      "recoverable_anchor_count": 3306,
+      "recoverable_anchor_rate": 0.200157,
+      "rank_buckets": {
+        "rank_1": 16502,
+        "rank_2_5": 15,
+        "rank_6_10": 0,
+        "rank_gt_10": 0
+      },
+      "direction_breakdown": {
+        "left_to_right": {
+          "count": 7907,
+          "top1_error_count": 5,
+          "mean_gt_rank": 1.000632,
+          "top1_error_rate": 0.000632
+        },
+        "right_to_left": {
+          "count": 8610,
+          "top1_error_count": 10,
+          "mean_gt_rank": 1.001161,
+          "top1_error_rate": 0.001161
+        }
+      },
+      "coarse_type_breakdown": {
+        "Person": {
+          "count": 4268,
+          "top1_error_count": 0,
+          "margin_violation_count": 4267,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.610897,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.999766
+        },
+        "Place": {
+          "count": 4997,
+          "top1_error_count": 5,
+          "margin_violation_count": 4997,
+          "mean_gt_rank": 1.001001,
+          "mean_margin_delta": 0.515435,
+          "top1_error_rate": 0.001001,
+          "margin_violation_rate": 1.0
+        },
+        "Creative Work": {
+          "count": 2341,
+          "top1_error_count": 0,
+          "margin_violation_count": 2334,
+          "mean_gt_rank": 1.0,
+          "mean_margin_delta": 0.524333,
+          "top1_error_rate": 0.0,
+          "margin_violation_rate": 0.99701
+        },
+        "Organization": {
+          "count": 4911,
+          "top1_error_count": 10,
+          "margin_violation_count": 4907,
+          "mean_gt_rank": 1.002036,
+          "mean_margin_delta": 0.522896,
+          "top1_error_rate": 0.002036,
+          "margin_violation_rate": 0.999186
+        }
+      },
+      "status_breakdown": {
+        "closely_related": {
+          "count": 8844,
+          "top1_error_count": 9,
+          "margin_violation_count": 8841,
+          "mean_gt_rank": 1.001018,
+          "mean_margin_delta": 0.524475,
+          "top1_error_rate": 0.001018,
+          "margin_violation_rate": 0.999661
+        },
+        "safe_negative": {
+          "count": 7673,
+          "top1_error_count": 6,
+          "margin_violation_count": 7664,
+          "mean_gt_rank": 1.000782,
+          "mean_margin_delta": 0.565605,
+          "top1_error_rate": 0.000782,
+          "margin_violation_rate": 0.998827
+        }
+      }
+    }
+  },
+  "interpretation_note": "This audit estimates whether the relation-aware cache is large enough, balanced enough, and hard enough to justify a first warm-start relation-aware fine-tuning run."
+}
+[DONE] Relation-aware HNM full pipeline finished.

@@ -1,0 +1,45 @@
+loading data/model...
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+Traceback (most recent call last):
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/audit_type_modality_oracle_sweep.py", line 694, in <module>
+    main()
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/audit_type_modality_oracle_sweep.py", line 490, in main
+    modal_names = infer_active_modal_names(model)
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/audit_llm_risk_modality_routing.py", line 57, in infer_active_modal_names
+    gph_emb = model.multimodal_encoder.cross_graph_model(model.multimodal_encoder.entity_emb(model.input_idx), model.adj) if model.args.w_gcn else None
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/model/Tool_model.py", line 70, in forward
+    x = gat_layer(x, adj)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/anaconda3/envs/sgmea/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/model/layers.py", line 83, in forward
+    edge_h = torch.cat((h[edge[0, :], :], h[edge[1, :], :]), dim=1)  # edge: 2*D x E
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 792.00 MiB. GPU 1 has a total capacity of 23.68 GiB of which 673.88 MiB is free. Process 93748 has 4.81 GiB memory in use. Process 24932 has 6.78 GiB memory in use. Process 74999 has 7.80 GiB memory in use. Process 3066 has 3.62 GiB memory in use. Of the allocated memory 3.26 GiB is allocated by PyTorch, and 59.16 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

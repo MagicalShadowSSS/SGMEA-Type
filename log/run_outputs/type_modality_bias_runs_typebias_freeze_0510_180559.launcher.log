@@ -1,0 +1,5 @@
+nohup: ignoring input
+[launch] gpu=0 name=typebias_lr1e2_l2_1e4 lr=1e-2 l2=1e-4 scale=1.0 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/type_modality_bias_runs/typebias_freeze_0510_180559/typebias_lr1e2_l2_1e4_gpu0.log
+[launch] gpu=1 name=typebias_lr3e3_l2_1e4 lr=3e-3 l2=1e-4 scale=1.0 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/type_modality_bias_runs/typebias_freeze_0510_180559/typebias_lr3e3_l2_1e4_gpu1.log
+[launch] gpu=2 name=typebias_lr1e2_l2_1e3 lr=1e-2 l2=1e-3 scale=1.0 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/type_modality_bias_runs/typebias_freeze_0510_180559/typebias_lr1e2_l2_1e3_gpu2.log
+[launch] gpu=3 name=typebias_lr3e3_l2_1e3 lr=3e-3 l2=1e-3 scale=1.0 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/type_modality_bias_runs/typebias_freeze_0510_180559/typebias_lr3e3_l2_1e3_gpu3.log

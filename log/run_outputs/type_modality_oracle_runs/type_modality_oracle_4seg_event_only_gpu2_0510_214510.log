@@ -1,0 +1,32 @@
+loading data/model...
+loading raw data...
+94.56% entities have images
+image feature shape:(27793, 4096)
+entity coarse types: external distribution loaded
+  Person: 9014 (32.43%)
+  Place: 5151 (18.53%)
+  Organization: 4009 (14.42%)
+  Creative Work: 4648 (16.72%)
+  Event: 1144 (4.12%)
+  Entity: 3827 (13.77%)
+#left entity : 14951, #right entity: 12842
+#left entity not in train set: 8528, #right entity not in train set: 6421
+relation feature shape:(27793, 1000)
+attribute feature shape:(27793, 768)
+-----dataset summary-----
+dataset:		 /gly/tongqiang/dongyufeng/data/mmkg/FBDB15K/norm
+triple num:	 691241
+entity num:	 27793
+relation num:	 1624
+train ill num:	 6423 	 test ill num:	 6423
+-------------------------
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/src/utils.py:237: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:654.)
+  return torch.sparse.FloatTensor(indices, values, shape)
+getting a sparse tensor r_adj...
+modal_names=['img', 'attr', 'rel', 'graph'] weight_shape=(27793, 4) emb_shape=(27793, 1200)
+baseline avg_hits@1=0.7053 l2r=0.7037 r2l=0.7068
+type=Person fixed_global_delta=-0.0047 fixed_type_delta=+0.0274
+type=Place fixed_global_delta=-0.0139 fixed_type_delta=+0.0387
+type=Organization fixed_global_delta=-0.0115 fixed_type_delta=+0.0633
+type=Creative Work fixed_global_delta=+0.0039 fixed_type_delta=+0.0695
+sweeping type=Event configs=28560
