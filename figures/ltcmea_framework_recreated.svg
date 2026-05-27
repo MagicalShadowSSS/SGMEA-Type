@@ -1,0 +1,329 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#111827"/>
+    </marker>
+    <marker id="orangeArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#e07000"/>
+    </marker>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef7ff"/>
+      <stop offset="1" stop-color="#f8fbff"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f1fbec"/>
+      <stop offset="1" stop-color="#fbfff8"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f5edff"/>
+      <stop offset="1" stop-color="#fffaff"/>
+    </linearGradient>
+    <linearGradient id="orangeGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff6e9"/>
+      <stop offset="1" stop-color="#fffdf8"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff0f3"/>
+      <stop offset="1" stop-color="#fffafc"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#64748b" flood-opacity="0.15"/>
+    </filter>
+    <style>
+      .title { font: 700 24px Arial, sans-serif; fill: #111827; }
+      .subtitle { font: 400 18px Arial, sans-serif; fill: #111827; }
+      .box-title { font: 700 18px Arial, sans-serif; fill: #111827; }
+      .small { font: 400 13px Arial, sans-serif; fill: #111827; }
+      .tiny { font: 400 11px Arial, sans-serif; fill: #111827; }
+      .bold-small { font: 700 13px Arial, sans-serif; fill: #111827; }
+      .orange-title { font: 700 22px Arial, sans-serif; fill: #d66a00; }
+      .green-title { font: 700 20px Arial, sans-serif; fill: #116b25; }
+      .blue-label { fill: #d9ecff; stroke: #7bb5f0; stroke-width: 1.5; }
+      .green-label { fill: #daf3d6; stroke: #8ccf84; stroke-width: 1.5; }
+      .yellow-label { fill: #fff0a8; stroke: #e3bf35; stroke-width: 1.5; }
+      .purple-label { fill: #eadcff; stroke: #b695df; stroke-width: 1.5; }
+      .main-arrow { stroke: #111827; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .semantic-arrow { stroke: #e07000; stroke-width: 2.5; fill: none; stroke-dasharray: 8 8; marker-end: url(#orangeArrow); }
+      .thin { stroke: #111827; stroke-width: 1.2; fill: none; }
+      .soft { stroke: #cbd5e1; stroke-width: 1.2; fill: none; }
+    </style>
+    <symbol id="icon-bot" viewBox="0 0 64 56">
+      <line x1="32" y1="3" x2="32" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="32" cy="3" r="2.4" fill="currentColor"/>
+      <rect x="11" y="13" width="42" height="34" rx="9" fill="none" stroke="currentColor" stroke-width="3"/>
+      <path d="M11 27 H5 C2.8 27 2 29 2 32 V36 C2 39 3.2 41 5 41 H11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <path d="M53 27 H59 C61.2 27 62 29 62 32 V36 C62 39 60.8 41 59 41 H53" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="24" cy="30" r="3.3" fill="currentColor"/>
+      <circle cx="40" cy="30" r="3.3" fill="currentColor"/>
+      <path d="M23 40 Q32 45 41 40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-name" viewBox="0 0 32 32">
+      <rect x="7" y="4" width="19" height="24" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <path d="M22 4 V10 H26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <text x="12" y="22" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="currentColor">T</text>
+    </symbol>
+    <symbol id="icon-attr" viewBox="0 0 32 32">
+      <circle cx="7" cy="8" r="2" fill="currentColor"/><line x1="13" y1="8" x2="27" y2="8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="7" cy="16" r="2" fill="currentColor"/><line x1="13" y1="16" x2="27" y2="16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="7" cy="24" r="2" fill="currentColor"/><line x1="13" y1="24" x2="27" y2="24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-globe" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <path d="M4 16 H28 M16 4 C9.5 11 9.5 21 16 28 M16 4 C22.5 11 22.5 21 16 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-image" viewBox="0 0 32 32">
+      <rect x="4" y="6" width="24" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <circle cx="12" cy="13" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M7 23 L14 16 L19 21 L22 18 L26 23" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-clipboard" viewBox="0 0 32 32">
+      <rect x="7" y="5" width="20" height="24" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <path d="M13 4 H21 V8 H13 Z" fill="#ffffff" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      <line x1="12" y1="14" x2="23" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="12" y1="20" x2="23" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="12" y1="25" x2="19" y2="25" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-relation" viewBox="0 0 32 32">
+      <circle cx="7" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="25" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="16" cy="25" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/>
+      <line x1="10" y1="10" x2="14" y2="22" stroke="currentColor" stroke-width="2"/>
+      <line x1="22" y1="10" x2="18" y2="22" stroke="currentColor" stroke-width="2"/>
+      <line x1="10.5" y1="8" x2="21.5" y2="8" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    <symbol id="icon-graph" viewBox="0 0 32 32">
+      <circle cx="7" cy="8" r="2.8" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="24" cy="7" r="2.8" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="12" cy="21" r="2.8" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="25" cy="24" r="2.8" fill="none" stroke="currentColor" stroke-width="2"/>
+      <line x1="9" y1="10" x2="11" y2="18" stroke="currentColor" stroke-width="2"/>
+      <line x1="22" y1="9" x2="14" y2="19" stroke="currentColor" stroke-width="2"/>
+      <line x1="14.8" y1="21.8" x2="22.2" y2="23.2" stroke="currentColor" stroke-width="2"/>
+      <line x1="9.8" y1="7.8" x2="21.2" y2="7.2" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    <symbol id="icon-person" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="21" fill="#dcecff" stroke="currentColor" stroke-width="2.6"/>
+      <circle cx="24" cy="17" r="7" fill="none" stroke="currentColor" stroke-width="2.6"/>
+      <path d="M10 40 Q24 25 38 40" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+
+  <rect width="1600" height="980" fill="#ffffff"/>
+
+  <!-- Top semantic guidance modules -->
+  <rect x="225" y="36" width="590" height="210" rx="12" fill="url(#orangeGrad)" stroke="#e07000" stroke-width="1.6" filter="url(#shadow)"/>
+  <text x="360" y="74" class="orange-title">LLM Type Constructor</text>
+  <use href="#icon-bot" x="252" y="56" width="64" height="58" color="#e07000"/>
+  <use href="#icon-name" x="260" y="132" width="32" height="32" color="#111827"/>
+  <text x="248" y="188" class="small">Name</text>
+  <use href="#icon-attr" x="344" y="132" width="32" height="32" color="#111827"/>
+  <text x="322" y="188" class="small">Attributes</text>
+  <use href="#icon-globe" x="424" y="132" width="36" height="36" color="#111827"/>
+  <text x="421" y="188" class="small">Context</text>
+  <path d="M496 158 H526" class="semantic-arrow" stroke-dasharray="none"/>
+  <text x="568" y="146" class="orange-title" font-size="18">type</text>
+  <text x="565" y="176" class="orange-title" font-size="18">type t<tspan baseline-shift="sub" font-size="12">e</tspan></text>
+  <path d="M650 158 H678" class="semantic-arrow" stroke-dasharray="none"/>
+  <g transform="translate(670 62)">
+    <rect x="0" y="0" width="132" height="34" rx="6" fill="#fde6cf"/>
+    <rect x="0" y="38" width="132" height="34" rx="6" fill="#fdf0df"/>
+    <rect x="0" y="76" width="132" height="34" rx="6" fill="#fde6cf"/>
+    <rect x="0" y="114" width="132" height="34" rx="6" fill="#fdf0df"/>
+    <rect x="0" y="152" width="132" height="28" rx="6" fill="#f8eadc"/>
+    <text x="13" y="23" class="small">Person</text>
+    <text x="13" y="61" class="small">Place</text>
+    <text x="13" y="99" class="small">Organization</text>
+    <text x="13" y="137" class="small">Creative Work</text>
+    <text x="22" y="172" class="small">... ...</text>
+  </g>
+
+  <rect x="932" y="36" width="484" height="210" rx="12" fill="url(#orangeGrad)" stroke="#e07000" stroke-width="1.6" filter="url(#shadow)"/>
+  <text x="1040" y="74" class="orange-title">LLM Semantic Verifier</text>
+  <use href="#icon-bot" x="950" y="56" width="64" height="58" color="#e07000"/>
+  <g transform="translate(1015 98)">
+    <use href="#icon-person" x="-5" y="-7" width="28" height="28" color="#111827"/>
+    <text x="40" y="13" class="small">Query (e<tspan baseline-shift="sub" font-size="9">s</tspan>)</text>
+    <use href="#icon-person" x="-7" y="34" width="24" height="24" color="#111827"/>
+    <use href="#icon-person" x="9" y="36" width="22" height="22" color="#111827"/>
+    <text x="40" y="55" class="small">Candidates (Top-k)</text>
+    <use href="#icon-clipboard" x="-4" y="78" width="28" height="28" color="#111827"/>
+    <text x="40" y="99" class="small">Attributes</text>
+    <use href="#icon-globe" x="-4" y="118" width="28" height="28" color="#111827"/>
+    <text x="40" y="137" class="small">Context</text>
+    <path d="M196 52 H226" class="semantic-arrow" stroke-dasharray="none"/>
+  </g>
+  <g transform="translate(1270 98)">
+    <rect x="0" y="0" width="130" height="34" rx="6" fill="#d7f0d2"/>
+    <rect x="0" y="38" width="130" height="34" rx="6" fill="#fff0a8"/>
+    <rect x="0" y="76" width="130" height="34" rx="6" fill="#dcecff"/>
+    <rect x="0" y="114" width="130" height="34" rx="6" fill="#eeeeee"/>
+    <text x="14" y="23" class="bold-small" fill="#1f7a2e">same_entity</text>
+    <text x="14" y="61" class="bold-small">closely_related</text>
+    <text x="14" y="99" class="bold-small">safe_negative</text>
+    <text x="14" y="137" class="bold-small">unknown</text>
+  </g>
+
+  <!-- Main pipeline boxes -->
+  <rect x="16" y="312" width="184" height="448" rx="10" fill="#f8fafc" stroke="#c7c7c7" stroke-width="1.5"/>
+  <text x="48" y="352" class="box-title">1. Multimodal</text>
+  <text x="53" y="380" class="box-title">Entity Inputs</text>
+  <use href="#icon-person" x="80" y="405" width="58" height="58" color="#111827"/>
+  <text x="82" y="480" class="small">Entity e</text>
+  <g transform="translate(30 510)">
+    <rect x="0" y="0" width="156" height="46" rx="6" fill="#fff" stroke="#c7c7c7"/>
+    <use href="#icon-image" x="12" y="7" width="32" height="32" color="#111827"/><text x="66" y="30" class="small">Image</text>
+    <rect x="0" y="60" width="156" height="46" rx="6" fill="#fff" stroke="#c7c7c7"/>
+    <use href="#icon-clipboard" x="12" y="67" width="32" height="32" color="#111827"/><text x="62" y="90" class="small">Attribute</text>
+    <rect x="0" y="120" width="156" height="46" rx="6" fill="#fff" stroke="#c7c7c7"/>
+    <use href="#icon-relation" x="12" y="127" width="32" height="32" color="#111827"/><text x="62" y="150" class="small">Relation</text>
+    <rect x="0" y="180" width="156" height="46" rx="6" fill="#fff" stroke="#c7c7c7"/>
+    <use href="#icon-graph" x="12" y="187" width="32" height="32" color="#111827"/><text x="62" y="210" class="small">Graph</text>
+  </g>
+
+  <rect x="225" y="312" width="182" height="448" rx="10" fill="url(#blueGrad)" stroke="#83b8ef" stroke-width="1.7"/>
+  <text x="255" y="352" class="box-title">2. Multimodal</text>
+  <text x="284" y="380" class="box-title">Encoder</text>
+  <g transform="translate(250 470)">
+    <text x="0" y="20" class="bold-small">z<tspan baseline-shift="sub" font-size="9">img</tspan></text>
+    <text x="0" y="82" class="bold-small">z<tspan baseline-shift="sub" font-size="9">attr</tspan></text>
+    <text x="0" y="144" class="bold-small">z<tspan baseline-shift="sub" font-size="9">rel</tspan></text>
+    <text x="0" y="206" class="bold-small">z<tspan baseline-shift="sub" font-size="9">graph</tspan></text>
+    <g transform="translate(52 4)">
+      <rect class="blue-label" x="0" y="0" width="14" height="20"/><rect class="blue-label" x="16" y="0" width="14" height="20"/><rect class="blue-label" x="32" y="0" width="14" height="20"/><rect class="blue-label" x="48" y="0" width="14" height="20"/><rect class="blue-label" x="64" y="0" width="14" height="20"/><rect class="blue-label" x="80" y="0" width="14" height="20"/>
+    </g>
+    <g transform="translate(52 66)">
+      <rect class="green-label" x="0" y="0" width="14" height="20"/><rect class="green-label" x="16" y="0" width="14" height="20"/><rect class="green-label" x="32" y="0" width="14" height="20"/><rect class="green-label" x="48" y="0" width="14" height="20"/><rect class="green-label" x="64" y="0" width="14" height="20"/><rect class="green-label" x="80" y="0" width="14" height="20"/>
+    </g>
+    <g transform="translate(52 128)">
+      <rect class="yellow-label" x="0" y="0" width="14" height="20"/><rect class="yellow-label" x="16" y="0" width="14" height="20"/><rect class="yellow-label" x="32" y="0" width="14" height="20"/><rect class="yellow-label" x="48" y="0" width="14" height="20"/><rect class="yellow-label" x="64" y="0" width="14" height="20"/><rect class="yellow-label" x="80" y="0" width="14" height="20"/>
+    </g>
+    <g transform="translate(52 190)">
+      <rect class="purple-label" x="0" y="0" width="14" height="20"/><rect class="purple-label" x="16" y="0" width="14" height="20"/><rect class="purple-label" x="32" y="0" width="14" height="20"/><rect class="purple-label" x="48" y="0" width="14" height="20"/><rect class="purple-label" x="64" y="0" width="14" height="20"/><rect class="purple-label" x="80" y="0" width="14" height="20"/>
+    </g>
+    <text x="60" y="280" class="small">...</text>
+  </g>
+
+  <rect x="432" y="312" width="578" height="496" rx="10" fill="url(#greenGrad)" stroke="#9bd48e" stroke-width="1.7"/>
+  <text x="552" y="348" class="green-title">3. Type-aware Modality Calibration</text>
+  <g transform="translate(442 380)">
+    <rect x="0" y="0" width="130" height="302" rx="8" fill="#eefbe9" stroke="#a9d99e"/>
+    <text x="42" y="30" class="bold-small">Inputs</text>
+    <text x="34" y="70" class="orange-title" font-size="18">type t<tspan baseline-shift="sub" font-size="12">e</tspan></text>
+    <text x="58" y="108" class="box-title">+</text>
+    <text x="14" y="150" class="tiny">z<tspan baseline-shift="sub" font-size="8">img</tspan></text><g transform="translate(58 136)"><rect class="blue-label" x="0" y="0" width="14" height="16"/><rect class="blue-label" x="14" y="0" width="14" height="16"/><rect class="blue-label" x="28" y="0" width="14" height="16"/><rect class="blue-label" x="42" y="0" width="14" height="16"/><rect class="blue-label" x="56" y="0" width="14" height="16"/></g>
+    <text x="14" y="196" class="tiny">z<tspan baseline-shift="sub" font-size="8">attr</tspan></text><g transform="translate(58 182)"><rect class="green-label" x="0" y="0" width="14" height="16"/><rect class="green-label" x="14" y="0" width="14" height="16"/><rect class="green-label" x="28" y="0" width="14" height="16"/><rect class="green-label" x="42" y="0" width="14" height="16"/><rect class="green-label" x="56" y="0" width="14" height="16"/></g>
+    <text x="14" y="242" class="tiny">z<tspan baseline-shift="sub" font-size="8">rel</tspan></text><g transform="translate(58 228)"><rect class="yellow-label" x="0" y="0" width="14" height="16"/><rect class="yellow-label" x="14" y="0" width="14" height="16"/><rect class="yellow-label" x="28" y="0" width="14" height="16"/><rect class="yellow-label" x="42" y="0" width="14" height="16"/><rect class="yellow-label" x="56" y="0" width="14" height="16"/></g>
+    <text x="14" y="288" class="tiny">z<tspan baseline-shift="sub" font-size="8">graph</tspan></text><g transform="translate(58 274)"><rect class="purple-label" x="0" y="0" width="14" height="16"/><rect class="purple-label" x="14" y="0" width="14" height="16"/><rect class="purple-label" x="28" y="0" width="14" height="16"/><rect class="purple-label" x="42" y="0" width="14" height="16"/><rect class="purple-label" x="56" y="0" width="14" height="16"/></g>
+  </g>
+  <text x="682" y="392" class="bold-small">b<tspan baseline-shift="sub" font-size="9">t</tspan>: Type x Modality</text>
+  <text x="672" y="414" class="bold-small">(Reliability Bias Matrix)</text>
+  <g transform="translate(668 440)">
+    <use href="#icon-image" x="18" y="-28" width="24" height="24" color="#111827"/>
+    <use href="#icon-clipboard" x="84" y="-28" width="24" height="24" color="#111827"/>
+    <use href="#icon-relation" x="146" y="-28" width="24" height="24" color="#111827"/>
+    <use href="#icon-graph" x="208" y="-28" width="24" height="24" color="#111827"/>
+    <text x="12" y="0" class="tiny">Image</text><text x="84" y="0" class="tiny">Attr</text><text x="150" y="0" class="tiny">Rel</text><text x="210" y="0" class="tiny">Graph</text>
+    <text x="-62" y="42" class="tiny">Person</text><text x="-48" y="78" class="tiny">Place</text><text x="-80" y="114" class="tiny">Organization</text><text x="-72" y="150" class="tiny">Creative</text><text x="-55" y="166" class="tiny">Work</text><text x="-38" y="204" class="tiny">...</text>
+    <g>
+      <rect x="0" y="12" width="56" height="36" fill="#bde6af"/><rect x="56" y="12" width="56" height="36" fill="#dff3d7"/><rect x="112" y="12" width="56" height="36" fill="#e8f7df"/><rect x="168" y="12" width="56" height="36" fill="#d4edcc"/>
+      <rect x="0" y="48" width="56" height="36" fill="#74bf66"/><rect x="56" y="48" width="56" height="36" fill="#a8d99b"/><rect x="112" y="48" width="56" height="36" fill="#d6efcf"/><rect x="168" y="48" width="56" height="36" fill="#b3dda7"/>
+      <rect x="0" y="84" width="56" height="36" fill="#e4f5dd"/><rect x="56" y="84" width="56" height="36" fill="#d9f1d1"/><rect x="112" y="84" width="56" height="36" fill="#edf8e8"/><rect x="168" y="84" width="56" height="36" fill="#e5f5df"/>
+      <rect x="0" y="120" width="56" height="36" fill="#ccebc4"/><rect x="56" y="120" width="56" height="36" fill="#b9e2ad"/><rect x="112" y="120" width="56" height="36" fill="#d7efd0"/><rect x="168" y="120" width="56" height="36" fill="#94cf86"/>
+      <rect x="0" y="156" width="56" height="36" fill="#dcefd6"/><rect x="56" y="156" width="56" height="36" fill="#bfe5b5"/><rect x="112" y="156" width="56" height="36" fill="#cdebc4"/><rect x="168" y="156" width="56" height="36" fill="#e6f6df"/>
+      <rect x="0" y="12" width="224" height="180" fill="none" stroke="#bcd7b4"/>
+    </g>
+    <g transform="translate(242 26)">
+      <rect x="0" y="0" width="14" height="106" fill="#e5f5df" stroke="#a9d99e"/>
+      <rect x="0" y="62" width="14" height="44" fill="#43a047"/>
+      <path d="M-8 62 L7 42 L22 62 Z" fill="#43a047" opacity="0.65"/>
+      <text x="28" y="12" class="tiny">High</text><text x="28" y="27" class="tiny">(reliable)</text>
+      <text x="28" y="95" class="tiny">Low</text><text x="28" y="110" class="tiny">(unreliable)</text>
+    </g>
+  </g>
+  <rect x="600" y="690" width="220" height="52" rx="6" fill="#fff" stroke="#111827" stroke-width="1.3"/>
+  <text x="620" y="724" class="bold-small">w' = softmax(log w + b<tspan baseline-shift="sub" font-size="9">t</tspan>)</text>
+  <path d="M724 635 V681" class="soft" marker-end="url(#arrow)"/>
+  <rect x="865" y="662" width="136" height="138" rx="8" fill="#eefbe9" stroke="#a9d99e"/>
+  <text x="908" y="690" class="bold-small">Output</text>
+  <text x="890" y="725" class="small">Calibrated</text>
+  <text x="885" y="746" class="small">Representation</text>
+  <text x="925" y="772" class="bold-small">z'</text>
+  <g transform="translate(892 782)"><rect class="green-label" x="0" y="0" width="14" height="18"/><rect class="green-label" x="16" y="0" width="14" height="18"/><rect class="green-label" x="32" y="0" width="14" height="18"/><rect class="green-label" x="48" y="0" width="14" height="18"/><rect class="green-label" x="64" y="0" width="14" height="18"/></g>
+
+  <rect x="1036" y="340" width="152" height="420" rx="10" fill="url(#purpleGrad)" stroke="#bd9be5" stroke-width="1.7"/>
+  <text x="1080" y="372" class="box-title">4. Top-k</text>
+  <text x="1040" y="400" class="box-title">Candidate Retrieval</text>
+  <text x="1052" y="467" class="bold-small">Top-k Candidates</text>
+  <g transform="translate(1088 496)">
+    <use href="#icon-person" x="-17" y="-20" width="34" height="34" color="#111827"/><text x="34" y="7" class="small">c<tspan baseline-shift="sub" font-size="9">1</tspan></text>
+    <rect x="-38" y="35" width="118" height="50" rx="8" fill="#fff2bf" opacity="0.9"/><use href="#icon-person" x="-17" y="40" width="34" height="34" color="#111827"/><text x="34" y="67" class="small">c<tspan baseline-shift="sub" font-size="9">2</tspan></text>
+    <use href="#icon-person" x="-17" y="104" width="34" height="34" color="#111827"/><text x="34" y="131" class="small">c<tspan baseline-shift="sub" font-size="9">3</tspan></text>
+    <text x="0" y="185" class="small">...</text>
+    <use href="#icon-person" x="-17" y="212" width="34" height="34" color="#111827"/><text x="34" y="239" class="small">c<tspan baseline-shift="sub" font-size="9">k</tspan></text>
+  </g>
+
+  <rect x="1214" y="340" width="196" height="420" rx="10" fill="url(#purpleGrad)" stroke="#bd9be5" stroke-width="1.7"/>
+  <text x="1264" y="372" class="box-title">5. Semantic</text>
+  <text x="1270" y="400" class="box-title">Reranking</text>
+  <text x="1232" y="468" class="bold-small">Before (Retrieval Rank)</text>
+  <g transform="translate(1244 506)">
+    <circle cx="0" cy="0" r="20" fill="#d7c6ea"/><text x="-6" y="5" class="small">c<tspan baseline-shift="sub" font-size="9">2</tspan></text>
+    <circle cx="40" cy="0" r="20" fill="#d7c6ea"/><text x="34" y="5" class="small">c<tspan baseline-shift="sub" font-size="9">1</tspan></text>
+    <circle cx="80" cy="0" r="20" fill="#d7c6ea"/><text x="74" y="5" class="small">c<tspan baseline-shift="sub" font-size="9">3</tspan></text>
+    <text x="114" y="5" class="small">...</text>
+    <circle cx="150" cy="0" r="20" fill="#d7c6ea"/><text x="143" y="5" class="small">c<tspan baseline-shift="sub" font-size="9">k</tspan></text>
+  </g>
+  <path d="M1312 545 V592" class="soft" marker-end="url(#arrow)"/>
+  <text x="1252" y="630" class="bold-small">d' = d - lambda · conf · Delta</text>
+  <path d="M1312 648 V690" class="soft" marker-end="url(#arrow)"/>
+  <text x="1255" y="710" class="bold-small">After (Reranked)</text>
+  <g transform="translate(1244 742)">
+    <circle cx="0" cy="0" r="20" fill="#b9e9a8"/><text x="-6" y="5" class="small">c<tspan baseline-shift="sub" font-size="9">1</tspan></text>
+    <circle cx="40" cy="0" r="20" fill="#d7c6ea"/><text x="34" y="5" class="small">c<tspan baseline-shift="sub" font-size="9">2</tspan></text>
+    <circle cx="80" cy="0" r="20" fill="#d7c6ea"/><text x="74" y="5" class="small">c<tspan baseline-shift="sub" font-size="9">3</tspan></text>
+    <text x="114" y="5" class="small">...</text>
+    <circle cx="150" cy="0" r="20" fill="#d7c6ea"/><text x="143" y="5" class="small">c<tspan baseline-shift="sub" font-size="9">k</tspan></text>
+  </g>
+
+  <rect x="1435" y="340" width="160" height="420" rx="10" fill="url(#redGrad)" stroke="#ee8aa3" stroke-width="1.7"/>
+  <text x="1478" y="372" class="box-title">6. Final</text>
+  <text x="1470" y="400" class="box-title">Alignment</text>
+  <text x="1467" y="480" class="bold-small">Final Aligned</text>
+  <text x="1475" y="503" class="bold-small">Entity Pair</text>
+  <use href="#icon-person" x="1459" y="537" width="46" height="46" color="#111827"/>
+  <use href="#icon-person" x="1517" y="537" width="46" height="46" color="#111827"/>
+  <line x1="1504" y1="560" x2="1518" y2="560" stroke="#111827" stroke-width="2"/><path d="M1510 554 L1504 560 L1510 566 M1512 554 L1518 560 L1512 566" fill="none" stroke="#111827" stroke-width="1.6"/>
+  <text x="1477" y="598" class="small">e<tspan baseline-shift="sub" font-size="9">s</tspan></text><text x="1535" y="598" class="small">e<tspan baseline-shift="sub" font-size="9">t</tspan></text>
+  <path d="M1501 650 L1517 668 L1545 625" fill="none" stroke="#22a447" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Flow arrows -->
+  <path d="M200 544 H225" class="main-arrow"/>
+  <path d="M407 544 H432" class="main-arrow"/>
+  <path d="M1010 544 H1036" class="main-arrow"/>
+  <path d="M1188 544 H1214" class="main-arrow"/>
+  <path d="M1410 544 H1435" class="main-arrow"/>
+  <path d="M644 246 V312" class="semantic-arrow"/>
+  <path d="M515 246 V312" class="semantic-arrow" opacity="0.35"/>
+  <path d="M1174 246 V340" class="semantic-arrow"/>
+  <path d="M1312 246 V340" class="semantic-arrow"/>
+
+  <!-- Legend -->
+  <rect x="46" y="832" width="1490" height="86" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-dasharray="8 5"/>
+  <path d="M68 872 H106" class="main-arrow"/>
+  <text x="124" y="868" class="subtitle">Main Pipeline</text>
+  <text x="124" y="894" class="subtitle">(Representation Flow)</text>
+  <line x1="332" y1="852" x2="332" y2="902" stroke="#e5e7eb"/>
+  <path d="M365 872 H404" class="semantic-arrow"/>
+  <text x="430" y="868" class="subtitle">LLM Semantic Guidance</text>
+  <text x="430" y="894" class="subtitle">(Type Construction &amp; Verification)</text>
+  <rect x="798" y="859" width="28" height="28" rx="4" fill="#d9ecff" stroke="#7bb5f0"/>
+  <text x="838" y="880" class="subtitle">Encoding</text>
+  <rect x="944" y="859" width="28" height="28" rx="4" fill="#daf3d6" stroke="#8ccf84"/>
+  <text x="984" y="880" class="subtitle">Calibration (Core)</text>
+  <rect x="1156" y="859" width="28" height="28" rx="4" fill="#eadcff" stroke="#b695df"/>
+  <text x="1196" y="880" class="subtitle">Retrieval &amp; Reranking</text>
+  <rect x="1400" y="859" width="28" height="28" rx="4" fill="#fff0f3" stroke="#ee8aa3"/>
+  <text x="1440" y="880" class="subtitle">Output</text>
+
+  <text x="566" y="970" class="title">Overall framework of LTCMEA.</text>
+</svg>

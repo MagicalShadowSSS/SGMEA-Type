@@ -1,0 +1,7 @@
+Evaluation Metrics. We employ Hits@n and  MRR as metrics to evaluate all the methods. Hits@n means the rate correct entities rank in the top n according to similarity computing. MRR denotes the mean reciprocal rank of correct entities. The higher values of Hits@n and MRR explain the better performance of the method.
+
+Evaluation Metrics We assess the alignment  probability between entities from different MMKGs based on cosine similarity. Hits@N and Mean Reciprocal Rank (MRR) are used as evaluation metrics for all models. Higher values of Hits@N and MRR indicate better performance.
+
+Evaluation Metrics. We assessed the alignment probability between entities from different MMKGs based on cosine similarity calculation. Then, we chose H@N (Hits@N), MRR (Mean Reciprocal Rank), and MR (Mean Rank) as metrics to evaluate all the models. A higher value for H@N and MRR indicates better performance, whereas a lower value for MR suggests the same.
+
+Evaluation Metrics We employ two metrics for  evaluation. Hits@1 (abbreviated as H@1) measures the accuracy of top-one predictions. Mean Reciprocal Rank (MRR) assesses the average inverse rank of the correct entity. Higher values of H@1 and MRR indicate better performance.

@@ -98,7 +98,7 @@ def load_eva_data(logger, args):
         img_vec_path = osp.join(args.data_path, "pkls", args.data_split + "_GA_id_img_feature_dict.pkl")
 
     assert osp.exists(img_vec_path)
-    img_features = load_img(logger, ENT_NUM, img_vec_path)
+    img_features, img_available = load_img(logger, ENT_NUM, img_vec_path)
     logger.info(f"image feature shape:{img_features.shape}")
 
     if args.word_embedding == "glove":
@@ -253,6 +253,7 @@ def load_eva_data(logger, args):
         'ent_num': ENT_NUM,
         'rel_num': REL_NUM,
         'images_list': img_features,
+        'image_available': torch.BoolTensor(img_available),
         'rel_features': rel_features,
         'att_features': att_features,
         'name_features': name_features,
@@ -584,7 +585,8 @@ def load_img(logger, e_num, path):
     # img_embd = np.array([np.zeros_like(img_dict[0]) for i in range(e_num)]) # no image
     # img_embd = np.array([img_dict[i] if i in img_dict else np.zeros_like(img_dict[0]) for i in range(e_num)])
 
+    img_available = np.array([i in img_dict for i in range(e_num)], dtype=np.bool_)
     img_embd = np.array([img_dict[i] if i in img_dict else np.random.normal(mean, std, mean.shape[0]) for i in range(e_num)])
     logger.info(f"{(100 * len(img_dict) / e_num):.2f}% entities have images")
-    return img_embd
+    return img_embd, img_available
 

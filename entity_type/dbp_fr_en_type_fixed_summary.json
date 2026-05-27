@@ -1,0 +1,23 @@
+{
+  "lang_pair": "fr_en",
+  "output": "entity_type/dbp_fr_en_type_fixed.jsonl",
+  "total_rows": 39654,
+  "source_entities": 19661,
+  "target_entities": 19993,
+  "ill_pairs": 15000,
+  "propagated_target_types": 15000,
+  "skipped_source_conflicts": 0,
+  "coarse_type_distribution": {
+    "Place": 6284,
+    "Creative Work": 4942,
+    "Organization": 4826,
+    "Person": 10423,
+    "Event": 658,
+    "Entity": 12521
+  },
+  "type_source_distribution": {
+    "dbpedia_source": 19661,
+    "alignment_propagated": 15000,
+    "default_target": 4993
+  }
+}

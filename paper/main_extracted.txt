@@ -1,0 +1,1252 @@
+
+
+===== PAGE 1 =====
+ 
+Contents lists available at ScienceDirect
+Pattern Recognition
+journal homepage: www.elsevier.com/locate/pr  
+HSP: A Hierarchical Semantic Preserving method for multimodal entity 
+alignment
+Bao Wang a, Ruizhe Ma b,∗, Xinyu Liang a, Li Yan a,c, Zongmin Ma a,c
+ ,∗∗
+a College of Computer Science and Technology, Nanjing University of Aeronautics and Astronautics, Nanjing, 211106, Jiangsu, China
+b Richard A. Miner School of Computer & Information Sciences, University of Massachusetts Lowell, Lowell, 211106, MA, USA
+c Collaborative Innovation Centre of Novel Software Technology and Industrialization, Nanjing, 211106, Jiangsu, China
+A R T I C L E  I N F O
+Keywords:
+Multimodal entity alignment
+Multimodal knowledge graph
+Semantic preservation
+Meta-learning
+Contrastive learning
+ A B S T R A C T
+Multimodal entity alignment (MEA) aims to identify equivalent entities across multimodal knowledge graphs. 
+However, existing entailment-based approaches fail to capture entity-aware cross-modal semantics due to 
+coarse representation and rigid fusion. In this paper, we propose an innovative Hierarchical Semantic-
+Preserving (HSP) method, which holistically addresses semantic collapse, cross-modal misalignment, and rigid 
+fusion by preserving high-dimensional visual structure, calibrating heterogeneous representations in a shared 
+semantic space, and adapting fusion dynamically to entity types. Specifically, HSP first designs a hierarchical 
+vision-preserving encoder to preserve the intrinsic topology of high-dimensional visual representations, 
+ensuring structural integrity and fine-grained semantic retention in the preserve stage. Then, HSP constructs 
+a cross-modal semantic calibration network to align textual and visual modalities within a unified semantic 
+space in the calibrate stage, mitigating cross-modal discrepancies. Finally, in the adapt stage, HSP develops an 
+entity-type-adaptive fusion controller to dynamically balance modality contributions through meta-learning, 
+enabling flexible, type-aware multimodal integration. Extensive experiments conducted on three public cross-
+lingual MEA benchmark datasets (ZH-EN, JA-EN, FR-EN) and two cross-graph datasets (FB-DB, FB-YG) under 
+three experimental settings demonstrate that the proposed model achieves up to a 2% improvement in MRR 
+over strong baseline methods.
+1. Introduction
+Knowledge graphs (KGs) provide a structured representation of 
+semantic knowledge by mapping real-world entities to graph nodes, 
+with edges explicitly modeling the relationships among them. Since 
+the deployment of large-scale knowledge graphs [1], numerous studies 
+have advanced their construction and application, particularly in tasks 
+such as question answering [2], recommender systems [3], and natural 
+language understanding [4], where KGs have become indispensable 
+tools. However, with the rapid proliferation of multimedia content 
+on social media platforms, traditional text-based knowledge graphs 
+exhibit inherent limitations in leveraging and representing multimodal 
+information. To address this issue, Chen et al. [5] propose Multimodal 
+Knowledge Graphs (MMKGs) associating entities and relations with 
+multimodal signals, enabling effective representation of real-world sce-
+narios through cross-modal information aggregation MMKGs enable 
+richer and more context-aware knowledge representations, thereby sup-
+porting advanced applications such as visual question answering [6,7] 
+∗ Corresponding author.
+∗∗ Corresponding author at: College of Computer Science and Technology, Nanjing University of Aeronautics and Astronautics, Nanjing, 211106, Jiangsu, China.
+E-mail addresses: ruizhe_ma@uml.edu (R. Ma), zongminma@nuaa.edu.cn (Z. Ma).
+and embodied intelligence [8,9]. At the same time, they introduce 
+new challenges for existing research due to the complexity of their 
+construction. In particular, the multimodal entity alignment (MEA) task 
+has become a focal point, since effective alignment of entities across 
+knowledge graphs significantly enhances semantic interoperability, as 
+illustrated in Fig.  1.
+To tackle this complex task, Chen et al. [5] initially propose the 
+classical three-stage architecture consisting of embedding, fusion, and 
+matching, followed by subsequent studies [10–12] that develop various 
+methods to exploit visual clues from the image modality and inte-
+grate multimodal information, partially alleviating the scarcity of seed 
+alignments. More recent works [11,13,14] further concentrate on the 
+utilization of fused multimodal representations and the design of more 
+sophisticated fusion strategies. Nonetheless, Zhao et al. [15] reveal that 
+these approaches still suffer from insufficient inter-KG interaction and 
+are vulnerable to multimodal heterogeneity. To fundamentally address 
+these limitations at a paradigm level, they reframe the multimodal 
+https://doi.org/10.1016/j.patcog.2026.113878
+Received 29 December 2025; Received in revised form 22 March 2026; Accepted 27 April 2026
+Pattern Recognition 179 (2026) 113878 
+Available online 29 April 2026 
+0031-3203/© 2026 Elsevier Ltd. All rights are reserved, including those for text and data mining, AI training, and similar technologies. 
+
+
+===== PAGE 2 =====
+B. Wang et al.
+Fig. 1. Detailed presentation of different knowledge graph and entity alignment tasks.
+entity alignment task as an entailment reasoning problem, where the 
+multimodal description of one entity semantically entails that of an-
+other, implying that they correspond to the same real-world entity. By 
+projecting information from all modalities into the textual space of a 
+pre-trained language model, this entailment-based formulation enables 
+fine-grained, token-level interactions between entity representations. 
+Consequently, it achieves more robust cross-modal semantic align-
+ment and demonstrates significantly superior performance compared 
+to contemporary methods [16–18].
+However, the aforementioned entailment-based framework
+inevitably encounters three critical deficiencies: (1) dimensionality 
+catastrophe in cross-modal semantic mapping, (2) lack of cross-modal 
+semantic consistency, and (3) limited adaptability in modality-specific 
+fusion. Specifically, visual modalities encode rich fine-grained seman-
+tics, such as spatial layout, facial details, or architectural cues, but exist-
+ing entailment-based methods typically compress these high-
+dimensional features into low-dimensional textual spaces through lin-
+ear projection, resulting in substantial semantic loss. Meanwhile, visual 
+representations, which are continuous, contrast sharply with the dis-
+crete, symbolic form of textual descriptions, and without a calibrated 
+semantic bridge, models often align entities based on spurious co-
+occurrence rather than genuine semantic correspondence. Moreover, 
+current fusion strategies apply uniform weighting across all entity 
+types, ignoring that ‘‘person’’ entities rely heavily on facial details, 
+‘‘building’’ entities benefit from global structural patterns, and ‘‘abstract 
+concept’’ entities may lack meaningful visual signals, rendering the 
+fusion process rigid and suboptimal.
+To address these limitations and advance the entailment paradigm, 
+we propose a novel Hierarchical Semantic Preserving (HSP) method 
+that reconstructs the alignment process via a three-stage ‘‘Preserve–
+Calibrate–Adapt’’ mechanism. Specifically, HSP comprises three key 
+components. First, the Hierarchical Vision-Preserving Encoder (HVPE) 
+preserves the intrinsic topology of 2048-dimensional visual features 
+through a residual hierarchical Transformer with three parallel paths 
+capturing local, global, and semantic information. Second, the Cross-
+Modal Semantic Calibration Network (CSCN) projects visual and textual 
+representations into a shared semantic subspace via bilinear mapping 
+and contrastive learning with InfoNCE loss and hard negative min-
+ing. Finally, the Entity-Type Adaptive Fusion Controller (EAFC) lever-
+ages meta-learning to generate entity-type-aware fusion weights via 
+a gated attention mechanism, enabling context-sensitive, type-aware 
+fusion across modalities. These components form a unified, interde-
+pendent pipeline, where high-fidelity features support cross-modal cal-
+ibration, and calibrated representations are refined through type-aware 
+fusion, forming a coherent end-to-end framework for multimodal entity 
+alignment.
+To comprehensively evaluate the proposed model and its hierar-
+chical semantic preservation (HSP) strategy, we conduct systematic 
+experiments on three cross-lingual datasets (ZH–EN, JA–EN, FR–EN) 
+and two cross-graph datasets (FB15K–DB15K, FB15K–YG15K) under 
+three seed settings (20%, 50%, 80%), where results show that HSP 
+achieves up to 2.0% MRR improvements over the strongest baselines 
+on cross-graph benchmarks under low-resource settings, while yielding 
+consistent gains of 0.2%–0.6% on cross-lingual datasets, demonstrating 
+robust generalization across diverse language pairs. The remainder of 
+this paper is organized as follows: Section 2 reviews related work on 
+multimodal knowledge graphs and entity alignment. Section 3 presents 
+the proposed model, detailing the HVPE, CSCN, and EAFC modules. 
+Section 4 describes the experimental setup and reports empirical re-
+sults, including ablation studies. Section 5 discusses limitations and 
+outlines directions for future work. Finally, Section 6 concludes this 
+work.
+In summary, the main contributions of this paper are as follows:
+• We identify three key limitations in existing entailment-based 
+approaches that hinder effective cross-modal alignment across 
+modalities: dimensionality imbalance, semantic inconsistency, 
+and inflexible modality fusion.
+• We propose Hierarchical Semantic-Preserving (HSP), an
+entailment-based multimodal entity alignment method that in-
+troduces a three-stage ‘‘Preserve–Calibrate–Adapt’’ paradigm to 
+jointly mitigate dimensionality-induced semantic collapse; en-
+force cross-modal semantic consistency; and enable entity-type-
+aware adaptive fusion.
+• Extensive experiments on multiple public MEA benchmarks
+demonstrate that HSP achieves superior and consistently robust 
+performance across both cross-lingual and cross-graph alignment 
+scenarios.
+2. Related works
+In this section, we systematically review the developmental tra-
+jectory of multimodal knowledge graphs, and then elaborate on the 
+specifics of the multimodal entity alignment task.
+2.1. Multimodal knowledge graph
+Multimodal knowledge graphs integrate heterogeneous modalities 
+such as text, images, audio, and video, overcoming the semantic limi-
+tations of traditional text-based knowledge graphs [19]. Such graphs 
+enable fine-grained, multi-perspective semantic modeling of entities 
+while enhancing semantic richness and cross-modal understanding. 
+Recent studies have explored this paradigm from multiple perspectives. 
+Zhang et al. [20] propose an optimal transport-based knowledge graph 
+embedding model to address a key challenge in multimodal knowledge 
+graph embedding: direct fusion of heterogeneous modalities can dis-
+rupt their intrinsic spatial structures, hindering semantic consistency 
+Pattern Recognition 179 (2026) 113878 
+2 
+
+
+===== PAGE 3 =====
+B. Wang et al.
+and comprehensive representation. Zhao et al. [21] develop a multi-
+modal knowledge graph–based image captioning framework to mitigate 
+weak entit–visual associations caused by long-tail named entities and 
+complex visual contexts. Meanwhile, Chen et al. [22] introduce a 
+transformer-based architecture with a modality-level noise masking 
+mechanism for robust multimodal entity feature fusion.
+2.2. Multimodal entity alignment
+Multimodal Entity Alignment (MEA) extends the traditional en-
+tity alignment task from knowledge graphs to multimodal knowledge 
+graphs by integrating heterogeneous modalities, such as text and im-
+ages, thereby enabling cross-graph multimodal entity matching. Early 
+work [5] introduces a three-stage paradigm comprising embedding 
+encoding, feature fusion, and feature matching, establishing a foun-
+dational framework for subsequent research. Later studies [11,23] 
+recognize the impact of cross-modal joint embeddings on alignment 
+accuracy. EVA [24] leverages visual information as anchors to per-
+form unsupervised entity alignment, enhancing matching performance. 
+MCLEA [23] applies contrastive learning strategies to efficiently learn 
+multimodal entity representations, further improving alignment qual-
+ity. IBMEA [25] incorporates a variational information bottleneck to 
+reduce interference from redundant information and misleading cues 
+within the multimodal fusion process. More recent research [26,27] 
+continues to explore advanced modality fusion strategies: the former 
+dynamically computes modality weights and calibrates them according 
+to uncertainty, whereas the latter addresses weak visual signals and 
+modality imbalance through cross-modal mapping combined with joint 
+optimization losses.
+In summary, existing approaches have achieved substantial ad-
+vances in modality encoding and cross-modal fusion, yet they re-
+main insufficient for capturing fine-grained cross-modal interactions. 
+The proposed method addresses inherent limitations of the entity-
+centric framework, enabling simultaneous enhancement of fine-grained 
+cross-modal semantic consistency and alignment accuracy.
+3. Methodology
+3.1. Task objective
+The objective of the proposed HSP model is to address three key 
+limitations in existing entailment-based multimodal entity alignment 
+methods: (1) semantic distortion caused by excessive compression of 
+high-dimensional visual features into a text-centric space, (2) insuf-
+ficient cross-modal interaction leading to weak semantic alignment, 
+and (3) static fusion that ignores entity-type-specific modality rele-
+vance. By mitigating these issues, HSP better preserves feature fidelity, 
+cross-modal consistency, and entity-type awareness, thereby enhancing 
+visual-language co-modeling performance.
+3.2. Overview
+The Hierarchical Semantic-Preserving (HSP) model addresses key 
+limitations in existing multimodal entity alignment approaches through 
+a Preserve–Calibrate–Adapt architecture that organizes feature process-
+ing into a progressive and interdependent pipeline. As illustrated in 
+Fig.  2, HSP first preserves the hierarchical structure of visual features 
+in their original high-dimensional space to mitigate information loss, 
+thereby providing high-fidelity inputs for cross-modal alignment. It 
+then aligns heterogeneous visual and textual modalities into a shared 
+semantic subspace via contrastive calibration, establishing a consistent 
+semantic basis. Finally, it adaptively fuses multimodal representations 
+according to entity types to produce unified embeddings. These em-
+beddings are subsequently fed into a pre-trained language model for 
+entailment classification, which outputs a confidence score to guide the 
+final alignment decision.
+Fig. 2. The overall architecture of the proposed HSP model. Different rounded 
+rectangular areas contain different components to demonstrate their working 
+principles. The lower right corner area is the process of inference. The top 
+area is the input data for the model.
+3.3. Hierarchical vision-preserving encoder
+To mitigate the dimensional catastrophe and semantic collapse 
+in the prior method [15], which naively compress high-dimensional 
+visual features into low-dimensional spaces, we design the Hierarchi-
+cal Vision-Preserving Encoder (HVPE). Unlike prior approaches that 
+directly project visual features such as the ResNet-152 outputs into 
+low-dimensional PLM embedding spaces, HVPE adopts a two-stage 
+architecture: the first stage operates in the original high-dimensional 
+feature space to preserve topological structure and semantic richness, 
+while the second stage generates PLM-compatible learnable prefixes to 
+enable effective downstream fusion and reasoning.
+3.3.1. Hierarchical feature enhancement
+In the first stage, HVPE processes the feature vector 𝑖𝑒, extracted 
+from the raw image 𝑣𝑒 of entity 𝑒 using a frozen ResNet-152 network. 
+𝐹 0 = ResNet152(𝑣𝑒), 𝐹 0 ∈ R𝐻×𝑊 ×𝑑𝑣 (1)
+𝑖𝑒 = Flatten(𝐹 0), 𝑖 𝑒 ∈ R𝑁×𝑑𝑣 (2)
+where 𝑑𝑣 = 2048  denotes the dimensionality of the flattened feature 
+vector, and 𝑁 = 𝐻 × 𝑊  represents the spatial resolution of the feature 
+map before flattening.
+Then, we design a residual hierarchical Transformer with three 
+pathways to generate enriched high-dimensional features while pre-
+serving the image topology. The local pathway 𝐹local employs window-
+based attention to capture fine-grained visual patterns such as textures 
+and edges. The global pathway 𝐹global utilizes full self-attention to 
+model overall composition and spatial relationships across the image. 
+The semantic pathway 𝐹semantic introduces a lightweight multilayer 
+Pattern Recognition 179 (2026) 113878 
+3 
+
+
+===== PAGE 4 =====
+B. Wang et al.
+perceptron for semantic aggregation, extracting high-level semantic 
+concepts such as ‘‘person’’ or ‘‘building’’. 
+𝐹local = transformerlocal(𝑖𝑒) (3)
+𝐹global = transformerglobal(𝑖𝑒) (4)
+𝐹semantic = transformersemantic(𝐹global) (5)
+To ensure the integrity of information flow and the effective uti-
+lization of multi-granularity features, we introduce cross-layer feature 
+reuse to integrate the outputs 𝐹local, 𝐹global, and 𝐹semantic. Subsequently, 
+a learnable dynamic weighting gating network adaptively generates 
+a normalized weight vector based on the input image content, and 
+performs weighted fusion over the three outputs to obtain the final 
+high-dimensional visual representation. 
+̃𝐹 = 𝐺( Pool(𝐹local), Pool(𝐹global), Pool(𝐹semantic)) ∈ R𝑑𝑐 (6)
+𝑤𝑝 = softmax( 𝑊𝑝 ⋅ LN( ̃𝐹 ) + 𝑏𝑝
+) (7)
+𝐹𝑣 =
+∑
+𝑝∈{loc,glo,sem}
+𝑤𝑝 ⋅ Pool( ̃𝐹 ) (8)
+where Pool(⋅) is the learnable attention pooling operation, and 𝐺(⋅) is 
+the learnable gate network.
+3.3.2. PLM-compatible visual prefix generation
+In the second stage, to facilitate cross-modal interaction within 
+the PLM while preserving high-dimensional information, we intro-
+duce a learnable low-dimensional prefix sequence instead of directly 
+compressing the full visual features. Specifically, we design a vision 
+mapping network (VMN), implemented as a multi-layer perceptron, to 
+project the extracted visual features 𝐹𝑣 into a learnable token embed-
+ding sequence of length 𝐿: 
+𝑃 = VMN(𝐹𝑣) ∈ R𝐿×𝑑 , 𝑃 = [𝑃1, 𝑃2, … , 𝑃𝐿]. (9)
+The resulting tokens are prepended to the textual sequence of 
+each entity and serve as input embeddings for the PLM. Unlike prior 
+approaches that rely on aggressive compression, HVPE preserves the 
+original visual representations without discarding high-dimensional 
+information.
+3.4. Cross-modal semantic calibration network
+To mitigate the modality discrepancy between continuous visual 
+representations and discrete textual semantics, we propose the Cross-
+Modal Semantic Calibration Network (CSCN). Its core objective is to 
+project the high-dimensional visual representations produced by HVPE 
+and the PLM-encoded contextual text representations 𝑇𝑒 into a shared 
+semantic subspace. Semantic correspondence is further strengthened 
+through contrastive learning. Unlike token-level interactions within 
+the PLM [15], CSCN explicitly models and corrects cross-modal bi-
+ases through calibration and fusion modules, yielding a robust shared 
+semantic representation. The process consists of three steps: textual 
+context modeling, cross-modal semantic mapping and calibration, and 
+cross-modal contrastive learning.
+3.4.1. Contextual text representation
+For a given entity 𝑒, its textual information includes the name 
+sequence, neighbor sequence, and attribute sequence. These sequences 
+are processed by a tokenizer to obtain a set of tokens. Meanwhile, the 
+learnable prefix token sequence 𝑃 generated by HVPE is inserted at the 
+beginning of the text sequence, thereby constructing the input sequence 
+for the PLM: 
+𝑋𝑒 = [𝑝1, … , 𝑝𝐿, 𝑡1, … , 𝑡𝑚] ∈ R(𝐿+𝑚)×𝑑 (10)
+where 𝑑 denotes the embedding dimension of the PLM, and 𝑚 is the 
+number of text tokens. After passing through 𝐿 layers of the Trans-
+former encoder, this sequence 𝑋𝑒 produces a contextualized hidden 
+state matrix: 
+𝐻𝑡 = PLM(𝑋𝑒) = [ ℎ1, ℎ2, … , ℎ𝐿+𝑚] ∈ R(𝐿+𝑚)×𝑑 (11)
+To obtain the overall textual representation of the entity, we apply 
+attention pooling over 𝐻𝑡: 
+𝑢𝑖 = 𝑞⊤ ⋅ tanh(𝑊 ⋅ ℎ𝑖 + 𝑏) (12)
+𝑇𝑒 =
+𝐿+𝑚∑
+𝑖=1
+exp(𝑢𝑖)
+∑𝐿+𝑚
+𝑗=1 exp(𝑢𝑗 )
+⋅ ℎ𝑖 (13)
+where 𝑞 is a learnable query vector, 𝑊  denotes the projection parame-
+ters, ℎ𝑖 is the representation of the 𝑖th token in 𝐻𝑡, and 𝑇𝑒 corresponds 
+to the contextual text representation of entity 𝑒.
+3.4.2. Cross-modal semantic projection and calibration
+After obtaining the visual aggregated representation from HVPE and 
+the textual representation 𝑇𝑒, CSCN first projects these two features into 
+a shared semantic subspace of dimension 𝑑𝑐: 
+𝑆𝑣 = LayerNorm( 𝜎(𝑊 ⊤
+𝑣 ⋅ 𝐹𝑣) + 𝑏𝑣
+) (14)
+𝑆𝑡 = LayerNorm( 𝜎(𝑊 ⊤
+𝑡 ⋅ 𝑇𝑒) + 𝑏𝑡
+) (15)
+where 𝑊𝑣 ∈ R𝑑𝑐 ×𝑑𝑐 , 𝑊𝑡 ∈ R𝑑×𝑑𝑐 are the learnable weight matrices, and 
+𝜎 is a nonlinear activation function.
+To further enhance fine-grained cross-modal semantic coupling, we 
+introduce a bilinear interaction term to ensure the independent seman-
+tics of visual and textual features are preserved, while also achieving 
+cross-modal alignment. The final cross-modal shared representation 
+𝑆shared ∈ R𝑑𝑐 is obtained through a gating mechanism as follows: 
+𝐼𝑣𝑡 = (𝑆𝑣)⊤ ⋅ 𝑈 ⋅ 𝑆𝑡 (16)
+𝑔 = 𝜎( 𝑊𝑔 ⋅ [𝑆𝑣; 𝑆𝑡; 𝐼𝑣𝑡] + 𝑏𝑔
+) (17)
+𝑆shared = 𝑔 ⋅ 𝑆𝑣 + (1 − 𝑔) ⋅ 𝑆𝑡 (18)
+where 𝑈 ∈ R𝑑𝑐 ×𝑑𝑐 is a learnable interaction matrix, and 𝑊𝑔 ∈ R1×(2𝑑𝑐 +1)
+and 𝑏𝑔 are learnable parameters.
+3.4.3. Contrastive calibration and fusion
+In the third stage, we employ a contrastive learning mechanism to 
+explicitly enhance the consistency between visual and textual represen-
+tations in the shared subspace. For an entity 𝑒 in a batch, its positive 
+sample pair is (𝑆𝑣
+𝑒 , 𝑆𝑡
+𝑒), and the negative sample set consists of the 
+representations of other entities in the same batch. The InfoNCE loss 
+is defined as follows: 
+cscn = − 1
+𝐵
+𝐵∑
+𝑖=1
+log
+exp( sim( ̂𝑆𝑣
+𝑖 , ̂𝑆𝑡
+𝑖 )∕𝜏)
+∑𝐵
+𝑗=1 exp( sim( ̂𝑆𝑣
+𝑖 , ̂𝑆𝑡
+𝑗 )∕𝜏) (19)
+where sim(⋅, ⋅) denotes cosine similarity, and 𝜏 is the temperature 
+coefficient.
+After completing the contrastive calibration, the calibrated visual 
+and textual representations 𝑆𝑣 and 𝑆𝑡 are passed to the EAFC module 
+for type-aware adaptive fusion.
+3.5. Entity-type adaptive fusion controller
+The HVPE and CSCN modules preserve high-dimensional features 
+and perform cross-modal semantic calibration but do not explicitly 
+model heterogeneous modality dependencies across entity types. For in-
+stance, visual signals (e.g., facial images) are often more discriminative 
+Pattern Recognition 179 (2026) 113878 
+4 
+
+
+===== PAGE 5 =====
+B. Wang et al.
+for Person entities, whereas textual signals (e.g., attribute descrip-
+tions or neighbor relations) convey stronger semantics for Organiza-
+tion and Location entities. Static fusion strategies [15] overlook such 
+type-specific dependencies, increasing the risk of semantic misalign-
+ment. Therefore, a type-aware fusion mechanism is essential for robust 
+cross-modal alignment.
+Therefore, we propose the Entity-Type Adaptive Fusion Controller 
+(EAFC). Built upon the calibrated visual representation 𝑆𝑣 and textual 
+representation 𝑆𝑡 produced by CSCN, EAFC introduces a type-aware 
+dynamic weighting mechanism that adaptively adjusts the fusion ratio 
+according to the entity type 𝑡𝑒. In addition, to improve the model’s 
+generalization capability on few-shot and unseen entity types, EAFC 
+employs a meta-learning-based adaptive optimization strategy.
+3.5.1. Type-aware fusion weight generation
+In the first stage, EAFC leverages the entity type embedding to 
+generate adaptive weights for different modalities. If the type 𝑡𝑒 of 
+entity 𝑒 is known, the corresponding type embedding vector is retrieved 
+from a lookup table: 
+𝐭𝑒 = Embed(𝑡𝑒) ∈ R𝑑𝑡 (20)
+where 𝑑𝑡 denotes the dimensionality of the type embedding. If the entity 
+type is unknown, a lightweight type predictor (e.g., a classifier based on 
+the PLM [CLS] vector) is used to estimate its type distribution 𝑝(𝑡 ∣ 𝑒), 
+and the weighted average embedding is then computed as: 
+𝐭𝑒 =
+𝐾∑
+𝑘=1
+𝑝(𝑡𝑘|𝑒) ⋅ Embed(𝑡𝑘) (21)
+where 𝐾 denotes the total number of predefined entity types. The type 
+embedding 𝐭𝑒 is then projected through a gating network 𝐺(⋅) to gen-
+erate normalized fusion weights for the visual and textual modalities. 
+[𝛼𝑒, 𝛽𝑒] = softmax( 𝐺(𝐭𝑒)) ∈ R2, (𝛼𝑒 + 𝛽𝑒 = 1) (22)
+𝑍EAFC
+𝑒 = 𝛼𝑒 ⋅ 𝑆𝑣 + 𝛽𝑒 ⋅ 𝑆𝑡 (23)
+3.5.2. Meta-learning based adaptive optimization
+In the second stage, we further improve the generalization capa-
+bility of EAFC toward few-shot and previously unseen entity types by 
+integrating a MAML-based meta-optimization strategy. This strategy 
+equips EAFC with a transferable initialization, enabling rapid special-
+ization to emerging entity types under limited supervision. Specifically, 
+each entity type 𝑘 is formulated as an independent meta-task 𝑇𝑘, aiming 
+to learn a fusion weight generator 𝐺(⋅) that can adapt effectively from 
+scarce samples. The training procedure follows a bi-level optimization 
+paradigm consisting of an inner loop and an outer loop.
+Inner Loop (Task-Specific Adaptation): For each task 𝑇𝑘, a small 
+support set sup
+𝑘  is sampled to emulate the low-resource setting. Ini-
+tialized with the global parameters 𝜃, EAFC performs a gradient-based 
+update to rapidly specialize the fusion behavior, yielding task-adapted 
+parameters 𝜃′
+𝑘: 
+𝜃′
+𝑘 = 𝜃 − 𝛼∇𝜃𝑇𝑘 (𝜃; sup
+𝑘 ), (24)
+Outer Loop (Meta-Level Optimization): The task-adapted parame-
+ters are evaluated on the query set qry
+𝑘  of task 𝑇𝑘, encouraging the 
+model to favor parameter initializations that generalize after adapta-
+tion. The global parameters 𝜃 are then optimized to minimize the query 
+loss: 
+𝜃 ← 𝜃 − 𝛽∇𝜃𝑇𝑘 (𝜃′
+𝑘; qry
+𝑘 ). (25)
+where 𝛼 and 𝛽 denote the learning rates for the inner loop and outer 
+loop, respectively, and 𝑇𝑘 represents the loss function for task 𝑇𝑘.
+3.6. Unified input construction and training
+Through the integration of HVPE, CSCN, and EAFC, we obtain 
+a robust multimodal entity representation 𝑍EAFC
+𝑒  for each entity 𝑒.
+However, representation learning alone is insufficient for the down-
+stream entity alignment task. To facilitate effective alignment learning, 
+we introduce a unified input sequence construction mechanism coupled 
+with a multi-task joint optimization objective, leveraging the PLM to 
+enable end-to-end training.
+3.6.1. Multimodal input sequence construction
+For each entity 𝑒, we construct an input sequence that includes vi-
+sual prefixes and textual information (name, neighbors, and attributes):
+Seq(𝑒) = [ 𝑃𝑒; Token(𝑆name); Token(𝑆nbr); Token(𝑆attr)] (26)
+where 𝑃 denotes the visual prefix tokens generated by HVPE, and the 
+textual part is tokenized into a sequence of tokens.
+In the candidate alignment task, for a source entity 𝑒 and its 
+candidate target entity 𝑒′, we construct the input template as follows: 
+𝑇 (𝑒, 𝑒′) = [ [CLS] Seq(𝑒) [T] Seq(𝑒′) [SEP]] (27)
+where [T] serves as a delimiter to ensure the distinguish ability of 
+sequences across entities. The sequence is then fed into the PLM for 
+encoding, producing the contextual hidden state matrix.
+3.6.2. Triple construction
+To enhance discriminative cross-modal entity alignment, we for-
+mulate a triplet-based objective within a multi-task joint optimization 
+framework. For a source entity 𝑒, its aligned counterpart 𝑒+ is paired 
+with multiple negative samples 𝑒−. The negatives are constructed via 
+a hard sampling strategy that combines random negatives with highly 
+similar yet unaligned candidates in the embedding space. This design 
+promotes stable optimization and improves fine-grained discriminative 
+learning among semantically similar entities.
+3.6.3. Joint optimization objectives
+After obtaining the triplets, we design a joint optimization loss 
+function at multiple levels:
+• The Embedding Alignment Loss is used to constrain positive 
+sample pairs to be closer in the embedding space and is defined 
+as follows: 
+mr =
+∑
+(𝑒,𝑒−,𝑒+)
+max( 0, 𝑑 (𝑍EAFC
+𝑒 , 𝑍EAFC
+𝑒+ ) − 𝑑(𝑍EAFC
+𝑒 , 𝑍EAFC
+𝑒− ) + 𝑚) (28)
+where 𝑑(⋅, ⋅) denotes the squared Euclidean distance.
+• The Entailment Losses are used to discriminate and rank align-
+ment relations and are defined as follows: 
+be = −
+(
+𝑦 ⋅ log 𝑝(𝑦 ∣ 𝑇 (𝑒, 𝑒+)) + (1 −𝑦) ⋅ log( 1 − 𝑝(𝑦 ∣ 𝑇 (𝑒, 𝑒−))) )
+(29)
+bm =
+∑
+(𝑒,𝑒−,𝑒+)
+max( 0, 𝑝 (𝑦 ∣ 𝑇 (𝑒, 𝑒−)) − 𝑝(𝑦 ∣ 𝑇 (𝑒, 𝑒+)) + 𝑚′) (30)
+• The Cross-Modal Contrastive Loss is employed to ensure consis-
+tency between visual and textual representations in the shared 
+subspace and is defined as follows: 
+cscn = − 1
+𝐵
+𝐵∑
+𝑖=1
+log
+exp( sim( ̂𝑆𝑣
+𝑖 , ̂𝑆𝑡
+𝑖 )∕𝜏)
+∑𝐵
+𝑗=1 exp( sim( ̂𝑆𝑣
+𝑖 , ̂𝑆𝑡
+𝑗 )∕𝜏) (31)
+• The EAFC employs a Meta-Learning Loss to enhance general-
+ization across different entity types and is defined as follows: 
+meta =
+∑
+𝑘∈
+𝑇𝑘 (𝜃′
+𝑘; qry
+𝑘 ) (32)
+During training, we employ joint training to optimize the overall model, 
+so the final objective function is given by: 
+ = 𝜆1 ⋅ mr + 𝜆2 ⋅ be + 𝜆3 ⋅ bm + 𝜆4 ⋅ cscn + 𝜆5 ⋅ meta (33)
+Pattern Recognition 179 (2026) 113878 
+5 
+
+
+===== PAGE 6 =====
+B. Wang et al.
+Table 1
+Detailed statistics of datasets.
+ Dataset type Dataset MMKGs #Ent. #Rel. #Attr. #Rel. Triplet #Attr. Triplet #Img. #Seed  
+ 
+Cross-graph
+FB15K-DB15K FB15K 14,951 1345 116 592,313 29,395 13 444 12,849 
+ DB15K 12,842 279 225 89,197 48,080 12 837  
+ FB15K-YG15K FB15K 14,951 1345 116 592,313 29,395 13 444 11,199 
+ YG15K 15,404 32 7 122,886 23,532 11 194  
+ 
+Cross-lingual
+DBPZH-EN
+Chinese(ZH) 19,388 1701 7780 70,414 379,684 19 388 15,000 
+ English(EN) 19,572 1323 6933 95,142 567,755 19 572  
+ DBPJA-EN
+Japanese(JA) 19,814 1299 5681 77,214 354,619 12 739 15,000 
+ English(EN) 19,780 1153 5850 93,484 497,230 13 741  
+ DBPFR-EN
+French(FR) 19,661 903 4431 105,998 528,665 14 174 15,000 
+ English(EN) 19,993 1208 6161 115,722 576,543 13 858  
+3.7. Dual entailment reasoning
+During inference, the model identifies the aligned entity in the 
+target knowledge graph 𝐺2 for each source entity 𝑒 in 𝐺1 through a 
+two-stage process: embedding-based candidate retrieval followed by 
+entailment-based semantic reasoning. In the first stage, the source and 
+target entities are encoded and fused via HVPE, CSCN, and EAFC to 
+obtain unified cross-modal representations. Cosine similarity is then 
+computed in the shared embedding space, and the top-𝑘 most similar 
+entities are selected to form the candidate set 𝐶(𝑒): 
+𝑆𝑖𝑚emb(𝑒, 𝑒′) =
+𝑍EAFC
+𝑒 ⋅ 𝑍EAFC
+𝑒′
+‖𝑍EAFC
+𝑒 ‖ ⋅ ‖𝑍EAFC
+𝑒′ ‖
+, (34)
+Although embedding similarity provides an efficient coarse-grained 
+estimate of entity compatibility, it can become unreliable when can-
+didates exhibit highly similar multimodal representations. To address 
+this, HSP employs a PLM-based entailment reasoning mechanism for 
+deeper semantic verification, constructing a joint input sequence
+𝑋(𝑒, 𝑒′) for each candidate 𝑒′ ∈ 𝐶(𝑒) and computing the alignment 
+probability using one of two complementary reasoning variants: HSP-N, 
+which emphasizes global semantic compatibility between entity pairs, 
+and HSP-M, which enables finer-grained contextual inference.
+HSP-N (NSP-based reasoning). This variant models entity alignment 
+as a sentence-pair task, processing the joint sequence through 
+the PLM and using the [CLS] representation ℎCLS to encode the 
+global semantic relationship between the two entities, with the 
+alignment probability then computed as: 
+𝑝NSP
+align(𝑒, 𝑒′) = 𝜎 ( 𝐰⊤
+NSPℎCLS + 𝑏NSP
+) , (35)
+HSP-M (MLM-based reasoning). This variant casts alignment as a 
+masked semantic inference task, inserting a [MASK] token into 
+the input sequence and predicting whether it should be filled 
+with ‘‘Yes’’, thereby enabling finer-grained semantic inference 
+conditioned on the full multimodal context, with ℎmask denoting 
+the hidden representation at the masked position: 
+𝑝MLM
+align (𝑒, 𝑒′) = 𝜎 ( 𝐰⊤
+MLMℎmask + 𝑏MLM
+) , (36)
+Both variants share the same architecture and differ only in the 
+entailment prediction head, with 𝑝entail(𝑒, 𝑒′) denoting either 𝑝NSP
+align or 
+𝑝MLM
+align depending on the reasoning variant; the final matching score then 
+combines embedding similarity with the entailment signal: 
+𝑆(𝑒, 𝑒′) = 𝛾 ⋅ 𝑆𝑖𝑚emb(𝑒, 𝑒′) + (1 − 𝛾) ⋅ 𝑝entail(𝑒, 𝑒′), (37)
+𝑒′∗ = arg max
+𝑒′∈𝐶(𝑒)
+𝑆(𝑒, 𝑒′). (38)
+where 𝛾 balances structural similarity and semantic verification. By 
+integrating embedding-based retrieval with entailment reasoning, HSP 
+performs multi-level semantic validation, reducing reliance on embed-
+ding similarity alone and enhancing robustness when aligning noisy, 
+heterogeneous, or semantically overlapping multimodal entities.
+4. Experiments
+4.1. Datasets
+To comprehensively evaluate the performance of the proposed HSP 
+model,1 we conduct experiments on five representative benchmark 
+datasets encompassing both cross-graph and cross-lingual scenarios. 
+As summarized in Table  1, the FB15K-DB15K dataset is constructed 
+by aligning entities between FB15K [28] and DB15K [29], result-
+ing in a cross-kg entity alignment benchmark with 12,849 align-
+ment seeds and 26,281 associated images. Similarly, the FB15K-YG15K 
+dataset is constructed by matching identical entities between FB15K 
+and YG15K [30], yielding a dataset with 11,199 alignment seeds and 
+24,638 associated images. The DBP dataset [29] comprises three cross-
+lingual sub-datasets: ZH-EN, JA-EN, and FR-EN, covering Chinese, 
+English, French, and Japanese, and representing complex cross-lingual 
+interaction scenarios; these sub-datasets contain 38,960, 26,480, and 
+28,032 associated images, respectively, providing rich cross-modal 
+interaction cues for entity alignment. For training, we adopt three 
+different alignment seed ratios: 20%, 50%, and 80%, and for entities 
+without associated images, we follow the prior work [24] setting by 
+assigning random vectors as their visual features.
+4.2. Implementation details
+All experiments are implemented using the PyTorch framework2 
+and conducted on a system equipped with two NVIDIA RTX 4090 GPUs, 
+each with 24 GB of memory. To ensure reproducibility, we repeat each 
+experiment using five distinct random seeds and report the average 
+performance across three independent runs for each seed. The model 
+is trained with a batch size of 32 to balance training stability and 
+GPU memory consumption, for up to 100 epochs, with early stopping 
+applied based on validation set performance to mitigate overfitting. We 
+employ the Adam optimizer, using an initial learning rate of 3×10 −5 for 
+the language encoder and 1 × 10−4 for other components; this learning 
+rate is decayed by a factor of 0.1 every 20 epochs. A dropout rate of 
+0.1 and weight decay of 1 × 10−5 are applied throughout the model to 
+enhance generalization, and the GeLU activation function is used in all 
+applicable layers.
+To ensure a fair comparison with the state-of-the-art model [15], we 
+reproduce its results using the original protocol. The original work used 
+NVIDIA A6000 GPUs with 48 GB memory,3 while our experiments use 
+RTX 4090 GPUs. Differences in hardware may cause minor performance 
+variations. We retain the original results for reference and analyze 
+discrepancies to support a transparent evaluation of HSP.
+1 https://github.com/SheetahKing/HSP.
+2 https://pytorch.org/.
+3 https://github.com/OreOZhao/ME3A.
+Pattern Recognition 179 (2026) 113878 
+6 
+
+
+===== PAGE 7 =====
+B. Wang et al.
+4.3. Evaluation metrics
+To ensure a comprehensive evaluation of the proposed method on 
+the multimodal entity alignment task, we adopt Hits@n and MRR as 
+primary evaluation metrics. Hits@n measures the proportion of test 
+entities for which the correct alignment appears within the top n 
+ranked candidates; for instance, Hits@1 = 0.8 indicates that the correct 
+match is ranked first in 80% of the cases. MRR, or Mean Reciprocal 
+Rank, computes the average of the reciprocal ranks of correct entities, 
+assigning scores of 1, 0.5, 0.33, and so on for ranks 1, 2, 3, respectively. 
+This metric rewards models that place correct matches higher in the 
+ranked list. Higher values of both Hits@n and MRR indicate more 
+accurate and robust entity alignment performance.
+4.4. Baseline models
+To evaluate the effectiveness of the proposed model, we assess it 
+against several recent and representative baselines on two cross-graph 
+datasets. All hyperparameters follow the configurations reported in 
+the original papers to ensure reproducibility. These baselines cover 
+diverse paradigms, including multimodal fusion, contrastive learning, 
+distribution alignment, and causal modeling: PoE [31] establishes a 
+foundational framework for cross-modal semantic fusion; MMEA [5] 
+unifies structure, attributes, and visual information for multimodal 
+entity alignment; EVA [24] employs vision as a pivot for unsuper-
+vised alignment; MCLEA [23] advances multimodal contrastive learn-
+ing to align heterogeneous embedding spaces; MEAformer [32] formu-
+lates a meta-modality hybrid mechanism for heterogeneous modality 
+fusion; PCMEA [18] introduces pseudo-label calibration to alleviate 
+noise propagation; LoginMEA [33] presents a local-to-global inter-
+action network for multi-level relational fusion; OTMEA [16] aligns 
+multimodal distributions via optimal transport to reduce heterogene-
+ity; GSIEA [34] separately models graph structure and multimodal 
+information to mitigate structural heterogeneity; RICEA [26] enhances 
+generalization through relative interaction modeling and dynamic cal-
+ibration; CDMEA [17] addresses modality bias from a causal perspec-
+tive; ME3A [15] formulates MEA as an entity entailment task to enable 
+fine-grained cross-graph interaction. On the DBP dataset, we evalu-
+ate the model against MSNEA [35], MultiJAF [36], DESAlign [37], 
+PSNEA [38], AMFSEA [13], and IBMEA [25].
+4.5. Main results
+We conduct extensive experiments across multiple datasets to eval-
+uate the performance of the proposed HSP model against recent and 
+competitive baselines. As shown in Table  2, HSP demonstrates highly 
+competitive performance on the cross-graph datasets FB15K-DB15K and 
+FB15K-YG15K under alignment seed ratios of 20%, 50%, and 80%, fre-
+quently surpassing previous methods. In the low-resource setting with 
+only 20% seed alignments, although some methods achieve slightly 
+higher Hits@1 on FB15K-DB15K, HSP-M attains the best Hits@10 
+(0.837) and MRR (0.702), indicating stronger overall ranking capabil-
+ity and more reliable candidate alignment under limited supervision. 
+As supervision increases, HSP’s advantage becomes more evident; for 
+instance, with 50% seeds on FB15K-DB15K, HSP improves Hits@1 
+to 0.755, outperforming the strongest baseline (0.735) by 2.0%, and 
+maintains top performance across nearly all metrics at the 80% set-
+ting. These results suggest that HSP scales effectively with additional 
+supervision while preserving stable performance gains.
+According to the results in Table  3, HSP consistently achieves 
+leading performance across all language pairs (ZH–EN, JA–EN, FR–
+EN). In particular, HSP-M attains an MRR of 0.946 and Hits@1 of 
+0.906 on FR–EN, while consistently outperforming recent competitive 
+baselines, including the ME3A variants, on the other subsets. These 
+uniform improvements across linguistically diverse datasets indicate 
+that HSP enhances both the discriminability of entity representations 
+and the accuracy of alignment, which can be attributed to its coordi-
+nated integration of structural preservation, semantic calibration, and 
+adaptive feature fusion.
+4.6. Ablation study
+To assess the contribution of each component within the proposed 
+HSP framework, we conduct systematic ablation studies on the DBP15K 
+benchmark datasets (ZH–EN and JA–EN). As shown in Table  4, re-
+moving any core module leads to performance declines of varying 
+magnitudes. Specifically, eliminating HVPE (Hierarchical Visual Preser-
+vation Encoder) results in the largest drop, with Hits@1 decreasing by 
+0.038 on ZH–EN, suggesting that preserving high-dimensional visual 
+topology is associated with reduced semantic representation degrada-
+tion. Removing CSCN, which performs cross-modal calibration through 
+bilinear interaction and contrastive learning, yields a performance 
+decrease of 0.032, indicating that explicit semantic alignment within 
+a shared subspace contributes positively to model performance. Dis-
+abling EAFC (Entity-type Adaptive Fusion Controller) lowers Hits@1 by 
+0.023, suggesting that dynamically adjusting modality weights based 
+on entity semantics tends to be more effective than static fusion. 
+In addition, removing meta-learning (w/o META) or contrastive cal-
+ibration (w/o CONT) causes performance drops of 0.011 and 0.028, 
+respectively, indicating their roles in supporting cross-entity-type gen-
+eralization and cross-modal consistency. Overall, these observations are 
+consistent with the ‘‘preserve–calibrate–adapt’’ design principle: HVPE 
+is associated with maintaining structural information, CSCN supports 
+semantic alignment across modalities, and EAFC enables context-aware 
+fusion. Collectively, these components contribute to stable performance 
+under low-resource and cross-lingual settings.
+As shown in Table  5, we systematically evaluate the impact of differ-
+ent pretrained visual and textual encoders on model performance and 
+inference efficiency. For visual encoders, performance does not increase 
+monotonically with parameter scale: VGG-16 and ViT-base contain 
+138M and 87M parameters, respectively, both exceeding the 60M 
+parameters of ResNet-152, yet they exhibit slightly inferior alignment 
+performance. Although CLIP yields an approximate 0.6% improvement 
+in MRR, it also introduces higher inference overhead. This observation 
+may be related to the relative sparsity of visual signals in multimodal 
+entity alignment, where most entities are associated with only a single 
+image, thereby limiting the effective utilization of large-scale visual 
+models. For textual encoders, replacing the static word embeddings 
+of GloVe with contextualized pretrained language models leads to a 
+substantial performance gain, improving MRR by approximately 5.9%, 
+suggesting that dynamic semantic modeling helps capture entity con-
+textual information. In contrast, BERT-large provides only a modest 
+improvement of about 0.4% over BERT-base, indicating that further 
+scaling the model yields limited returns under the current data con-
+ditions. Overall, smaller encoders may be insufficient for modeling 
+cross-modal semantics, whereas excessively large models are more 
+likely to be constrained by data availability while incurring additional 
+computational cost. Therefore, ResNet-152 and BERT-base offer a more 
+balanced trade-off between performance and efficiency and are adopted 
+as the default configuration.
+4.7. Case study
+To illustrate HSP’s type-aware fusion, we examine two representa-
+tive entity types, Person and Location (Fig.  3(a)). Unlike prior methods 
+that rely on static fusion [15], HSP dynamically adjusts modality 
+weights via EAFC to reflect entity-specific importance.
+For Person entities (e.g., ‘‘Michelle Obama’’), identity discrimination 
+relies primarily on facial geometry, leading EAFC to assign greater 
+weight to the visual modality. HVPE preserves fine-grained geomet-
+ric features, such as interocular distance and jawline structure, in 
+a 2048-dimensional space. CSCN then aligns these visual cues with 
+bilingual textual representations in a shared semantic subspace, facil-
+itating accurate cross-modal alignment. In contrast, for Location en-
+tities (e.g., ‘‘Notre-Dame de Paris’’), visual appearance alone is often 
+Pattern Recognition 179 (2026) 113878 
+7 
+
+
+===== PAGE 8 =====
+B. Wang et al.
+Table 2
+The experiment results on the DB15K-DB15K and FB15K-YG15K dataset. The best results are highlighted in bold, while the second 
+best are underlined. The 𝛥𝐼𝑚𝑝. represents the difference between the best and second best performances. The 𝛥𝑆𝑡𝑑. is the standard 
+deviation of the average performance.
+ Seeds Model Ref. FB15K-DB15K FB15K-YG15K
+ Hits@1 Hits@10 MRR Hits@1 Hits@10 MRR  
+ 
+20%
+PoE ESWC’19 0.126 0.251 0.170 0.250 0.495 0.334  
+ MMEA KSEM’20 0.265 0.541 0.357 0.234 0.480 0.317  
+ EVA AAAI’21 0.199 0.448 0.283 0.153 0.361 0.224  
+ MCLEA COLING’22 0.295 0.582 0.393 0.254 0.484 0.332  
+ MEAformer MM’23 0.417 0.715 0.518 0.327 0.595 0.417  
+ PCMEAa AAAI’24 0.436 0.707 0.528 0.397 0.654 0.486  
+ LoginMEAa ECAI’24 0.536 0.784 0.667 0.572 0.758 0.652  
+ OTMEA ICASSP’25 0.443 0.712 0.523 0.395 0.628 0.477  
+ GSIEA IPM’25 0.580 0.791 0.649 0.515 0.728 0.588  
+ RICEA ACL’25 0.471 0.720 0.557 0.411 0.658 0.497  
+ CDMEAa SIGIR’25 0.549 0.741 0.611 0.434 0.682 0.523  
+ ME3A-N IPM’25 0.492 0.824 0.689 0.587 0.766 0.651  
+ ME3A-M IPM’25 0.502 0.822 0.683 0.586 0.764 0.659  
+ HSP-N – 0.544 0.831 0.699 0.597 0.784 0.679  
+ HSP-M – 0.542 0.837 0.702 0.609 0.791 0.672  
+ 𝛥𝐴𝑣𝑔. – −0.036 0.013 0.013 0.022 0.025 0.020  
+ 𝛥𝑆𝑡𝑑. – ±0.012 ±0.009 ±0.010 ±0.011 ±0.007 ±0.009 
+ 
+50%
+PoE ESWC’19 0.464 0.658 0.533 0.411 0.669 0.498  
+ MMEA KSEM’20 0.417 0.703 0.512 0.403 0.645 0.486  
+ EVA AAAI’21 0.334 0.589 0.422 0.311 0.534 0.388  
+ MCLEA COLING’22 0.555 0.784 0.637 0.501 0.705 0.574  
+ MEAformer MM’23 0.619 0.843 0.698 0.560 0.778 0.639  
+ PCMEAa AAAI’24 0.633 0.825 0.701 0.606 0.785 0.652  
+ LoginMEAa ECAI’24 0.712 0.857 0.755 0.648 0.805 0.699  
+ OTMEA ICASSP’25 0.658 0.854 0.734 0.617 0.809 0.687  
+ GSIEA IPM’25 0.716 0.886 0.775 0.646 0.828 0.711  
+ RICEA ACL’25 0.648 0.852 0.721 0.617 0.811 0.687  
+ CDMEAa SIGIR’25 0.675 0.861 0.737 0.628 0.824 0.692  
+ ME3A-N IPM’25 0.729 0.884 0.788 0.664 0.827 0.721  
+ ME3A-M IPM’25 0.735 0.882 0.797 0.662 0.826 0.726  
+ HSP-N – 0.747 0.893 0.804 0.674 0.837 0.736  
+ HSP-M – 0.755 0.894 0.807 0.681 0.841 0.739  
+ 𝛥𝐴𝑣𝑔. – 0.020 0.008 0.010 0.017 0.013 0.013  
+ 𝛥𝑆𝑡𝑑. – ±0.007 ±0.005 ±0.007 ±0.008 ±0.007 ±0.006 
+ 
+80%
+PoE ESWC’19 0.666 0.820 0.721 0.492 0.705 0.572  
+ MMEA KSEM’20 0.590 0.869 0.685 0.598 0.839 0.682  
+ EVA AAAI’21 0.484 0.696 0.563 0.491 0.692 0.565  
+ MCLEA COLING’22 0.735 0.890 0.790 0.667 0.824 0.722  
+ MEAformer MM’23 0.765 0.916 0.820 0.703 0.873 0.766  
+ PCMEAa AAAI’24 0.744 0.904 0.818 0.715 0.869 0.784  
+ LoginMEAa ECAI’24 0.773 0.908 0.822 0.724 0.904 0.803  
+ OTMEA ICASSP’25 0.793 0.919 0.839 0.739 0.898 0.798  
+ GSIEA IPM’25 0.804 0.928 0.847 0.734 0.861 0.793  
+ RICEA ACL’25 0.776 0.916 0.829 0.734 0.892 0.792  
+ CDMEAa SIGIR’25 0.804 0.931 0.859 0.743 0.891 0.806  
+ ME3A-N IPM’25 0.824 0.933 0.841 0.748 0.935 0.808  
+ ME3A-M IPM’25 0.822 0.928 0.844 0.751 0.931 0.811  
+ HSP-N – 0.835 0.935 0.858 0.767 0.943 0.821  
+ HSP-M – 0.838 0.937 0.861 0.766 0.946 0.819  
+ 𝛥𝐼𝑚𝑝. – 0.014 0.004 0.002 0.016 0.011 0.010  
+ 𝛥𝑆𝑡𝑑. – ±0.006 ±0.005 ±0.004 ±0.006 ±0.004 ±0.005 
+a Represents reproduced experimental results.
+ambiguous, as architectural similarities among distractors such as ‘‘Mi-
+lan Cathedral’’ and ‘‘Cologne Cathedral’’ may mislead vision-dominant 
+models. HSP mitigates this by shifting emphasis to textual semantics via 
+EAFC, prioritizing contextual descriptors such as ‘‘Paris’’ and ‘‘Gothic 
+architecture’’, allowing the model to disambiguate visually similar 
+candidates and achieve robust alignment even under strong visual 
+interference.
+Additionally, we perform a quantitative analysis of modality
+weights across four distinct entity types. As shown in Fig.  3(b), EAFC 
+adaptively allocates contributions of visual and textual modalities 
+according to entity semantics. Person entities exhibit the highest visual 
+weights, whereas Location, Organization, and Other entities display 
+progressively lower values, providing strong evidence for the soundness 
+and interpretability of the proposed fusion strategy.
+4.8. Efficiency analysis
+Although the main experiments and ablation studies have validated 
+HSP’s effectiveness, computational efficiency remains critical for real-
+world deployment. We perform a component-level analysis on the 
+large-scale OpenEA100K dataset. As shown in Table  6, the HVPE mod-
+ule, composed of three parallel three-layer Transformers, accounts for 
+most of the computational overhead, while CSCN handles cross-modal 
+projection and EAFC supports gated fusion with minimal additional 
+Pattern Recognition 179 (2026) 113878 
+8 
+
+
+===== PAGE 9 =====
+B. Wang et al.
+Table 3
+The experiment results on the DBP15K dataset. The best results are highlighted in bold, while the second best are underlined. The 𝛥𝐼𝑚𝑝. represents the difference 
+between the best and second best performances. The 𝛥𝑆𝑡𝑑. is the standard deviation of the average performance.
+ Method Ref. 𝐷𝐵𝑃 15𝐾 ZH-EN 𝐷𝐵𝑃 15𝐾 JA-EN 𝐷𝐵𝑃 15𝐾 FR-EN
+ Hits@1 Hits@10 MRR Hits@1 Hits@10 MRR Hits@1 Hits@10 MRR  
+ EVA AAAI’21 0.680 0.910 0.762 0.673 0.908 0.757 0.683 0.923 0.767  
+ MCLEA COLING’22 0.715 0.923 0.788 0.715 0.909 0.785 0.711 0.909 0.782  
+ MSNEA WWW’23 0.601 0.83 0.684 0.535 0.775 0.617 0.543 0.801 0.630  
+ MEAformer MM’23 0.771 0.951 0.835 0.764 0.959 0.834 0.770 0.961 0.841  
+ PSNEA MM’23 0.816 0.957 0.869 0.819 0.963 0.853 0.844 0.982 0.891  
+ DESAlign ICDE’24 0.868 0.969 0.909 0.871 0.974 0.913 0.882 0.982 0.924  
+ IBMEA MM’24 0.859 0.975 0.903 0.856 0.978 0.902 0.864 0.985 0.911  
+ LoginMEAa ECAI’24 0.877 0.972 0.905 0.868 0.972 0.910 0.879 0.983 0.919  
+ OTMEA ICASSP’25 0.779 0.953 0.842 0.783 0.959 0.849 0.796 0.97 0.861  
+ AMFSEAa COLING’25 0.691 0.879 0.751 0.696 0.871 0.757 0.767 0.914 0.818  
+ ME3A-N IPM’25 0.894 0.981 0.916 0.878 0.962 0.927 0.893 0.994 0.935  
+ ME3A-M IPM’25 0.886 0.984 0.919 0.882 0.970 0.929 0.895 0.994 0.938  
+ HSP-N – 0.897 0.987 0.924 0.894 0.982 0.936 0.903 0.993 0.944  
+ HSP-M – 0.902 0.986 0.930 0.889 0.985 0.938 0.906 0.995 0.946  
+ 𝛥𝐼𝑚𝑝. – 0.005 0.001 0.006 0.005 0.003 0.002 0.003 0.001 0.002  
+ 𝛥𝑆𝑡𝑑. – ±0.004 ±0.003 ±0.005 ±0.004 ±0.003 ±0.002 ±0.003 ±0.002 ±0.004 
+a Represents reproduced experimental results.
+Table 4
+The experiment results of ablation study. The ↓ represents the difference between the current result and the model’s final 
+performance.
+ Component DBPZH-EN DBPJA-EN
+ Hits@1 Hits@10 MRR Hits@1 Hits@10 MRR  
+ HSP (full) 0.902 0.986 0.930 0.889 0.985 0.938  
+ HSP w/o HVPE 0.864 (↓0.038) 0.964 (↓0.022) 0.911 (↓0.019) 0.852 (↓0.037) 0.966 (↓0.019) 0.920 (↓0.018) 
+ HSP w/o CSCN 0.870 (↓0.032) 0.969 (↓0.017) 0.916 (↓0.014) 0.857 (↓0.032) 0.970 (↓0.015) 0.924 (↓0.014) 
+ HSP w/o EAFC 0.879 (↓0.023) 0.977 (↓0.009) 0.922 (↓0.008) 0.868 (↓0.021) 0.975 (↓0.010) 0.929 (↓0.009) 
+ HSP w/o META 0.891 (↓0.011) 0.982 (↓0.004) 0.926 (↓0.004) 0.879 (↓0.010) 0.981 (↓0.004) 0.934 (↓0.004) 
+ HSP w/o CONT 0.874 (↓0.028) 0.972 (↓0.014) 0.918 (↓0.012) 0.861 (↓0.028) 0.969 (↓0.016) 0.923 (↓0.015) 
+Table 5
+Efficiency and performance analysis of different visual and text encoders.
+ Vis. pre-trained Txt. pre-trained Vis Param. Txt. Param. Infer time (ms) FB15K-DB15K
+ Hits@1 Hits@10 MRR  
+ ResNet-50 BERT-base 26M 110M 27.8 0.746 0.883 0.785 
+ ResNet-152 BERT-base 60M 110M 35.2 0.755 0.894 0.807 
+ VGG-16 BERT-base 138M 110M 38.1 0.751 0.888 0.801 
+ ViT-base BERT-base 87M 110M 39.6 0.753 0.891 0.804 
+ CLIP-ViT-large BERT-base 303M 110M 78.3 0.760 0.900 0.813 
+ ResNet-152 Glove-300d 60M (static) 23.9 0.594 0.730 0.615 
+ ResNet-152 Albert-base 60M 11M 26.4 0.692 0.825 0.728 
+ ResNet-152 BERT-base 60M 110M 35.2 0.755 0.894 0.807 
+ ResNet-152 BERT-large 60M 340M 52.1 0.758 0.899 0.811 
+Fig. 3. Case study.
+cost. The full HSP model contains about 145M parameters with an 
+inference latency of 40.0 ms, indicating that its computational scale 
+remains within a practical deployment range for large-scale alignment. 
+As illustrated in Fig.  4, we train a lightweight single-path student 
+network via knowledge distillation to reduce computational burden,. 
+The distilled model reduces latency to 31.4 ms, achieving a 21.5% 
+Pattern Recognition 179 (2026) 113878 
+9 
+
+
+===== PAGE 10 =====
+B. Wang et al.
+Fig. 4. The experiment results of efficiency analysis.
+Fig. 5. Performance comparison of baseline models. The ∙, ∙, ∙, ∙, and ∙ represent DESAlign, LoginMEA, RICEA, ME3A-M, and HSP-M models, respectively.
+speedup with only a 2.0% drop in Hits@1. This lightweight variant 
+outperforms ME3A on the EN-FR and EN-DE pairs, indicating that 
+HSP maintains a favorable balance between alignment accuracy and 
+computational efficiency.
+We further conduct a comparative analysis of HSP against represen-
+tative methods to evaluate deployment efficiency. HSP (3-Path) exhibits 
+slightly higher latency than ME3A but remains substantially faster than 
+CDMEA and PCMEA. CDMEA and PCMEA rely on causal graph de-
+composition with counterfactual interventions and pseudo-label driven 
+iterative enhancement, respectively, incurring higher inference over-
+head. HSP leverages structured multi-path feature fusion to maintain 
+high alignment accuracy with computational cost within a practi-
+cal range. The distilled variant achieves lower inference latency and 
+continues to outperform existing competitive approaches, indicating 
+that HSP is practical and scalable for large-scale knowledge graph 
+alignment.
+4.9. Reproducibility analysis
+In the main experiments, the proposed HSP consistently outper-
+forms a range of recent competitive methods. However, we observe that 
+several models exhibit performance fluctuations across different runs, 
+indicating sensitivity to random initialization and training stochasticity, 
+as shown in Fig.  5. To systematically assess model stability, we select 
+multiple representative approaches and conduct repeated independent 
+experiments on two cross-graph and two cross-lingual datasets. To 
+reduce the influence of supervision strength on performance variance, 
+all experiments are repeated five times under a moderate supervision 
+setting.
+As illustrated in Fig.  6, HSP demonstrates strong stability across 
+multiple runs, with the variance of all evaluation metrics remaining 
+below 1.5% and performance distributions highly concentrated. In 
+contrast, although LoginMEA achieves relatively high peak perfor-
+mance, it exhibits more noticeable fluctuations, with a variance of 
+approximately 1.8%. Furthermore, DESAlign, RICEA, and ME3A show 
+variances exceeding 1.4% across datasets, suggesting greater sensitiv-
+ity to randomness. Overall, while maintaining favorable performance, 
+HSP exhibits improved stability and consistency, resulting in smaller 
+performance variations and more reliable generalization across both 
+cross-lingual and cross-graph scenarios.
+4.10. Hyperparameters sensitivity analysis
+We conduct a systematic sensitivity analysis of four key hyperpa-
+rameters on the OpenEA100K (EN–FR) dataset to assess the robustness 
+of HSP, as its larger scale and more diverse entity distribution provide 
+Pattern Recognition 179 (2026) 113878 
+10 
+
+
+===== PAGE 11 =====
+B. Wang et al.
+Table 6
+Model parameter counts and per-sample inference time on the OpenEA100K dataset. T.C. denotes time cost, and Param. denotes 
+the number of parameters. Inference latency is reported as the average of three runs under identical hardware settings.
+ Component Param. T.C. (ms) Core computation cost analysis  
+ HVPE 25.6M – Parallel path of three-layer Transformer.  
+ CSCN 8.1M – Cross modal projection and contrastive loss calculation.  
+ EAFC 1.2M – Gated Networks and Meta Learning (Training).  
+ PLM (BERT) 110M – Standard BERT encoding and implicit reasoning.  
+ HSP (3-Path) 145M 40 –
+ HSP (1-Path) 130M 31.4 –
+ ME3A – 35.2 Mapping all modalities to text sequences with PLM-based entailment inference.  
+ PCMEA – 96.3 Dynamic pseudo-labeling with confidence calibration and iterative refinement.  
+ CDMEA – 42.7 Causal graph decomposition with counterfactual construction and intervention.  
+ MFIEA – 21.5 Feature-level interaction with non-sequential modeling; conventional architecture. 
+ IBMEA – 28.4 Information bottleneck compression with variational inference and MI estimation. 
+Fig. 6. Performance distribution of the model over five independent runs on the same platform.
+Fig. 7. The performance changes of the model under different parameter settings.
+a more statistically reliable testbed than DBP15K. As shown in Fig.  7, 
+the model exhibits stable performance across a wide range of settings. 
+The contrastive loss temperature 𝜏 achieves peak Hits@1 (95.4%) at 
+𝜏 = 0 .1; smaller or larger values degrade performance due to over-
+fitting or insufficient discrimination. The fusion balance coefficient 𝜆
+is optimal at 0.6, confirming the necessity of combining embedding 
+retrieval with semantic re-ranking. The EAFC inner-loop learning rate 
+𝛼 = 0 .01 balances fast adaptation and generalization, while visual 
+prefix length 𝐿 = 8  offers the best trade-off between accuracy and 
+efficiency, with performance remaining above 95.2% for 𝐿 ∈ [4 , 16]. 
+Pattern Recognition 179 (2026) 113878 
+11 
+
+
+===== PAGE 12 =====
+B. Wang et al.
+These results demonstrate that HSP is not only effective but also robust 
+to hyperparameter variations, supporting its practical applicability.
+5. Limitations analysis
+Although HSP achieves superior performance, it has three practical 
+limitations. First, the HSP model relies on frozen ResNet-152 features 
+as visual input. Removing HVPE reduces Hits@1 by 3.8% on DBPZH–EN, 
+showing dependence on high-quality visual features; however, ResNet-
+152 may provide insufficient representations for abstract or visually 
+ambiguous entities (e.g., ‘‘inflation’’), limiting alignment. This limita-
+tion could be mitigated by adopting stronger vision foundation models. 
+Second, the EAFC component assumes a predefined set of entity types 
+for adaptive fusion. Although meta-learning aids generalization, align-
+ment of unseen or fine-grained types depends on an auxiliary type 
+predictor, which may propagate errors into fusion weights, restrict-
+ing applicability in open-world settings. Future work could explore 
+type-free fusion mechanisms that adapt without explicit type super-
+vision. Third, the model-agnostic meta-learning in EAFC introduces 
+non-negligible training overhead due to bi-level optimization, which 
+may limit scalability on ultra-large knowledge graphs under memory-
+constrained batch processing. Future work could investigate first-order 
+approximations or distributed strategies to alleviate this cost.
+6. Conclusion
+In this paper, we re-examine entailment-based multimodal entity 
+alignment and identify three fundamental limitations that hinder its 
+effectiveness: (1) semantic collapse caused by aggressive compres-
+sion of high-dimensional visual features, (2) insufficient cross-modal 
+semantic consistency due to weak calibration mechanisms, and (3) 
+rigid fusion strategies that ignore entity-type-specific modality rele-
+vance. To address these challenges, we propose HSP, a Hierarchical 
+Semantic-Preserving framework that unifies the alignment process un-
+der a Preserve–Calibrate–Adapt paradigm. Concretely, HSP preserves 
+the intrinsic topology and fine-grained semantics of visual representa-
+tions via a hierarchical vision-preserving encoder, thereby mitigating 
+information loss during feature compression. It then enforces cross-
+modal semantic consistency by explicitly calibrating visual and textual 
+representations within a shared semantic space. Furthermore, HSP in-
+troduces an entity-type-adaptive fusion controller that dynamically ad-
+justs modality contributions; the fusion strategy is optimized via meta-
+learning to capture context-dependent modality relevance. By jointly 
+addressing semantic fidelity, cross-modal consistency, and adaptive 
+fusion, HSP improves the reliability and expressiveness of entailment-
+based alignment. Extensive experiments on five public benchmarks 
+across cross-lingual and cross-graph scenarios show that it consistently 
+outperforms competitive baselines under varying supervision levels, 
+demonstrating strong effectiveness and generalization.
+CRediT authorship contribution statement
+Bao Wang: Writing – original draft. Ruizhe Ma: Writing – review 
+& editing. Xinyu Liang: Validation, Data curation. Li Yan: Validation. 
+Zongmin Ma: Writing – review & editing.
+Declaration of competing interest
+The authors declare that they have no known competing finan-
+cial interests or personal relationships that could have appeared to 
+influence the work reported in this paper.
+Data availability
+Data will be made available on request.
+References
+[1] A. Singhal, Introducing the knowledge graph: things, not strings, 2012.
+[2] Y. Yuan, J. Zeng, S. Shan, Exp-VQA: Fine-grained facial expression analysis via 
+visual question answering, Pattern Recognit. 168 (2025) 111783, http://dx.doi.
+org/10.1016/j.patcog.2025.111783.
+[3] S. Sun, X. Pan, S. Qi, J. Gao, Knowledge enhanced prompt learning framework 
+for financial news recommendation, Pattern Recognit. 163 (2025) 111461, http:
+//dx.doi.org/10.1016/j.patcog.2025.111461.
+[4] F. Zhao, H. Zou, C. Yan, Structure-aware knowledge graph-to-text generation 
+with planning selection and similarity distinction, in: Proceedings of the Confer-
+ence on Empirical Methods in Natural Language Processing, EMNLP, 2023, pp. 
+8693–8703, http://dx.doi.org/10.18653/v1/2023.emnlp-main.537.
+[5] L. Chen, Z. Li, Y. Wang, T. Xu, Z. Wang, E. Chen, MMEA: entity alignment 
+for multi-modal knowledge graph, in: International Conference on Knowledge 
+Science, Engineering and Management, KSEM, 2020, pp. 134–147, http://dx.
+doi.org/10.1007/978-3-030-55130-8-12.
+[6] C. Qiu, K. Huang, Z. Xie, M. Liu, J. Gu, X. Zong, Explainable medical visual 
+question answering via chain of evidence, Knowl.-Based Syst. 324 (2025) 
+113672, http://dx.doi.org/10.1016/j.knosys.2025.113672.
+[7] L. Fan, X. Gong, C. Zheng, X. Tan, J. Li, Y. Ou, Cycle-VQA: A cycle-consistent 
+framework for robust medical visual question answering, Pattern Recognit. 165 
+(2025) 111609, http://dx.doi.org/10.1016/j.patcog.2025.111609.
+[8] S. Hu, Z. Lu, X. Xu, R. Deng, X. Du, Q. Duan, LAECIPS: Large vision model 
+assisted adaptive edge–cloud collaboration for IoT-based embodied intelligence 
+system, J. Ind. Inf. Integr. 48 (2025) 100955, http://dx.doi.org/10.1016/j.jii.
+2025.100955.
+[9] J. Huang, J. Gao, Z. Yu, Orchestrating mechanics, perception and control: 
+Enabling embodied intelligence in humanoid robots, Inf. Process. Manag. 63 
+(2026) 104363, http://dx.doi.org/10.1016/j.ipm.2025.104363.
+[10] Y. Qian, L. Pan, Leveraging multimodal features for knowledge graph entity 
+alignment based on dynamic self-attention networks, Expert Syst. Appl. 228 
+(2023) 120363, http://dx.doi.org/10.1016/j.eswa.2023.120363.
+[11] Q. Li, S. Guo, Y. Luo, C. Ji, L. Wang, Sheng, Attribute-consistent knowledge 
+graph representation learning for multi-modal entity alignment, in: Proceedings 
+of the ACM Web Conference, WWW, 2023, pp. 2499–2508, http://dx.doi.org/
+10.1145/3543507.3583328.
+[12] H. Guo, J. Tang, W. Zeng, X. Zhao, L. Liu, Multi-modal entity alignment in 
+hyperbolic space, Neurocomputing 461 (2021) 598–607, http://dx.doi.org/10.
+1016/j.neucom.2021.03.132.
+[13] C. Li, J. Cheng, Q. Tong, F. Zhang, Exploring the impacts of feature fusion 
+strategy in multi-modal entity alignment, in: Proceedings of the International 
+Conference on Computational Linguistics, COLING, 2025, pp. 7809–7818.
+[14] Y. Shi, M. Wang, Z. Zhang, Z. Lin, Y. Zheng, Probing the impacts of visual context 
+in multimodal entity alignment, in: Proceedings of the ACM Web and Big Data, 
+AWBD, 2022, pp. 255–270, http://dx.doi.org/10.1007/978-3-031-25198-6-20.
+[15] Y. Zhao, Y. Zhang, X. Sui, X. Cai, ME3A: A multimodal entity entailment 
+framework for multimodal entity alignment, Inf. Process. Manag. 62 (2025) 
+103951, http://dx.doi.org/10.1016/j.ipm.2024.103951.
+[16] C. Wang, W. Wang, X. Li, Q. Liang, F. Bao, OTMEA : Multi-modal entity 
+alignment via optimal transport, in: IEEE International Conference on Acoustics, 
+Speech and Signal Processing, ICASSP, 2025, pp. 1–5, http://dx.doi.org/10.1109/
+ICASSP49660.2025.10889745.
+[17] T. Su, J. Sheng, D. Ma, X. Li, J. Yue, M. Song, Mitigating modality bias in multi-
+modal entity alignment from a causal perspective, in: Proceedings of the Research 
+and Development in Information Retrieval, SIGIR, 2025, pp. 1186–1196, http:
+//dx.doi.org/10.1145/3726302.3730037.
+[18] L. Wang, P. Qi, X. Bao, C. Zhou, B. Qin, Pseudo-label calibration semi-supervised 
+multi-modal entity alignment, in: Proceedings of the AAAI Conference on 
+Artificial Intelligence, AAAI, 2024, pp. 1014–1022, http://dx.doi.org/10.1609/
+aaai.v38i8.28762.
+[19] T. Song, L. Yin, Y. Liu, L. Liao, J. Luo, Z. Xu, Expressiveness analysis and 
+enhancing framework for geometric knowledge graph embedding models, IEEE 
+Trans. Knowl. Data Eng. 37 (2025) 306–318, http://dx.doi.org/10.1109/TKDE.
+2024.3486915.
+[20] Z. Cao, Q. Xu, Z. Yang, Y. He, Cao, OTKGE: Multi-modal knowledge graph 
+embeddings via optimal transport, in: Advances in Neural Information Processing 
+Systems, NeurIPS, 2022, pp. 39090–39102, http://dx.doi.org/10.5555/3600270.
+3603103.
+[21] W. Zhao, X. Wu, Boosting entity-aware image captioning with multi-modal 
+knowledge graph, IEEE Trans. Multimed. 26 (2024) 2659–2670, http://dx.doi.
+org/10.1109/TMM.2023.3301279.
+[22] Z. Chen, Y. Fang, Y. Zhang, L. Guo, J. Chen, Noise-powered multi-modal 
+knowledge graph representation framework, in: Proceedings of the International 
+Conference on Computational Linguistics, COLING, 2025, pp. 141–155.
+[23] Z. Lin, Z. Zhang, M. Wang, Y. Shi, X. Wu, Y. Zheng, Multi-modal contrastive 
+representation learning for entity alignment, in: Proceedings of the Conference 
+on Computational Linguistics, COLING, 2022, pp. 2572–2584.
+Pattern Recognition 179 (2026) 113878 
+12 
+
+
+===== PAGE 13 =====
+B. Wang et al.
+[24] F. Liu, M. Chen, D. Roth, N. Collier, Visual pivoting for (unsupervised) entity 
+alignment, in: Proceedings of the Conference on Artificial Intelligence, AAAI, 
+Vol. 35, 2021, pp. 4257–4266, http://dx.doi.org/10.1609/aaai.v35i5.16550.
+[25] T. Su, J. Sheng, S. Wang, X. Zhang, H. Xu, T. Liu, IBMEA: Exploring variational 
+information bottleneck for multi-modal entity alignment, in: Proceedings of 
+the International Conference on Multimedia, MM, 2024, pp. 4436–4445, http:
+//dx.doi.org/10.1145/3664648.3670090.
+[26] C. Li, J. Cheng, Q. Tong, F. Zhang, C. Wang, Probing relative interaction 
+and dynamic calibration in multi-modal entity alignment, in: Proceedings of 
+the Association for Computational Linguistics, ACL, 2025, pp. 28504–28516, 
+http://dx.doi.org/10.18653/v1/2025.acl-long.1384.
+[27] X. Zhang, Y. Liu, S. Shan, Multi-modal entity alignment under imbalanced 
+visual modality information, in: IEEE International Conference on Acoustics, 
+Speech and Signal Processing, ICASSP, 2025, pp. 1–5, http://dx.doi.org/10.1109/
+ICASSP49660.2025.10887914.
+[28] K. Bollacker, C. Evans, P. Paritosh, T. Sturge, J. Taylor, Freebase: a collabora-
+tively created graph database for structuring human knowledge, in: Proceedings 
+of the International Conference on Management of Data, SIGMOD, 2008, pp. 
+1247–1250, http://dx.doi.org/10.1145/1376616.1376746.
+[29] Z. Sun, W. Hu, C. Li, Cross-lingual entity alignment via joint attribute-preserving 
+embedding, in: Proceedings of the 16th International Semantic Web Conference, 
+ISWC, 2017, pp. 628–644, http://dx.doi.org/10.1007/978-3-319-68288-4-37.
+[30] F.M. Suchanek, G. Kasneci, G. Weikum, YAGO: A core of semantic knowledge 
+unifying WordNet and wikipedia, in: Proceedings of the International Conference 
+on World Wide Web, WWW, 2007, http://dx.doi.org/10.1145/1242572.1242667.
+[31] Y. Liu, H. Li, A. Garcia-Duran, M. Niepert, D. Onoro-Rubio, D.S. Rosenblum, 
+MMKG: multi-modal knowledge graphs, in: European Semantic Web Conference, 
+ESWC, 2019, pp. 459–474, http://dx.doi.org/10.1007/978-3-030-21348-0-30.
+[32] Z. Chen, J. Chen, W. Zhang, L. Guo, Y. Fang, Y. Huang, Y. Zhang, Y. Geng, 
+MEAformer: Multi-modal entity alignment transformer for meta modality hybrid, 
+in: Proceedings of the ACM International Conference on Multimedia, ACM MM, 
+2023, pp. 3317–3327, http://dx.doi.org/10.1145/3581783.3611786.
+[33] T. Su, X. Zhang, J. Sheng, Z. Zhang, T. Liu, LoginMEA: Local-to-global inter-
+action network for multi-modal entity alignment, in: European Conference on 
+Artificial Intelligence, ECAI, 2024, pp. 1173–1180, http://dx.doi.org/10.3233/
+FAIA240612.
+[34] Y. Zhang, X. Luo, J. Hu, M. Zhang, K. Xiao, Z. Li, Graph structure prefix injection 
+transformer for multi-modal entity alignment, Inf. Process. Manag. 62 (3) (2025) 
+104048.
+[35] X. Liu, J. Wu, T. Li, L. Chen, Y. Gao, Unsupervised entity alignment for temporal 
+knowledge graphs, in: Proceedings of the ACM Web Conference, WWW, 2023, 
+pp. 2528–2538, http://dx.doi.org/10.1145/3543507.3583381.
+[36] S. Liang, M. Zhao, H. Schuetze, Modular and parameter-efficient multimodal 
+fusion with prompting, in: Findings of the Association for Computational Linguis-
+tics, ACL, 2022, pp. 2976–2985, http://dx.doi.org/10.18653/v1/2022.findings-
+acl.234.
+[37] Y. Wang, H. Sun, J. Wang, J. Wang, W. Tang, Qi, Towards semantic consis-
+tency: Dirichlet energy driven robust multi-modal entity alignment, in: IEEE 
+International Conference on Data Engineering, ICDE, 2024, pp. 3559–3572, 
+http://dx.doi.org/10.1109/ICDE60146.2024.00274.
+[38] W. Ni, Q. Xu, Y. Jiang, Z. Cao, Cao, PSNEA: Pseudo-siamese network for 
+entity alignment between multi-modal knowledge graphs, in: Proceedings of 
+the ACM International Conference on Multimedia, MM, 2023, pp. 3489–3497, 
+http://dx.doi.org/10.1145/3581783.3611778.
+Pattern Recognition 179 (2026) 113878 
+13 

@@ -1,0 +1,8 @@
+[launch] 4 baseline /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbyg_r05_il_baseline_seed42.log
+[launch] 5 tcms_dehr /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbyg_r05_il_tcms_dehr_seed42.log
+[launch] 6 baseline /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbyg_r08_il_baseline_seed42.log
+[launch] 7 tcms_dehr /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbyg_r08_il_tcms_dehr_seed42.log
+[exit] 0
+[exit] 0
+[exit] 0
+[exit] 0

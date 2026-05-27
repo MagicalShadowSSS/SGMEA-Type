@@ -460,3 +460,37 @@ Interpretation:
 - `mix=0.15` is a conservative structural choice, not a modality prior. It gives the best `r=0.5` result among the small tested set, but `mix=0.05` remains close, especially on FBDB. This weakens the grid-search criticism.
 - `mix=0.30` degrades both datasets, suggesting that the residual branch should complement rather than dominate the learned type bias.
 - Paper recommendation: report `mix=0.15` as the default and include the small sensitivity table. Avoid a large hyperparameter sweep; the point is robustness, not tuning.
+
+## Iteration V2-R Component Ablation for Transformer Interpretability
+
+- [Hypothesis]: If V2-P is paper-facing, the residual contextual branch, Transformer mixer, type token, and contextual mixing coefficient must each have a clear experimental role. In particular, the Transformer should not be just decorative, and the residual contextual branch should be distinguishable from a generic hidden-state contextual head.
+- [Arch Change]: Keep the accepted V2-P setting fixed on `Rate=0.5`: `dehr_direction_mode=learned_type`, no manual direction prior, `dehr_contextual_source=residual`, `dehr_contextual_mix=0.15`, `dehr_stat_feature_mask=none`, train+pseudo calibration with dropout-consensus pseudo source, and final checkpoint selection. Add one ablation flag, `--dehr_drop_type_token`, which replaces the DEHR type token with zeros while keeping the rest of the router unchanged. Compare: Full V2-P, no residual contextual head (`contextual_source=hidden`, V2-O), no Transformer / identity mixer (`dehr_layers=0`), no type token, and no contextual mix (`dehr_contextual_mix=0.0`, V2-L style).
+- [Result vs. Oracle]: Full V2-P remains the best or tied-best paper-facing setting. Both datasets stay above the 80% Oracle-retention target. The strongest drops are from removing the Transformer on both datasets and removing the type token on FBYG; removing contextual mix causes a smaller but consistent drop. Replacing residual attribution with hidden-token contextualization barely changes FBDB but hurts FBYG slightly.
+- [Action]: Accept this as the component-ablation package for the paper. The conservative claim is: the main gain still comes through the learned log-space bias `b_t`, but V2-P makes the Transformer contribution measurable via residual attribution; type information and contextual residual mixing provide additional, dataset-dependent gains.
+
+| Dataset | Variant | Change | L2R H@1 | R2L H@1 | Avg H@1 | Delta vs Full |
+|---|---|---|---:|---:|---:|---:|
+| FBDB15K r=0.5 | Full V2-P | residual contextual head + 1-layer Transformer + type token | 0.73980 | 0.74930 | 0.74455 | 0.00000 |
+| FBDB15K r=0.5 | No residual contextual head | use hidden contextual head instead of `Delta h` residual, V2-O | 0.74050 | 0.74840 | 0.74445 | -0.00010 |
+| FBDB15K r=0.5 | No Transformer / identity mixer | `dehr_layers=0`; residual branch receives no attention-induced signal | 0.73860 | 0.74480 | 0.74170 | -0.00285 |
+| FBDB15K r=0.5 | No type token | `--dehr_drop_type_token`; type token zeroed | 0.73970 | 0.74950 | 0.74460 | +0.00005 |
+| FBDB15K r=0.5 | No contextual mix | `dehr_contextual_mix=0.0`; remove contextual branch | 0.73860 | 0.74790 | 0.74325 | -0.00130 |
+| FBYG15K r=0.5 | Full V2-P | residual contextual head + 1-layer Transformer + type token | 0.82120 | 0.82300 | 0.82210 | 0.00000 |
+| FBYG15K r=0.5 | No residual contextual head | use hidden contextual head instead of `Delta h` residual, V2-O | 0.81950 | 0.82300 | 0.82125 | -0.00085 |
+| FBYG15K r=0.5 | No Transformer / identity mixer | `dehr_layers=0`; residual branch receives no attention-induced signal | 0.81840 | 0.82050 | 0.81945 | -0.00265 |
+| FBYG15K r=0.5 | No type token | `--dehr_drop_type_token`; type token zeroed | 0.81860 | 0.81960 | 0.81910 | -0.00300 |
+| FBYG15K r=0.5 | No contextual mix | `dehr_contextual_mix=0.0`; remove contextual branch | 0.81820 | 0.82360 | 0.82090 | -0.00120 |
+
+Interpretation:
+- `b_t` is the direct source of routing gain by design, because it is the only new term inserted into `softmax(log(w_base)+b_t)`. The defensibility comes from how `b_t` is produced: it is trainable, type-aware, and generated from token interactions rather than copied from an Oracle grid table.
+- The residual contextual branch contributes modestly but consistently versus `mix=0.0` (`+0.00130` FBDB, `+0.00120` FBYG). This supports keeping it as a lightweight complement to the learned type head, not as the sole driver.
+- The Transformer is no longer purely decorative in V2-P: with `dehr_layers=0`, the residual branch loses attention-induced signal and both datasets drop (`-0.00285` FBDB, `-0.00265` FBYG). This is the cleanest evidence for the residual-attribution design.
+- The type token is important on FBYG (`-0.00300`) but neutral on FBDB (`+0.00005`). The explanation should avoid claiming universal type-token dominance; instead, say type conditioning is useful when type-specific modality mismatch is stronger.
+- Hidden-state contextualization without residual attribution is competitive on FBDB but weaker on FBYG. This supports the paper choice of `Delta h = H-X`: it is more interpretable and gives the best average behavior without adding depth.
+
+Log files:
+- Full V2-P: `log/run_outputs/phase10_elegant_triplet_0514/FBDB15K_r05_v2p_residualmix015.log`, `log/run_outputs/phase10_elegant_triplet_0514/FBYG15K_r05_v2p_residualmix015.log`
+- No residual contextual head: `log/run_outputs/phase10_elegant_triplet_0514/FBDB15K_r05_v2o_contextmix015.log`, `log/run_outputs/phase10_elegant_triplet_0514/FBYG15K_r05_v2o_contextmix015.log`
+- No Transformer / identity mixer: `log/run_outputs/phase10_elegant_triplet_0514/FBDB15K_r05_v2p_residualmix015_no_transformer.log`, `log/run_outputs/phase10_elegant_triplet_0514/FBYG15K_r05_v2p_residualmix015_no_transformer.log`
+- No type token: `log/run_outputs/phase10_elegant_triplet_0514/FBDB15K_r05_v2p_ablate_no_type_token.log`, `log/run_outputs/phase10_elegant_triplet_0514/FBYG15K_r05_v2p_ablate_no_type_token.log`
+- No contextual mix: `log/run_outputs/phase10_elegant_triplet_0514/FBDB15K_r05_v2p_ablate_no_contextual_mix.log`, `log/run_outputs/phase10_elegant_triplet_0514/FBYG15K_r05_v2p_ablate_no_contextual_mix.log`

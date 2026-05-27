@@ -1,0 +1,238 @@
+{
+  "rows": [
+    {
+      "log": "fbdb_beta_0.00.log",
+      "dataset": "fbdb",
+      "kind": "TCMS beta",
+      "value": 0.0,
+      "h1_avg": 0.7129,
+      "h10_avg": 0.8802,
+      "mrr_avg": 0.774,
+      "probe": "type_modality_weight_delta_abs_mean=0.0000 tcms_gate_mean=0.1056 tcms_gate_max=0.8818 tcms_delta_norm_mean=0.0000 tcms_delta_abs_mean=0.0000 tcms_missing_rate=0.0544 tcms_anchor_cos_mean=-0.0004 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbdb_beta_0.10.log",
+      "dataset": "fbdb",
+      "kind": "TCMS beta",
+      "value": 0.1,
+      "h1_avg": 0.7202,
+      "h10_avg": 0.885,
+      "mrr_avg": 0.7805,
+      "probe": "type_modality_weight_delta_abs_mean=0.0000 tcms_gate_mean=0.1056 tcms_gate_max=0.8818 tcms_delta_norm_mean=0.0168 tcms_delta_abs_mean=0.0008 tcms_missing_rate=0.0544 tcms_anchor_cos_mean=0.0170 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbdb_beta_0.25.log",
+      "dataset": "fbdb",
+      "kind": "TCMS beta",
+      "value": 0.25,
+      "h1_avg": 0.73315,
+      "h10_avg": 0.89195,
+      "mrr_avg": 0.791,
+      "probe": "type_modality_weight_delta_abs_mean=0.0000 tcms_gate_mean=0.1056 tcms_gate_max=0.8818 tcms_delta_norm_mean=0.0419 tcms_delta_abs_mean=0.0020 tcms_missing_rate=0.0544 tcms_anchor_cos_mean=0.0389 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbdb_beta_0.40.log",
+      "dataset": "fbdb",
+      "kind": "TCMS beta",
+      "value": 0.4,
+      "h1_avg": 0.7392,
+      "h10_avg": 0.8943,
+      "mrr_avg": 0.795,
+      "probe": "type_modality_weight_delta_abs_mean=0.0000 tcms_gate_mean=0.1056 tcms_gate_max=0.8818 tcms_delta_norm_mean=0.0670 tcms_delta_abs_mean=0.0031 tcms_missing_rate=0.0544 tcms_anchor_cos_mean=0.0551 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbdb_dehr_scale_0.00.log",
+      "dataset": "fbdb",
+      "kind": "DEHR scale",
+      "value": 0.0,
+      "h1_avg": 0.73285,
+      "h10_avg": 0.89265,
+      "mrr_avg": 0.7905,
+      "probe": "type_modality_weight_delta_abs_mean=0.0000 dehr_bias_abs_mean=0.0000 tcms_gate_mean=0.1083 tcms_gate_max=0.8574 tcms_delta_norm_mean=0.0474 tcms_delta_abs_mean=0.0022 tcms_missing_rate=0.0544 tcms_anchor_cos_mean=0.0407 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbdb_dehr_scale_0.20.log",
+      "dataset": "fbdb",
+      "kind": "DEHR scale",
+      "value": 0.2,
+      "h1_avg": 0.7527,
+      "h10_avg": 0.9,
+      "mrr_avg": 0.806,
+      "probe": "type_modality_weight_delta_abs_mean=0.0281 dehr_bias_abs_mean=0.1193 tcms_gate_mean=0.1083 tcms_gate_max=0.8574 tcms_delta_norm_mean=0.0474 tcms_delta_abs_mean=0.0022 tcms_missing_rate=0.0544 tcms_anchor_cos_mean=0.0407 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbdb_dehr_scale_0.35.log",
+      "dataset": "fbdb",
+      "kind": "DEHR scale",
+      "value": 0.35,
+      "h1_avg": 0.75555,
+      "h10_avg": 0.90055,
+      "mrr_avg": 0.8075,
+      "probe": "type_modality_weight_delta_abs_mean=0.0542 dehr_bias_abs_mean=0.2357 tcms_gate_mean=0.1083 tcms_gate_max=0.8574 tcms_delta_norm_mean=0.0474 tcms_delta_abs_mean=0.0022 tcms_missing_rate=0.0544 tcms_anchor_cos_mean=0.0407 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbdb_dehr_scale_0.50.log",
+      "dataset": "fbdb",
+      "kind": "DEHR scale",
+      "value": 0.5,
+      "h1_avg": 0.7551,
+      "h10_avg": 0.89805,
+      "mrr_avg": 0.8065,
+      "probe": "type_modality_weight_delta_abs_mean=0.0715 dehr_bias_abs_mean=0.3160 tcms_gate_mean=0.1083 tcms_gate_max=0.8574 tcms_delta_norm_mean=0.0474 tcms_delta_abs_mean=0.0022 tcms_missing_rate=0.0544 tcms_anchor_cos_mean=0.0407 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbyg_beta_0.00.log",
+      "dataset": "fbyg",
+      "kind": "TCMS beta",
+      "value": 0.0,
+      "h1_avg": 0.7984,
+      "h10_avg": 0.92695,
+      "mrr_avg": 0.8465,
+      "probe": "type_modality_weight_delta_abs_mean=0.0000 tcms_gate_mean=0.1420 tcms_gate_max=0.6833 tcms_delta_norm_mean=0.0000 tcms_delta_abs_mean=0.0000 tcms_missing_rate=0.1883 tcms_anchor_cos_mean=0.0000 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbyg_beta_0.10.log",
+      "dataset": "fbyg",
+      "kind": "TCMS beta",
+      "value": 0.1,
+      "h1_avg": 0.80205,
+      "h10_avg": 0.92825,
+      "mrr_avg": 0.8485,
+      "probe": "type_modality_weight_delta_abs_mean=0.0000 tcms_gate_mean=0.1420 tcms_gate_max=0.6833 tcms_delta_norm_mean=0.0100 tcms_delta_abs_mean=0.0005 tcms_missing_rate=0.1883 tcms_anchor_cos_mean=0.0136 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbyg_beta_0.25.log",
+      "dataset": "fbyg",
+      "kind": "TCMS beta",
+      "value": 0.25,
+      "h1_avg": 0.8115,
+      "h10_avg": 0.93095,
+      "mrr_avg": 0.856,
+      "probe": "type_modality_weight_delta_abs_mean=0.0000 tcms_gate_mean=0.1420 tcms_gate_max=0.6833 tcms_delta_norm_mean=0.0251 tcms_delta_abs_mean=0.0012 tcms_missing_rate=0.1883 tcms_anchor_cos_mean=0.0317 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbyg_beta_0.40.log",
+      "dataset": "fbyg",
+      "kind": "TCMS beta",
+      "value": 0.4,
+      "h1_avg": 0.8156,
+      "h10_avg": 0.93375,
+      "mrr_avg": 0.8585,
+      "probe": "type_modality_weight_delta_abs_mean=0.0000 tcms_gate_mean=0.1420 tcms_gate_max=0.6833 tcms_delta_norm_mean=0.0401 tcms_delta_abs_mean=0.0019 tcms_missing_rate=0.1883 tcms_anchor_cos_mean=0.0466 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbyg_dehr_scale_0.00.log",
+      "dataset": "fbyg",
+      "kind": "DEHR scale",
+      "value": 0.0,
+      "h1_avg": 0.8126,
+      "h10_avg": 0.9323,
+      "mrr_avg": 0.8565,
+      "probe": "type_modality_weight_delta_abs_mean=0.0000 dehr_bias_abs_mean=0.0000 tcms_gate_mean=0.1604 tcms_gate_max=0.7656 tcms_delta_norm_mean=0.0297 tcms_delta_abs_mean=0.0014 tcms_missing_rate=0.1883 tcms_anchor_cos_mean=0.0352 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbyg_dehr_scale_0.20.log",
+      "dataset": "fbyg",
+      "kind": "DEHR scale",
+      "value": 0.2,
+      "h1_avg": 0.82895,
+      "h10_avg": 0.9383,
+      "mrr_avg": 0.8695,
+      "probe": "type_modality_weight_delta_abs_mean=0.0281 dehr_bias_abs_mean=0.1311 tcms_gate_mean=0.1604 tcms_gate_max=0.7656 tcms_delta_norm_mean=0.0297 tcms_delta_abs_mean=0.0014 tcms_missing_rate=0.1883 tcms_anchor_cos_mean=0.0352 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbyg_dehr_scale_0.35.log",
+      "dataset": "fbyg",
+      "kind": "DEHR scale",
+      "value": 0.35,
+      "h1_avg": 0.8302,
+      "h10_avg": 0.9379,
+      "mrr_avg": 0.871,
+      "probe": "type_modality_weight_delta_abs_mean=0.0467 dehr_bias_abs_mean=0.2168 tcms_gate_mean=0.1604 tcms_gate_max=0.7656 tcms_delta_norm_mean=0.0297 tcms_delta_abs_mean=0.0014 tcms_missing_rate=0.1883 tcms_anchor_cos_mean=0.0352 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    },
+    {
+      "log": "fbyg_dehr_scale_0.50.log",
+      "dataset": "fbyg",
+      "kind": "DEHR scale",
+      "value": 0.5,
+      "h1_avg": 0.83015,
+      "h10_avg": 0.9384,
+      "mrr_avg": 0.871,
+      "probe": "type_modality_weight_delta_abs_mean=0.0605 dehr_bias_abs_mean=0.2910 tcms_gate_mean=0.1604 tcms_gate_max=0.7656 tcms_delta_norm_mean=0.0297 tcms_delta_abs_mean=0.0014 tcms_missing_rate=0.1883 tcms_anchor_cos_mean=0.0352 tcms_memory_diversity=0.0000",
+      "status": "ok"
+    }
+  ],
+  "avg_by_param": [
+    {
+      "kind": "DEHR scale",
+      "value": 0.0,
+      "h1_avg": 0.772725,
+      "h10_avg": 0.912475,
+      "mrr_avg": 0.8235
+    },
+    {
+      "kind": "DEHR scale",
+      "value": 0.2,
+      "h1_avg": 0.790825,
+      "h10_avg": 0.91915,
+      "mrr_avg": 0.83775
+    },
+    {
+      "kind": "DEHR scale",
+      "value": 0.35,
+      "h1_avg": 0.792875,
+      "h10_avg": 0.919225,
+      "mrr_avg": 0.83925
+    },
+    {
+      "kind": "DEHR scale",
+      "value": 0.5,
+      "h1_avg": 0.792625,
+      "h10_avg": 0.918225,
+      "mrr_avg": 0.83875
+    },
+    {
+      "kind": "TCMS beta",
+      "value": 0.0,
+      "h1_avg": 0.75565,
+      "h10_avg": 0.903575,
+      "mrr_avg": 0.81025
+    },
+    {
+      "kind": "TCMS beta",
+      "value": 0.1,
+      "h1_avg": 0.761125,
+      "h10_avg": 0.906625,
+      "mrr_avg": 0.8145
+    },
+    {
+      "kind": "TCMS beta",
+      "value": 0.25,
+      "h1_avg": 0.772325,
+      "h10_avg": 0.91145,
+      "mrr_avg": 0.8235
+    },
+    {
+      "kind": "TCMS beta",
+      "value": 0.4,
+      "h1_avg": 0.7774,
+      "h10_avg": 0.914025,
+      "mrr_avg": 0.82675
+    }
+  ]
+}

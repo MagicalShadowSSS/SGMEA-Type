@@ -1,0 +1,99 @@
++ set -euo pipefail
++ CODE_ROOT=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA
++ DATA_ROOT=/gly/tongqiang/dongyufeng/data/mmkg
++ PYTHON=/gly/tongqiang/anaconda3/envs/sgmea/bin/python
++ GPU_IDS=4,5,6,7
++ RUN_TAG=phase22_tcms_keep_dehr_combo_0519_122532_retry
++ FORCE=0
++ cd /gly/tongqiang/dongyufeng/Mode-Test/SGMEA
++ LOG_DIR=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase22_tcms_keep_dehr_combo_0519_122532_retry
++ SAVE_DIR=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save
++ mkdir -p /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase22_tcms_keep_dehr_combo_0519_122532_retry /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save
++ IFS=,
++ read -r -a GPUS
++ ((  4 < 4  ))
++ common_tcms_args=(main.py --gpu 0 --data_path "$DATA_ROOT" --data_split norm --model_name SGMEA --epoch 250 --eval_epoch 5 --lr 5e-4 --hidden_units 300,300,300 --save_model 1 --batch_size 1024 --csls --csls_k 3 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler cos --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau 0.1 --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --disable_sgmea_guidance --no_tensorboard --use_tcms --tcms_prefusion --tcms_zero_init_residual --tcms_noise_same_type_ratio 0.7 --tcms_disable_gate_match_features --tcms_beta 0.25 --tcms_beta_warmup_start 70 --tcms_beta_warmup_end 150 --tcms_pretrain_loss_weight 0.002 --tcms_selfsup_start 100 --tcms_selfsup_warmup_end 170 --tcms_sparse_weight 0.03 --tcms_gate_init -3.0 --tcms_missing_mode keep)
++ common_dehr_args=(main.py --gpu 0 --data_path "$DATA_ROOT" --data_split norm --model_name SGMEA --hidden_units 300,300,300 --batch_size 2048 --csls --csls_k 1 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler fixed --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau 0.1 --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --enable_sota --disable_sgmea_guidance --freeze_type_modality_bias_entity --no_tensorboard --use_tcms --tcms_prefusion --tcms_zero_init_residual --tcms_noise_same_type_ratio 0.7 --tcms_disable_gate_match_features --tcms_beta 0.25 --tcms_beta_warmup_start 70 --tcms_beta_warmup_end 150 --tcms_pretrain_loss_weight 0.002 --tcms_selfsup_start 100 --tcms_selfsup_warmup_end 170 --tcms_sparse_weight 0.03 --tcms_gate_init -3.0 --tcms_missing_mode keep --epoch 0 --eval_epoch 1 --save_model 0 --type_modality_bias_only_train --use_dehr_router --dehr_direction_mode learned_type --dehr_direction_values=0,0,0,0 --dehr_global_direction_weight 0.0 --dehr_type_direction_residual_scale 0.0 --dehr_type_direction_residual_max 0.0 --dehr_rho_init_values 0.7,0.7,0.7,0.7,0.7,0.7 --dehr_rho_max 1.0 --dehr_bias_clamp 0.35 --dehr_learned_bias_scale 0.35 --dehr_contextual_mix 0.15 --dehr_contextual_source residual --dehr_learned_bias_l2_weight 1e-4 --dehr_stat_feature_mask none --dehr_calib_pretrain_epochs 25 --dehr_calib_pretrain_lr 5e-3 --dehr_calib_pretrain_tau 0.05 --dehr_calib_pretrain_batch_size 256 --dehr_calib_pretrain_val_ratio 0.2 --dehr_calib_pretrain_patience 8 --dehr_calib_bias_l2 1e-4 --dehr_calib_pair_source train_pseudo --dehr_calib_selection final --dehr_calib_pseudo_margin 0.04 --dehr_calib_pseudo_csls_k 1 --dehr_calib_pseudo_source dropout_consensus --dehr_calib_consensus_min_votes 2 --lr 3e-4)
++ stage1_jobs=("FBDB15K 0.2 fbdb_r02_tcms_keep_ckpt" "FBDB15K 0.5 fbdb_r05_tcms_keep_ckpt" "FBDB15K 0.8 fbdb_r08_tcms_keep_ckpt" "FBYG15K 0.2 fbyg_r02_tcms_keep_ckpt" "FBYG15K 0.5 fbyg_r05_tcms_keep_ckpt" "FBYG15K 0.8 fbyg_r08_tcms_keep_ckpt")
++ stage2_jobs=("FBDB15K 0.5 fbdb_r05_tcms_keep_ckpt fbdb_r05_tcms_keep_plus_dehr" "FBYG15K 0.5 fbyg_r05_tcms_keep_ckpt fbyg_r05_tcms_keep_plus_dehr")
++ echo '[info] run_tag=phase22_tcms_keep_dehr_combo_0519_122532_retry'
+[info] run_tag=phase22_tcms_keep_dehr_combo_0519_122532_retry
++ echo '[info] log_dir=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase22_tcms_keep_dehr_combo_0519_122532_retry'
+[info] log_dir=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase22_tcms_keep_dehr_combo_0519_122532_retry
++ echo '[info] save_dir=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save'
+[info] save_dir=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save
++ echo '[info] gpus=4,5,6,7'
+[info] gpus=4,5,6,7
++ running=0
++ gpu_idx=0
++ for job in "${stage1_jobs[@]}"
++ read -r dataset rate exp_id
++ launch_stage1 FBDB15K 0.2 fbdb_r02_tcms_keep_ckpt 4
++ local dataset=FBDB15K
++ local rate=0.2
++ local exp_id=fbdb_r02_tcms_keep_ckpt
++ local gpu=4
++ local anchor=/gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl
++ local ckpt
+++ checkpoint_name FBDB15K 0.2 fbdb_r02_tcms_keep_ckpt
+++ local dataset=FBDB15K
+++ local rate=0.2
+++ local exp_id=fbdb_r02_tcms_keep_ckpt
+++ echo SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_
++ ckpt=SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_
++ local log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase22_tcms_keep_dehr_combo_0519_122532_retry/fbdb_r02_tcms_keep_ckpt.log
++ local ckpt_path=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_.pkl
++ [[ 0 != \1 ]]
++ [[ -f /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_.pkl ]]
++ echo '[stage1-launch] gpu=4 dataset=FBDB15K rate=0.2 exp_id=fbdb_r02_tcms_keep_ckpt ckpt=SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_'
+[stage1-launch] gpu=4 dataset=FBDB15K rate=0.2 exp_id=fbdb_r02_tcms_keep_ckpt ckpt=SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_
++ gpu_idx=1
++ running=1
++ ((  running >= 4  ))
++ for job in "${stage1_jobs[@]}"
++ read -r dataset rate exp_id
++ CUDA_VISIBLE_DEVICES=4
++ launch_stage1 FBDB15K 0.5 fbdb_r05_tcms_keep_ckpt 5
++ /gly/tongqiang/anaconda3/envs/sgmea/bin/python -u main.py --gpu 0 --data_path /gly/tongqiang/dongyufeng/data/mmkg --data_split norm --model_name SGMEA --epoch 250 --eval_epoch 5 --lr 5e-4 --hidden_units 300,300,300 --save_model 1 --batch_size 1024 --csls --csls_k 3 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler cos --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau 0.1 --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --disable_sgmea_guidance --no_tensorboard --use_tcms --tcms_prefusion --tcms_zero_init_residual --tcms_noise_same_type_ratio 0.7 --tcms_disable_gate_match_features --tcms_beta 0.25 --tcms_beta_warmup_start 70 --tcms_beta_warmup_end 150 --tcms_pretrain_loss_weight 0.002 --tcms_selfsup_start 100 --tcms_selfsup_warmup_end 170 --tcms_sparse_weight 0.03 --tcms_gate_init -3.0 --tcms_missing_mode keep --data_choice FBDB15K --data_rate 0.2 --external_anchor_type_jsonl /gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl --exp_name phase22_tcms_keep_dehr_combo_0519_122532_retry --exp_id fbdb_r02_tcms_keep_ckpt
++ local dataset=FBDB15K
++ local rate=0.5
++ local exp_id=fbdb_r05_tcms_keep_ckpt
++ local gpu=5
++ local anchor=/gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl
++ local ckpt
+++ checkpoint_name FBDB15K 0.5 fbdb_r05_tcms_keep_ckpt
+++ local dataset=FBDB15K
+++ local rate=0.5
+++ local exp_id=fbdb_r05_tcms_keep_ckpt
+++ echo SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_
++ ckpt=SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_
++ local log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase22_tcms_keep_dehr_combo_0519_122532_retry/fbdb_r05_tcms_keep_ckpt.log
++ local ckpt_path=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_.pkl
++ [[ 0 != \1 ]]
++ [[ -f /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_.pkl ]]
++ echo '[stage1-launch] gpu=5 dataset=FBDB15K rate=0.5 exp_id=fbdb_r05_tcms_keep_ckpt ckpt=SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_'
+[stage1-launch] gpu=5 dataset=FBDB15K rate=0.5 exp_id=fbdb_r05_tcms_keep_ckpt ckpt=SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_
++ gpu_idx=2
++ running=2
++ ((  running >= 4  ))
++ for job in "${stage1_jobs[@]}"
++ read -r dataset rate exp_id
++ CUDA_VISIBLE_DEVICES=5
++ /gly/tongqiang/anaconda3/envs/sgmea/bin/python -u main.py --gpu 0 --data_path /gly/tongqiang/dongyufeng/data/mmkg --data_split norm --model_name SGMEA --epoch 250 --eval_epoch 5 --lr 5e-4 --hidden_units 300,300,300 --save_model 1 --batch_size 1024 --csls --csls_k 3 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler cos --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau 0.1 --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --disable_sgmea_guidance --no_tensorboard --use_tcms --tcms_prefusion --tcms_zero_init_residual --tcms_noise_same_type_ratio 0.7 --tcms_disable_gate_match_features --tcms_beta 0.25 --tcms_beta_warmup_start 70 --tcms_beta_warmup_end 150 --tcms_pretrain_loss_weight 0.002 --tcms_selfsup_start 100 --tcms_selfsup_warmup_end 170 --tcms_sparse_weight 0.03 --tcms_gate_init -3.0 --tcms_missing_mode keep --data_choice FBDB15K --data_rate 0.5 --external_anchor_type_jsonl /gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl --exp_name phase22_tcms_keep_dehr_combo_0519_122532_retry --exp_id fbdb_r05_tcms_keep_ckpt
++ launch_stage1 FBDB15K 0.8 fbdb_r08_tcms_keep_ckpt 6
++ local dataset=FBDB15K
++ local rate=0.8
++ local exp_id=fbdb_r08_tcms_keep_ckpt
++ local gpu=6
++ local anchor=/gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl
++ local ckpt
+++ checkpoint_name FBDB15K 0.8 fbdb_r08_tcms_keep_ckpt
+++ local dataset=FBDB15K
+++ local rate=0.8
+++ local exp_id=fbdb_r08_tcms_keep_ckpt
+++ echo SGMEA_FBDB15K_0.8_fbdb_r08_tcms_keep_ckpt_
++ ckpt=SGMEA_FBDB15K_0.8_fbdb_r08_tcms_keep_ckpt_
++ local log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase22_tcms_keep_dehr_combo_0519_122532_retry/fbdb_r08_tcms_keep_ckpt.log
++ local ckpt_path=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.8_fbdb_r08_tcms_keep_ckpt_.pkl
++ [[ 0 != \1 ]]
++ [[ -f /gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save/SGMEA_FBDB15K_0.8_fbdb_r08_tcms_keep_ckpt_.pkl ]]

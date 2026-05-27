@@ -1,0 +1,24 @@
+++ date '+%F %T'
++ echo '[start] 2026-05-19 12:28:12 stage=tcms_keep gpu=4 dataset=FBDB15K rate=0.2 exp_id=fbdb_r02_tcms_keep_ckpt'
+[start] 2026-05-19 12:28:12 stage=tcms_keep gpu=4 dataset=FBDB15K rate=0.2 exp_id=fbdb_r02_tcms_keep_ckpt
++ CUDA_VISIBLE_DEVICES=4
++ /gly/tongqiang/anaconda3/envs/sgmea/bin/python -u main.py --gpu 0 --data_path /gly/tongqiang/dongyufeng/data/mmkg --data_split norm --model_name SGMEA --epoch 250 --eval_epoch 5 --lr 5e-4 --hidden_units 300,300,300 --save_model 1 --batch_size 1024 --csls --csls_k 3 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler cos --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau 0.1 --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --disable_sgmea_guidance --no_tensorboard --use_tcms --tcms_prefusion --tcms_zero_init_residual --tcms_noise_same_type_ratio 0.7 --tcms_disable_gate_match_features --tcms_beta 0.25 --tcms_beta_warmup_start 70 --tcms_beta_warmup_end 150 --tcms_pretrain_loss_weight 0.002 --tcms_selfsup_start 100 --tcms_selfsup_warmup_end 170 --tcms_sparse_weight 0.03 --tcms_gate_init -3.0 --tcms_missing_mode keep --data_choice FBDB15K --data_rate 0.2 --external_anchor_type_jsonl /gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl --exp_name phase22_debug_once --exp_id fbdb_r02_tcms_keep_ckpt
+INFO - 05/19/26 12:28:15 - 0:00:00 - ============ Initialized logger ============
+INFO - 05/19/26 12:28:15 - 0:00:00 - The experiment will be stored in /gly/tongqiang/dongyufeng/data/mmkg/dump/0519-phase22_debug_once/SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt
+                                     
+INFO - 05/19/26 12:28:15 - 0:00:00 - Running command: python main.py --gpu 0 --data_path '/gly/tongqiang/dongyufeng/data/mmkg' --data_split norm --model_name SGMEA --epoch 250 --eval_epoch 5 --lr '5e-4' --hidden_units '300,300,300' --save_model 1 --batch_size 1024 --csls --csls_k 3 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler cos --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau '0.1' --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --disable_sgmea_guidance --no_tensorboard --use_tcms --tcms_prefusion --tcms_zero_init_residual --tcms_noise_same_type_ratio '0.7' --tcms_disable_gate_match_features --tcms_beta '0.25' --tcms_beta_warmup_start 70 --tcms_beta_warmup_end 150 --tcms_pretrain_loss_weight '0.002' --tcms_selfsup_start 100 --tcms_selfsup_warmup_end 170 --tcms_sparse_weight '0.03' --tcms_gate_init '-3.0' --tcms_missing_mode keep --data_choice FBDB15K --data_rate '0.2' --external_anchor_type_jsonl '/gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBDB15K/norm_anchor_type_fixed.jsonl' --exp_name phase22_debug_once --exp_id fbdb_r02_tcms_keep_ckpt
+
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/main.py:49: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = GradScaler()
+loading raw data...
+INFO - 05/19/26 12:28:18 - 0:00:03 - 94.56% entities have images
+INFO - 05/19/26 12:28:18 - 0:00:03 - image feature shape:(27793, 4096)
+INFO - 05/19/26 12:28:18 - 0:00:03 - entity coarse types: external distribution loaded
+INFO - 05/19/26 12:28:18 - 0:00:03 -   Person: 9014 (32.43%)
+INFO - 05/19/26 12:28:18 - 0:00:03 -   Place: 5151 (18.53%)
+INFO - 05/19/26 12:28:18 - 0:00:03 -   Organization: 4009 (14.42%)
+INFO - 05/19/26 12:28:18 - 0:00:03 -   Creative Work: 4648 (16.72%)
+INFO - 05/19/26 12:28:18 - 0:00:03 -   Event: 1144 (4.12%)
+INFO - 05/19/26 12:28:18 - 0:00:03 -   Entity: 3827 (13.77%)
+INFO - 05/19/26 12:28:18 - 0:00:03 - #left entity : 14951, #right entity: 12842
+INFO - 05/19/26 12:28:18 - 0:00:03 - #left entity not in train set: 12382, #right entity not in train set: 10273

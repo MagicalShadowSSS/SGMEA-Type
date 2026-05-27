@@ -1,0 +1,16 @@
+{
+  "FBDB15K": {
+    "visual_calibration": {
+      "vsc_before": -0.0003940839960705489,
+      "vsc_after": 0.03890413045883179,
+      "pos_sim_before": 0.036538150161504745,
+      "pos_sim_after": 0.16294245421886444,
+      "gap_before": 0.03213465213775635,
+      "gap_after": 0.1583673059940338,
+      "delta_norm": 0.04190046712756157,
+      "gate_mean": 0.1055765375494957,
+      "missing_rate": 0.0544021874666214,
+      "test_pair_count": 6423
+    }
+  }
+}

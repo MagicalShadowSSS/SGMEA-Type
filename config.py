@@ -46,6 +46,8 @@ class cfg():
         parser.add_argument('--weight_decay', type=float, default=0.0001)
         parser.add_argument("--adam_epsilon", default=1e-8, type=float)
         parser.add_argument('--eval_epoch', default=100, type=int, help='evaluate each n epoch')
+        parser.add_argument("--disable_early_stop", action="store_true", default=False,
+                            help="disable early-stop transitions/breaks and always run to the configured epoch")
         parser.add_argument("--enable_sota", action="store_true", default=False)
 
         parser.add_argument('--margin', default=1, type=float, help='The fixed margin in loss function. ')
@@ -332,6 +334,8 @@ class cfg():
                             help="DEHR token-stat ablation mask. Empty keeps all seven stats; accepts comma-separated names among weight,entropy,max_weight,top1_gap,pairwise,direction,anchor, or a 7-bit 0/1 mask in that order.")
         parser.add_argument("--dehr_drop_projected_token", action="store_true", default=False,
                             help="ablate projected modality embedding tokens inside DEHR, leaving only stat/type/modal tokens")
+        parser.add_argument("--dehr_drop_type_token", action="store_true", default=False,
+                            help="ablate the DEHR type token by replacing it with zeros; used only for type-token contribution analysis")
         parser.add_argument("--dehr_zero_init_head", action="store_true", default=False,
                             help="zero initialize DEHR evidence head so anchor_residual starts exactly from the reliability anchor")
         parser.add_argument("--dehr_residual_l2_weight", type=float, default=0.0,
@@ -516,6 +520,164 @@ class cfg():
                             help="maximum semantic TMHG calibration strength predicted by the gamma head")
         parser.add_argument("--tmhg_strength_reg_weight", type=float, default=0.0,
                             help="optional regularization on semantic TMHG gamma strength to prevent over-scaling")
+
+        # --------- TMRD: Type-aware Modality Recovery and Denoising -----------
+        parser.add_argument("--use_tmrd", action="store_true", default=False,
+                            help="enable type-aware modality recovery, denoising, and quality-aware calibration")
+        parser.add_argument("--tmrd_type_emb_dim", type=int, default=16,
+                            help="type embedding dimension used by TMRD quality/recovery heads")
+        parser.add_argument("--tmrd_hidden_dim", type=int, default=128,
+                            help="hidden dimension used by TMRD lightweight MLP heads")
+        parser.add_argument("--tmrd_memory_k", type=int, default=4,
+                            help="number of K-Means recovery prototypes per type and modality")
+        parser.add_argument("--tmrd_kmeans_iters", type=int, default=8,
+                            help="number of lightweight K-Means refinement iterations for TMRD memory refresh")
+        parser.add_argument("--tmrd_memory_source", type=str, default="train_entities",
+                            choices=["train_entities", "all_entities"],
+                            help="entity pool used for TMRD clustered memory construction")
+        parser.add_argument("--tmrd_memory_refresh_epochs", type=int, default=0,
+                            help="refresh TMRD clustered memory every N epochs; <=0 only initializes once")
+        parser.add_argument("--tmrd_quality_init", type=float, default=0.9,
+                            help="initial expected quality score so TMRD starts conservatively")
+        parser.add_argument("--tmrd_quality_gamma", type=float, default=0.5,
+                            help="scale for log(q) quality bias added to modality fusion logits")
+        parser.add_argument("--tmrd_quality_bias_clip", type=float, default=1.0,
+                            help="clip absolute negative log-quality fusion bias; <=0 disables clipping")
+        parser.add_argument("--tmrd_quality_bias_mode", type=str, default="logq",
+                            choices=["logq", "centered_logit", "image_suppress", "image_suppress_gate", "image_suppress_targeted", "learned_img_suppress", "auto_img_suppress"],
+                            help="how TMRD quality scores are converted to fusion-logit calibration")
+        parser.add_argument("--tmrd_auto_img_suppress_scale", type=float, default=0.20,
+                            help="scale for data-driven image suppression from mean predicted image unreliability")
+        parser.add_argument("--tmrd_learned_img_suppress_init", type=float, default=0.08,
+                            help="initial negative image-logit suppression magnitude for learned_img_suppress")
+        parser.add_argument("--tmrd_learned_img_suppress_max", type=float, default=0.50,
+                            help="maximum learned image-logit suppression magnitude")
+        parser.add_argument("--tmrd_quality_suppress_modal_idx", type=int, default=0,
+                            help="modality index suppressed by image_suppress quality bias; default 0 is image")
+        parser.add_argument("--tmrd_quality_suppress_threshold", type=float, default=0.52,
+                            help="quality threshold below which image_suppress applies a negative fusion bias")
+        parser.add_argument("--tmrd_quality_suppress_quantile", type=float, default=0.0,
+                            help="if >0, use the batch/global quality quantile as the image_suppress threshold instead of a fixed threshold")
+        parser.add_argument("--tmrd_quality_suppress_temp", type=float, default=0.10,
+                            help="temperature that maps quality shortfall to image_suppress gate strength")
+        parser.add_argument("--tmrd_denoise_scale", type=float, default=0.25,
+                            help="maximum feature-level clean-proxy residual strength")
+        parser.add_argument("--tmrd_clean_mix_scale", type=float, default=0.0,
+                            help="global gate for replacing raw modality tokens with TMRD clean proxies; 0 keeps raw features")
+        parser.add_argument("--tmrd_clean_modal_idx", type=int, default=-1,
+                            help="only apply TMRD feature cleaning to one modality index; -1 applies to all modalities")
+        parser.add_argument("--tmrd_clean_quality_threshold", type=float, default=0.0,
+                            help="if >0, apply feature cleaning only when predicted quality is below this threshold")
+        parser.add_argument("--tmrd_missing_repair_mode", type=str, default="none",
+                            choices=["none", "proxy", "memory", "mix", "zero"],
+                            help="V10 hard handling for unavailable image features before final fusion")
+        parser.add_argument("--tmrd_missing_repair_mix", type=float, default=0.5,
+                            help="proxy ratio for V10 missing_repair_mode=mix; memory receives 1-ratio")
+        parser.add_argument("--tmrd_present_repair_quantile", type=float, default=0.0,
+                            help="if >0, softly repair present image tokens whose learned quality is in the bottom quantile")
+        parser.add_argument("--tmrd_present_repair_mix", type=float, default=0.5,
+                            help="maximum repair mix for present-but-low-quality image tokens")
+        parser.add_argument("--tmrd_train_type_bias_in_only_train", action="store_true", default=False,
+                            help="during --tmrd_only_train, also train type_modality_bias parameters if present")
+        parser.add_argument("--tmrd_train_suppress_only", action="store_true", default=False,
+                            help="during --tmrd_only_train, train only the learned image suppression scalar inside TMRD")
+        parser.add_argument("--tmrd_calibrate_img_suppress", action="store_true", default=False,
+                            help="before test, select learned_img_suppress magnitude on train ILL calibration links")
+        parser.add_argument("--tmrd_img_suppress_grid", type=str, default="0,0.04,0.08,0.15,0.30",
+                            help="comma-separated candidate image suppression magnitudes for calibration")
+        parser.add_argument("--tmrd_img_suppress_calib_metric", type=str, default="h1_mrr",
+                            choices=["h1_mrr", "hard_margin"],
+                            help="train-link objective used to select image suppression magnitude")
+        parser.add_argument("--tmrd_memory_mix", type=float, default=0.0,
+                            help="blend ratio for type-clustered recovery memory inside the clean proxy; 0 disables memory blending")
+        parser.add_argument("--tmrd_context_source", type=str, default="hidden",
+                            choices=["hidden", "raw"],
+                            help="context tokens used by TMRD proxy/quality heads: Transformer hidden tokens or raw modality tokens")
+        parser.add_argument("--tmrd_nce_tau", type=float, default=0.07,
+                            help="temperature for TMRD semantic proxy InfoNCE")
+        parser.add_argument("--tmrd_loss_sample_size", type=int, default=2048,
+                            help="max entity samples used by each TMRD self-supervised loss call")
+        parser.add_argument("--tmrd_corrupt_loss_weight", type=float, default=1.0,
+                            help="weight for same-type modality corruption detection inside TMRD pretraining")
+        parser.add_argument("--tmrd_nce_loss_weight", type=float, default=1.0,
+                            help="weight for cross-modal semantic proxy InfoNCE inside TMRD pretraining")
+        parser.add_argument("--tmrd_clean_anchor_weight", type=float, default=0.10,
+                            help="weak anchor that keeps clean modality quality from globally collapsing during TMRD pretraining")
+        parser.add_argument("--tmrd_missing_loss_weight", type=float, default=0.0,
+                            help="weak supervised weight for making TMRD image quality reflect real image availability; 0 disables")
+        parser.add_argument("--tmrd_missing_modal_idx", type=int, default=0,
+                            help="modality index used by the real missing-modality probe/loss; default 0 is image")
+        parser.add_argument("--tmrd_pretrain_loss_weight", type=float, default=0.0,
+                            help="global weight for TMRD self-supervised pretraining loss during normal training; 0 disables")
+        parser.add_argument("--tmrd_detach_selfsup_inputs", action="store_true", default=True,
+                            help="detach modality tokens inside TMRD self-supervised losses to avoid backbone-gradient conflict")
+        parser.add_argument("--tmrd_no_detach_selfsup_inputs", dest="tmrd_detach_selfsup_inputs", action="store_false",
+                            help="allow TMRD self-supervised losses to update upstream modality encoders")
+        parser.add_argument("--tmrd_only_train", action="store_true", default=False,
+                            help="freeze the backbone and train only TMRD parameters for decoupled self-supervised calibration")
+        parser.add_argument("--tmrd_only_train_use_ea", action="store_true", default=False,
+                            help="when --tmrd_only_train is set, keep the EA alignment loss and train only TMRD parameters")
+        parser.add_argument("--tmrd_use_memory_recovery", action="store_true", default=False,
+                            help="use type-conditioned clustered memory for feature-level recovery when quality is low")
+        parser.add_argument("--tmrd_disable_quality_bias", action="store_true", default=False,
+                            help="ablate the quality-aware log(q) fusion calibration while keeping feature denoising")
+        # --------- TCMS-Former: type-conditioned visual sanitizer ---------
+        parser.add_argument("--use_tcms", action="store_true", default=False,
+                            help="enable TCMS-Former visual feature sanitization before multimodal fusion")
+        parser.add_argument("--tcms_layers", type=int, default=1,
+                            help="number of lightweight Transformer layers in TCMS")
+        parser.add_argument("--tcms_heads", type=int, default=2,
+                            help="number of attention heads in TCMS")
+        parser.add_argument("--tcms_memory_k", type=int, default=4,
+                            help="number of EMA visual prototypes per entity type")
+        parser.add_argument("--tcms_beta", type=float, default=0.25,
+                            help="safe residual margin for visual sanitization")
+        parser.add_argument("--tcms_missing_mode", type=str, default="anchor_proto",
+                            choices=[
+                                "anchor_proto", "anchor", "proto", "zero", "keep",
+                                "anchor_proto_blend", "anchor_blend", "proto_blend",
+                            ],
+                            help="how TCMS handles explicitly missing image features")
+        parser.add_argument("--tcms_missing_blend", type=float, default=0.25,
+                            help="conservative blend ratio for *_blend missing recovery modes; scheduled with TCMS beta")
+        parser.add_argument("--tcms_ema_momentum", type=float, default=0.99,
+                            help="EMA momentum for type-conditioned visual prototypes")
+        parser.add_argument("--tcms_gate_threshold", type=float, default=0.35,
+                            help="gate threshold below which samples update EMA prototypes")
+        parser.add_argument("--tcms_gate_init", type=float, default=-2.0,
+                            help="initial logit bias for conservative TCMS intervention gate")
+        parser.add_argument("--tcms_disable_gate_match_features", action="store_true", default=False,
+                            help="ablate dense image-anchor match features in the TCMS gate")
+        parser.add_argument("--tcms_prefusion", action="store_true", default=False,
+                            help="apply TCMS before the original fusion Transformer so sanitized image tokens drive fusion attention")
+        parser.add_argument("--tcms_zero_init_residual", action="store_true", default=False,
+                            help="initialize TCMS residual head to zero so the sanitizer starts as identity")
+        parser.add_argument("--tcms_nce_tau", type=float, default=0.07,
+                            help="temperature for type-masked semantic InfoNCE")
+        parser.add_argument("--tcms_noise_same_type_ratio", type=float, default=0.70,
+                            help="ratio of same-type visual substitutions in hard corruption")
+        parser.add_argument("--tcms_noise_loss_weight", type=float, default=1.0,
+                            help="weight for TCMS hard-corruption gate loss")
+        parser.add_argument("--tcms_sparse_weight", type=float, default=0.01,
+                            help="sparsity penalty on clean-sample visual intervention gate")
+        parser.add_argument("--tcms_pretrain_loss_weight", type=float, default=0.0,
+                            help="global weight for TCMS self-supervised loss during normal training")
+        parser.add_argument("--tcms_beta_warmup_start", type=int, default=-1,
+                            help="epoch before which TCMS residual beta is forced to 0; <0 disables scheduling")
+        parser.add_argument("--tcms_beta_warmup_end", type=int, default=-1,
+                            help="epoch where TCMS residual beta reaches --tcms_beta; <=start makes a step schedule")
+        parser.add_argument("--tcms_selfsup_start", type=int, default=-1,
+                            help="epoch before which TCMS self-supervised loss weight is 0; <0 disables scheduling")
+        parser.add_argument("--tcms_selfsup_warmup_end", type=int, default=-1,
+                            help="epoch where TCMS self-supervised loss reaches --tcms_pretrain_loss_weight")
+        parser.add_argument("--tcms_loss_sample_size", type=int, default=2048,
+                            help="max entity samples used by each TCMS self-supervised loss call")
+        parser.add_argument("--tcms_only_train", action="store_true", default=False,
+                            help="freeze backbone and train only TCMS parameters")
+        parser.add_argument("--tcms_only_train_use_ea", action="store_true", default=False,
+                            help="when --tcms_only_train is set, keep EA alignment loss and train only TCMS parameters")
+        parser.add_argument("--tcms_train_fusion_layer", action="store_true", default=False,
+                            help="during --tcms_only_train, also unfreeze the original fusion Transformer layers")
         parser.add_argument("--tmhg_bias_mode", type=str, default="logprob",
                             choices=["logprob", "logit"],
                             help="how TMHG converts predicted type-modal scores into fusion bias: logprob uses log q - log uniform, logit uses centered raw logits directly")
@@ -605,7 +767,7 @@ class cfg():
         assert self.cfg.hidden_size == self.cfg.attr_dim
 
         # use SOTA param
-        if self.cfg.enable_sota and not getattr(self.cfg, "type_modality_bias_only_train", False):
+        if self.cfg.enable_sota and not getattr(self.cfg, "type_modality_bias_only_train", False) and not getattr(self.cfg, "tmrd_only_train", False) and not getattr(self.cfg, "tcms_only_train", False):
             if self.cfg.il:
                 self.cfg.eval_epoch = max(2, self.cfg.eval_epoch)
                 self.cfg.weight_decay = max(0.0005, self.cfg.weight_decay)

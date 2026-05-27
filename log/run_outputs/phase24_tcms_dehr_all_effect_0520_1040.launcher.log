@@ -1,0 +1,50 @@
+[info] run_tag=phase24_tcms_dehr_all_effect_0520_1040
+[info] log_dir=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040
+[info] save_dir=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save
+[info] gpus=0,1,2,3,4,5,6,7
+[tcms-check] verifying TCMS checkpoints
+[tcms-ok] SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_
+[tcms-ok] SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_
+[tcms-ok] SGMEA_FBDB15K_0.8_fbdb_r08_tcms_keep_ckpt_
+[tcms-ok] SGMEA_FBYG15K_0.2_fbyg_r02_tcms_keep_ckpt_
+[tcms-ok] SGMEA_FBYG15K_0.5_fbyg_r05_tcms_keep_ckpt_
+[tcms-ok] SGMEA_FBYG15K_0.8_fbyg_r08_tcms_keep_ckpt_
+[launch] gpu=0 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbdb_r02_tcms_only_eval.log
+[launch] gpu=1 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbdb_r05_tcms_only_eval.log
+[launch] gpu=2 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbdb_r08_tcms_only_eval.log
+[launch] gpu=3 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbyg_r02_tcms_only_eval.log
+[launch] gpu=4 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbyg_r05_tcms_only_eval.log
+[launch] gpu=5 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbyg_r08_tcms_only_eval.log
+[launch] gpu=6 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbdb_r02_dehr_only.log
+[launch] gpu=7 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbdb_r05_dehr_only.log
+[launch] gpu=0 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbdb_r08_dehr_only.log
+[launch] gpu=1 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbyg_r02_dehr_only.log
+[launch] gpu=2 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbyg_r05_dehr_only.log
+[launch] gpu=3 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbyg_r08_dehr_only.log
+[launch] gpu=4 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbdb_r02_tcms_plus_dehr.log
+[launch] gpu=5 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbdb_r05_tcms_plus_dehr.log
+[launch] gpu=6 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbdb_r08_tcms_plus_dehr.log
+[launch] gpu=7 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbyg_r02_tcms_plus_dehr.log
+[launch] gpu=0 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbyg_r05_tcms_plus_dehr.log
+[launch] gpu=1 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/fbyg_r08_tcms_plus_dehr.log
+[summary] /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040/summary.json
+key	variant	avg_hits1	avg_mrr	l2r_h1	r2l_h1	status
+fbdb_r02	DEHR	0.58865	0.66700	0.58470	0.59260	0
+fbdb_r02	TCMS	0.53535	0.62050	0.53150	0.53920	0
+fbdb_r02	TCMS+DEHR	0.58345	0.66350	0.57890	0.58800	0
+fbdb_r05	DEHR	0.74460	0.79700	0.73970	0.74950	0
+fbdb_r05	TCMS	0.71665	0.77800	0.71420	0.71910	0
+fbdb_r05	TCMS+DEHR	0.74865	0.80250	0.74280	0.75450	0
+fbdb_r08	DEHR	0.82880	0.86650	0.82880	0.82880	0
+fbdb_r08	TCMS	0.81670	0.85750	0.81710	0.81630	0
+fbdb_r08	TCMS+DEHR	0.83230	0.86950	0.83190	0.83270	0
+fbyg_r02	DEHR	0.66995	0.74100	0.67080	0.66910	0
+fbyg_r02	TCMS	0.65040	0.72650	0.65090	0.64990	0
+fbyg_r02	TCMS+DEHR	0.69225	0.76050	0.69150	0.69300	0
+fbyg_r05	DEHR	0.82300	0.86600	0.82140	0.82460	0
+fbyg_r05	TCMS	0.80385	0.85100	0.80230	0.80540	0
+fbyg_r05	TCMS+DEHR	0.83140	0.87100	0.83140	0.83140	0
+fbyg_r08	DEHR	0.89060	0.92000	0.88790	0.89330	0
+fbyg_r08	TCMS	0.88550	0.91550	0.88260	0.88840	0
+fbyg_r08	TCMS+DEHR	0.88820	0.91850	0.88710	0.88930	0
+[done] logs written to /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_1040

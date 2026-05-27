@@ -1,0 +1,11 @@
+[info] run_tag=dbp03_tcms_dehr_0525_8gpu_v3
+[info] log_dir=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dbp03_tcms_dehr_0525_8gpu_v3
+[info] save_dir=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save
+[info] gpu_ids=0,1,2,3,4,5,6,7
+[info] base_epochs=500 tcms_epochs=500 eval_epoch=10
+[launch] gpu=0 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dbp03_tcms_dehr_0525_8gpu_v3/zh_en_baseline.log
+[launch] gpu=1 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dbp03_tcms_dehr_0525_8gpu_v3/ja_en_baseline.log
+[launch] gpu=2 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dbp03_tcms_dehr_0525_8gpu_v3/fr_en_baseline.log
+[launch] gpu=3 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dbp03_tcms_dehr_0525_8gpu_v3/zh_en_tcms_keep.log
+[launch] gpu=4 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dbp03_tcms_dehr_0525_8gpu_v3/ja_en_tcms_keep.log
+[launch] gpu=5 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/dbp03_tcms_dehr_0525_8gpu_v3/fr_en_tcms_keep.log

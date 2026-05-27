@@ -1,0 +1,28 @@
+[info] run_tag=phase22_tcms_keep_dehr_combo_0519_122917
+[info] log_dir=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase22_tcms_keep_dehr_combo_0519_122917
+[info] save_dir=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save
+[info] gpus=4,5,6,7
+[stage1-launch] gpu=4 dataset=FBDB15K rate=0.2 exp_id=fbdb_r02_tcms_keep_ckpt ckpt=SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_
+[stage1-launch] gpu=5 dataset=FBDB15K rate=0.5 exp_id=fbdb_r05_tcms_keep_ckpt ckpt=SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_
+[stage1-launch] gpu=6 dataset=FBDB15K rate=0.8 exp_id=fbdb_r08_tcms_keep_ckpt ckpt=SGMEA_FBDB15K_0.8_fbdb_r08_tcms_keep_ckpt_
+[stage1-launch] gpu=7 dataset=FBYG15K rate=0.2 exp_id=fbyg_r02_tcms_keep_ckpt ckpt=SGMEA_FBYG15K_0.2_fbyg_r02_tcms_keep_ckpt_
+[stage1-launch] gpu=4 dataset=FBYG15K rate=0.5 exp_id=fbyg_r05_tcms_keep_ckpt ckpt=SGMEA_FBYG15K_0.5_fbyg_r05_tcms_keep_ckpt_
+[stage1-launch] gpu=5 dataset=FBYG15K rate=0.8 exp_id=fbyg_r08_tcms_keep_ckpt ckpt=SGMEA_FBYG15K_0.8_fbyg_r08_tcms_keep_ckpt_
+[stage1-done] verifying checkpoints
+[checkpoint-ok] SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_
+[checkpoint-ok] SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_
+[checkpoint-ok] SGMEA_FBDB15K_0.8_fbdb_r08_tcms_keep_ckpt_
+[checkpoint-ok] SGMEA_FBYG15K_0.2_fbyg_r02_tcms_keep_ckpt_
+[checkpoint-ok] SGMEA_FBYG15K_0.5_fbyg_r05_tcms_keep_ckpt_
+[checkpoint-ok] SGMEA_FBYG15K_0.8_fbyg_r08_tcms_keep_ckpt_
+[stage2-launch] gpu=4 dataset=FBDB15K rate=0.5 exp_id=fbdb_r05_tcms_keep_plus_dehr warm=SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_
+[stage2-launch] gpu=5 dataset=FBYG15K rate=0.5 exp_id=fbyg_r05_tcms_keep_plus_dehr warm=SGMEA_FBYG15K_0.5_fbyg_r05_tcms_keep_ckpt_
+[stage2-done] logs written to /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase22_tcms_keep_dehr_combo_0519_122917
+[metric] fbdb_r02_tcms_keep_ckpt.log	H1_l2r=0.5190	H1_r2l=0.5238	H1_avg=0.5214	MRR_l2r=0.6070	MRR_r2l=0.6100	MRR_avg=0.6085
+[metric] fbdb_r05_tcms_keep_ckpt.log	H1_l2r=0.7101	H1_r2l=0.7170	H1_avg=0.7135	MRR_l2r=0.7740	MRR_r2l=0.7780	MRR_avg=0.7760
+[metric] fbdb_r05_tcms_keep_plus_dehr.log	H1_l2r=0.7431	H1_r2l=0.7549	H1_avg=0.7490	MRR_l2r=0.7990	MRR_r2l=0.8060	MRR_avg=0.8025
+[metric] fbdb_r08_tcms_keep_ckpt.log	H1_l2r=0.8249	H1_r2l=0.8327	H1_avg=0.8288	MRR_l2r=0.8660	MRR_r2l=0.8720	MRR_avg=0.8690
+[metric] fbyg_r02_tcms_keep_ckpt.log	H1_l2r=0.6323	H1_r2l=0.6348	H1_avg=0.6336	MRR_l2r=0.7120	MRR_r2l=0.7120	MRR_avg=0.7120
+[metric] fbyg_r05_tcms_keep_ckpt.log	H1_l2r=0.8116	H1_r2l=0.8136	H1_avg=0.8126	MRR_l2r=0.8560	MRR_r2l=0.8570	MRR_avg=0.8565
+[metric] fbyg_r05_tcms_keep_plus_dehr.log	H1_l2r=0.8311	H1_r2l=0.8314	H1_avg=0.8313	MRR_l2r=0.8710	MRR_r2l=0.8710	MRR_avg=0.8710
+[metric] fbyg_r08_tcms_keep_ckpt.log	H1_l2r=0.8790	H1_r2l=0.8812	H1_avg=0.8801	MRR_l2r=0.9110	MRR_r2l=0.9120	MRR_avg=0.9115

@@ -1,0 +1,13 @@
+[info] run_tag=phase23_fbdb_tcms_repro_r02_bs512_0519_153951
+[info] log_dir=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase23_fbdb_tcms_repro_r02_bs512_0519_153951
+[info] gpus=4,5,6,7
+[info] batch_size=512
+[launch] gpu=4 rate=0.5 exp_id=fbdb_r05_keep_repro_seed42 seed=42 mode=keep beta=0.25 sparse=0.03 gate=-3.0 pretrain=0.002 blend=-
+[launch] gpu=5 rate=0.5 exp_id=fbdb_r05_keep_repro_seed43 seed=43 mode=keep beta=0.25 sparse=0.03 gate=-3.0 pretrain=0.002 blend=-
+[launch] gpu=6 rate=0.5 exp_id=fbdb_r05_keep_repro_seed44 seed=44 mode=keep beta=0.25 sparse=0.03 gate=-3.0 pretrain=0.002 blend=-
+[launch] gpu=7 rate=0.2 exp_id=fbdb_r02_keep_beta010_seed42 seed=42 mode=keep beta=0.10 sparse=0.03 gate=-3.0 pretrain=0.002 blend=-
+[launch] gpu=4 rate=0.2 exp_id=fbdb_r02_keep_beta015_gate25_sparse01_seed42 seed=42 mode=keep beta=0.15 sparse=0.01 gate=-2.5 pretrain=0.002 blend=-
+[launch] gpu=5 rate=0.2 exp_id=fbdb_r02_keep_beta020_gate25_sparse01_seed42 seed=42 mode=keep beta=0.20 sparse=0.01 gate=-2.5 pretrain=0.002 blend=-
+[launch] gpu=6 rate=0.2 exp_id=fbdb_r02_blend010_beta015_gate25_seed42 seed=42 mode=anchor_proto_blend beta=0.15 sparse=0.01 gate=-2.5 pretrain=0.002 blend=0.10
+[launch] gpu=7 rate=0.2 exp_id=fbdb_r02_anchor_beta015_gate25_seed42 seed=42 mode=anchor beta=0.15 sparse=0.01 gate=-2.5 pretrain=0.002 blend=-
+[done] 2026-05-19 15:41:03 failed=1 logs=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase23_fbdb_tcms_repro_r02_bs512_0519_153951

@@ -1,0 +1,15 @@
+[info] run_tag=phase24_tcms_dehr_all_effect_0520_102935
+[info] log_dir=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase24_tcms_dehr_all_effect_0520_102935
+[info] save_dir=/gly/tongqiang/dongyufeng/data/mmkg/SGMEA/save
+[info] gpus=0,1,2,3,4,5,6,7
+[tcms-train-skip] SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_ exists
+[tcms-train-skip] SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_ exists
+[tcms-train-skip] SGMEA_FBDB15K_0.8_fbdb_r08_tcms_keep_ckpt_ exists
+[tcms-train-skip] SGMEA_FBYG15K_0.2_fbyg_r02_tcms_keep_ckpt_ exists
+[tcms-train-skip] SGMEA_FBYG15K_0.5_fbyg_r05_tcms_keep_ckpt_ exists
+[tcms-train-skip] SGMEA_FBYG15K_0.8_fbyg_r08_tcms_keep_ckpt_ exists
+[tcms-check] verifying TCMS checkpoints
+[tcms-ok] SGMEA_FBDB15K_0.2_fbdb_r02_tcms_keep_ckpt_
+[tcms-ok] SGMEA_FBDB15K_0.5_fbdb_r05_tcms_keep_ckpt_
+[tcms-ok] SGMEA_FBDB15K_0.8_fbdb_r08_tcms_keep_ckpt_
+[tcms-ok] SGMEA_FBYG15K_0.2_fbyg_r02_tcms_keep_ckpt_

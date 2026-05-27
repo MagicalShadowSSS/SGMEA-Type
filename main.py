@@ -12,6 +12,7 @@ import pdb
 import pprint
 import json
 import pickle
+import math
 from collections import defaultdict
 
 from config import cfg
@@ -94,6 +95,122 @@ class Runner:
         model = model.module
         return model
 
+    def _calibrate_tmrd_img_suppress(self):
+        fusion = getattr(getattr(self.model, "multimodal_encoder", None), "fusion", None)
+        tmrd = getattr(fusion, "tmrd", None)
+        if tmrd is None or not hasattr(tmrd, "raw_img_suppress"):
+            return
+        old_mode = getattr(self.args, "tmrd_quality_bias_mode", "logq")
+        self.args.tmrd_quality_bias_mode = "learned_img_suppress"
+        raw_backup = tmrd.raw_img_suppress.detach().clone()
+        grid = []
+        for item in str(getattr(self.args, "tmrd_img_suppress_grid", "0,0.04,0.08,0.15,0.30")).split(','):
+            item = item.strip()
+            if not item:
+                continue
+            try:
+                grid.append(max(float(item), 0.0))
+            except ValueError:
+                continue
+        if not grid:
+            grid = [0.0, 0.04, 0.08, 0.15, 0.30]
+        train_links = torch.as_tensor(np.asarray(self.train_ill, dtype=np.int64), device=self.args.device)
+        left = train_links[:, 0].long()
+        right = train_links[:, 1].long()
+        left_pool = getattr(self.model, "left_entity_ids", None)
+        right_pool = getattr(self.model, "right_entity_ids", None)
+        if left_pool is not None:
+            left_pool = left_pool.to(self.args.device).long()
+        if right_pool is not None:
+            right_pool = right_pool.to(self.args.device).long()
+        left_target_pos = None
+        right_target_pos = None
+        if left_pool is not None and right_pool is not None:
+            right_pos_map = {int(ent): idx for idx, ent in enumerate(right_pool.detach().cpu().tolist())}
+            left_pos_map = {int(ent): idx for idx, ent in enumerate(left_pool.detach().cpu().tolist())}
+            left_target_pos = torch.as_tensor(
+                [right_pos_map[int(ent)] for ent in right.detach().cpu().tolist()],
+                dtype=torch.long,
+                device=self.args.device,
+            )
+            right_target_pos = torch.as_tensor(
+                [left_pos_map[int(ent)] for ent in left.detach().cpu().tolist()],
+                dtype=torch.long,
+                device=self.args.device,
+            )
+
+        def _ranking_score(query_emb, cand_emb, target_pos):
+            dist_mat = pairwise_distances(query_emb, cand_emb)
+            if self.args.csls is True:
+                dist_mat = 1 - csls_sim(1 - dist_mat, self.args.csls_k)
+            hits1 = 0.0
+            mrr = 0.0
+            margin_sum = 0.0
+            chunk = 512
+            for start in range(0, dist_mat.shape[0], chunk):
+                end = min(start + chunk, dist_mat.shape[0])
+                rows = dist_mat[start:end]
+                targets = target_pos[start:end]
+                target_dist = rows.gather(1, targets.view(-1, 1))
+                ranks = (rows < target_dist).sum(dim=1).float() + 1.0
+                masked = rows.clone()
+                masked.scatter_(1, targets.view(-1, 1), float("inf"))
+                nearest_neg = masked.min(dim=1).values
+                margin_sum += (nearest_neg - target_dist.squeeze(1)).sum().item()
+                hits1 += (ranks <= 1.0).float().sum().item()
+                mrr += (1.0 / ranks).sum().item()
+            denom = max(float(dist_mat.shape[0]), 1.0)
+            return hits1 / denom, mrr / denom, margin_sum / denom
+
+        best = None
+        rows = []
+        with torch.no_grad():
+            for value in grid:
+                value = min(max(value, 1e-8), float(getattr(self.args, "tmrd_learned_img_suppress_max", 0.50)))
+                tmrd.raw_img_suppress.copy_(torch.tensor(math.log(math.exp(value) - 1.0), device=tmrd.raw_img_suppress.device))
+                final_emb, _ = self.model.joint_emb_generat()
+                final_emb = F.normalize(final_emb)
+                if left_pool is not None and right_pool is not None:
+                    h1_l2r, mrr_l2r, margin_l2r = _ranking_score(final_emb[left], final_emb[right_pool], left_target_pos)
+                    h1_r2l, mrr_r2l, margin_r2l = _ranking_score(final_emb[right], final_emb[left_pool], right_target_pos)
+                    avg_h1 = float((h1_l2r + h1_r2l) / 2.0)
+                    avg_mrr = float((mrr_l2r + mrr_r2l) / 2.0)
+                    avg_margin = float((margin_l2r + margin_r2l) / 2.0)
+                else:
+                    dist = pairwise_distances(final_emb[left], final_emb[right])
+                    if self.args.csls is True:
+                        dist = 1 - csls_sim(1 - dist, self.args.csls_k)
+                    eval_result = self._evaluate_distance_matrix(dist)
+                    acc_l2r = eval_result["acc_l2r"]
+                    acc_r2l = eval_result["acc_r2l"]
+                    mrr_l2r = eval_result["mrr_l2r"]
+                    mrr_r2l = eval_result["mrr_r2l"]
+                    avg_h1 = float((acc_l2r[0] + acc_r2l[0]) / 2.0)
+                    avg_mrr = float((mrr_l2r + mrr_r2l) / 2.0)
+                    avg_margin = 0.0
+                rows.append(f"s={value:.4f}:h1={avg_h1:.4f}:mrr={avg_mrr:.4f}:margin={avg_margin:.6f}")
+                if getattr(self.args, "tmrd_img_suppress_calib_metric", "h1_mrr") == "hard_margin":
+                    score = (avg_margin, avg_h1, avg_mrr)
+                else:
+                    score = (avg_h1, avg_mrr, avg_margin)
+                if best is None or score > best[0]:
+                    best = (score, value)
+        if best is None:
+            tmrd.raw_img_suppress.copy_(raw_backup)
+            self.args.tmrd_quality_bias_mode = old_mode
+            return
+        selected = min(max(best[1], 1e-8), float(getattr(self.args, "tmrd_learned_img_suppress_max", 0.50)))
+        with torch.no_grad():
+            tmrd.raw_img_suppress.copy_(torch.tensor(math.log(math.exp(selected) - 1.0), device=tmrd.raw_img_suppress.device))
+        self.args.tmrd_quality_bias_mode = "learned_img_suppress"
+        if self.rank == 0:
+            self.logger.info(
+                f"TMRDCalibImgSuppress | selected={selected:.4f} "
+                f"metric={getattr(self.args, 'tmrd_img_suppress_calib_metric', 'h1_mrr')} "
+                f"score={best[0]} "
+                + " || ".join(rows)
+            )
+
     def model_choise(self):
         assert self.args.model_name in ["EVA", "MCLEA", "MSNEA", "SGMEA"]
         if self.args.model_name == "SGMEA":
@@ -120,6 +237,17 @@ class Runner:
             self.model.init_tmhg_type_prototypes(self.train_ill, logger=self.logger)
             if getattr(self.args, "tmhg_stat_prior_json", ""):
                 self.model.init_tmhg_from_stat_prior_json(logger=self.logger)
+        if (
+            self.args.model_name == "SGMEA"
+            and getattr(self.args, "use_tmrd", False)
+        ):
+            self.model.init_tmrd_memory(self.train_ill, logger=self.logger)
+        if (
+            self.args.model_name == "SGMEA"
+            and getattr(self.args, "use_tmrd", False)
+            and getattr(self.args, "tmrd_calibrate_img_suppress", False)
+        ):
+            self._calibrate_tmrd_img_suppress()
 
         total_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
         self.logger.info(f"total params num: {total_params}")
@@ -156,12 +284,80 @@ class Runner:
             self.logger.info(f"warmup_steps: {opt.warmup_steps}")
             self.logger.info(f"total_steps: {opt.total_steps}")
             self.logger.info(f"weight_decay: {opt.weight_decay}")
+        if getattr(opt, "tmrd_only_train", False) or getattr(opt, "tcms_only_train", False):
+            self.optimizer, self.scheduler = self._optim_init_tmrd_only(opt, accumulation_step)
+            return
         if getattr(opt, "type_modality_bias_only_train", False):
             self.optimizer, self.scheduler = self._optim_init_type_modality_bias_only(opt, accumulation_step)
             return
         freeze_part = []
 
         self.optimizer, self.scheduler = set_optim(opt, self.model_list, freeze_part, accumulation_step)
+
+    def _optim_init_tmrd_only(self, opt, accumulation_step=None):
+        for _, p in self.model.named_parameters():
+            p.requires_grad = False
+        fusion = getattr(getattr(self.model, "multimodal_encoder", None), "fusion", None)
+        tmrd = getattr(fusion, "tmrd", None)
+        tcms = getattr(fusion, "tcms", None)
+        if getattr(opt, "tmrd_only_train", False) and tmrd is None:
+            raise ValueError("--tmrd_only_train requires --use_tmrd")
+        if getattr(opt, "tcms_only_train", False) and tcms is None:
+            raise ValueError("--tcms_only_train requires --use_tcms")
+        train_params = []
+        if getattr(opt, "tcms_only_train", False):
+            for p in tcms.parameters():
+                p.requires_grad = True
+                train_params.append(p)
+            if getattr(opt, "tcms_train_fusion_layer", False):
+                for p in fusion.fusion_layer.parameters():
+                    p.requires_grad = True
+                    train_params.append(p)
+        elif getattr(opt, "tmrd_train_suppress_only", False):
+            if not hasattr(tmrd, "raw_img_suppress"):
+                raise ValueError("--tmrd_train_suppress_only requires TMRD raw_img_suppress")
+            tmrd.raw_img_suppress.requires_grad = True
+            train_params.append(tmrd.raw_img_suppress)
+        else:
+            for p in tmrd.parameters():
+                p.requires_grad = True
+                train_params.append(p)
+        if getattr(opt, "tmrd_train_type_bias_in_only_train", False):
+            type_bias = getattr(fusion, "type_modality_bias", None)
+            if type_bias is not None:
+                for p in type_bias.parameters():
+                    p.requires_grad = True
+                    train_params.append(p)
+        params = [{"params": train_params, "lr": opt.lr, "weight_decay": opt.weight_decay}]
+        optimizer = torch.optim.AdamW(params, lr=opt.lr, eps=opt.adam_epsilon)
+        if accumulation_step is None:
+            accumulation_step = opt.accumulation_steps
+        if opt.scheduler == 'fixed':
+            from src.utils import FixedScheduler
+            scheduler = FixedScheduler(optimizer)
+        elif opt.scheduler == 'linear':
+            from transformers import get_linear_schedule_with_warmup
+            scheduler = get_linear_schedule_with_warmup(
+                optimizer,
+                num_warmup_steps=int(opt.warmup_steps / accumulation_step),
+                num_training_steps=int(opt.total_steps / accumulation_step),
+            )
+        elif opt.scheduler == 'cos':
+            from transformers import get_cosine_schedule_with_warmup
+            scheduler = get_cosine_schedule_with_warmup(
+                optimizer,
+                num_warmup_steps=int(opt.warmup_steps / accumulation_step),
+                num_training_steps=int(opt.total_steps / accumulation_step),
+            )
+        trainable_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+        if self.rank == 0:
+            self.logger.info(
+                f"TMRDOnlyTrain | trainable_params={trainable_params} "
+                f"lr={opt.lr} weight_decay={opt.weight_decay} "
+                f"tmrd_pretrain_weight={getattr(opt, 'tmrd_pretrain_loss_weight', 0.0)} "
+                f"tcms_pretrain_weight={getattr(opt, 'tcms_pretrain_loss_weight', 0.0)}"
+            )
+        return optimizer, scheduler
 
     def _optim_init_type_modality_bias_only(self, opt, accumulation_step=None):
         for _, p in self.model.named_parameters():
@@ -569,7 +765,18 @@ class Runner:
                 self.epoch = i
                 if hasattr(self.model, "set_epoch"):
                     self.model.set_epoch(self.epoch)
-                if self.args.il and (self.epoch == self.args.il_start and self.stage == 0) or (self.early_stop_count <= 0 and self.epoch <= self.args.il_start):
+                if (
+                    self.args.model_name == "SGMEA"
+                    and getattr(self.args, "use_tmrd", False)
+                    and int(getattr(self.args, "tmrd_memory_refresh_epochs", 0)) > 0
+                    and self.epoch > 0
+                    and self.epoch % int(getattr(self.args, "tmrd_memory_refresh_epochs", 0)) == 0
+                ):
+                    self.model.init_tmrd_memory(self.train_ill, logger=self.logger)
+                early_stop_triggered = self.early_stop_count <= 0 and self.epoch <= self.args.il_start
+                if getattr(self.args, "disable_early_stop", False):
+                    early_stop_triggered = False
+                if self.args.il and ((self.epoch == self.args.il_start and self.stage == 0) or early_stop_triggered):
                     if self.early_stop_count <= 0:
                         logger.info(f"Early stop in epoch {self.epoch}... Begin iteration....")
                     self.stage = 1
@@ -604,17 +811,19 @@ class Runner:
                 if (i + 1) % self.args.eval_epoch == 0:
                     self.eval()
                 _tqdm.update(1)
-                if not self.args.il and self.early_stop_count <= 0:
+                if not getattr(self.args, "disable_early_stop", False) and not self.args.il and self.early_stop_count <= 0:
                     logger.info(f"Early stop in epoch {self.epoch} under non-iterative training.")
                     break
-                if self.stage == 1 and self.early_stop_count <= 0:
+                if not getattr(self.args, "disable_early_stop", False) and self.stage == 1 and self.early_stop_count <= 0:
                     logger.info(f"Early stop in epoch {self.epoch}")
                     break
 
         name = self._save_name_define()
-        if self.best_model_wts is not None:
+        if self.best_model_wts is not None and not getattr(self.args, "tmrd_only_train", False):
             self.logger.info("load from the best model before final testing ... ")
             self.model.load_state_dict(self.best_model_wts)
+        elif getattr(self.args, "tmrd_only_train", False):
+            self.logger.info("TMRDOnlyTrain | keep final self-supervised TMRD weights before final testing/saving")
         self.test(save_name=f"{name}_test_ep{self.args.epoch}")
 
         if self.rank == 0:
@@ -1891,6 +2100,84 @@ class Runner:
         if relation_items:
             relation_log_line = "RelationHNM | " + " ".join(relation_items)
 
+        tmrd_log_line = None
+        tmrd_keys = [
+            "tmrd_selfsup_scaled",
+            "tmrd_selfsup_loss",
+            "tmrd_corrupt_loss",
+            "tmrd_nce_loss",
+            "tmrd_corrupt_acc_probe",
+            "tmrd_corrupt_pair_acc_probe",
+            "tmrd_quality_gap_probe",
+            "tmrd_missing_loss",
+            "tmrd_missing_acc_probe",
+            "tmrd_missing_auc_probe",
+            "tmrd_missing_q_gap_probe",
+            "tmrd_missing_present_q_probe",
+            "tmrd_missing_absent_q_probe",
+            "tmrd_q_clean_mean_probe",
+            "tmrd_q_corrupt_mean_probe",
+            "tmrd_q_mean",
+            "tmrd_q_min",
+            "tmrd_q_max",
+            "tmrd_q_std",
+            "tmrd_quality_bias_abs_mean",
+            "tmrd_quality_suppress_bias_mean",
+            "tmrd_quality_suppress_bias_abs_mean",
+            "tmrd_quality_suppress_active_rate",
+            "tmrd_quality_suppress_gate_mean",
+            "tmrd_quality_suppress_shortfall_mean",
+            "tmrd_quality_suppress_threshold_used",
+            "tmrd_delta_abs_mean",
+            "tmrd_delta_norm_mean",
+            "tmrd_missing_repair_rate",
+            "tmrd_present_repair_rate",
+            "tmrd_img_raw_coeff_missing",
+            "tmrd_img_repair_delta_norm_mean",
+            "tmrd_learned_img_suppress",
+            "tmrd_proxy_cos_mean",
+            "tmrd_memory_diversity",
+            "tmrd_nce_loss_probe",
+            "tmrd_corrupt_loss_probe",
+        ]
+        tmrd_items = []
+        for key in tmrd_keys:
+            if key in avg_loss_dic:
+                tmrd_items.append(f"{key}={avg_loss_dic[key]:.4f}")
+        if tmrd_items:
+            tmrd_log_line = "TMRDProbe | " + " ".join(tmrd_items)
+
+        tcms_log_line = None
+        tcms_keys = [
+            "tcms_selfsup_scaled",
+            "tcms_selfsup_loss",
+            "tcms_sem_loss",
+            "tcms_noise_loss",
+            "tcms_sparse_loss",
+            "tcms_noise_acc_probe",
+            "tcms_gate_clean_mean_probe",
+            "tcms_gate_corrupt_mean_probe",
+            "tcms_gate_gap_probe",
+            "tcms_cross_type_negative_rate",
+            "tcms_gate_mean",
+            "tcms_gate_max",
+            "tcms_delta_norm_mean",
+            "tcms_delta_abs_mean",
+            "tcms_missing_rate",
+            "tcms_anchor_cos_mean",
+            "tcms_memory_diversity",
+            "tcms_selfsup_loss_probe",
+            "tcms_sem_loss_probe",
+            "tcms_noise_loss_probe",
+            "tcms_sparse_loss_probe",
+        ]
+        tcms_items = []
+        for key in tcms_keys:
+            if key in avg_loss_dic:
+                tcms_items.append(f"{key}={avg_loss_dic[key]:.4f}")
+        if tcms_items:
+            tcms_log_line = "TCMSProbe | " + " ".join(tcms_items)
+
         proto_log_line = None
         if self.curr_proto_stats_count > 0:
             proto_vis_dict = {}
@@ -1961,6 +2248,10 @@ class Runner:
             self.logger.info(ogar_log_line)
         if relation_log_line is not None and self.rank == 0:
             self.logger.info(relation_log_line)
+        if tmrd_log_line is not None and self.rank == 0:
+            self.logger.info(tmrd_log_line)
+        if tcms_log_line is not None and self.rank == 0:
+            self.logger.info(tcms_log_line)
 
     def eval(self, last_epoch=False, save_name=""):
         test_left = self.eval_left
@@ -1980,6 +2271,42 @@ class Runner:
         self.logger.info(" --------------------- Test result --------------------- ")
         self._test(test_left, test_right, last_epoch=last_epoch, save_name=save_name)
 
+    def _format_probe_stats(self, prefix, stats, keys=None):
+        if not stats:
+            return None
+        if keys is None:
+            keys = sorted(stats.keys())
+        pieces = []
+        for key in keys:
+            if key not in stats:
+                continue
+            value = stats[key]
+            if isinstance(value, (float, int, np.floating, np.integer)):
+                pieces.append(f"{key}={float(value):.4f}")
+            else:
+                pieces.append(f"{key}={value}")
+        if not pieces:
+            return None
+        return f"{prefix} | " + " ".join(pieces)
+
+    def _collect_router_test_probe(self):
+        if self.args.model_name != "SGMEA":
+            return {}, {}
+        router_stats = self.model.type_modality_bias_stats()
+        tmrd_selfsup_stats = {}
+        if getattr(self.args, "use_tmrd", False):
+            tmrd_loss, tmrd_selfsup_stats = self.model.tmrd_self_supervised_loss()
+            if tmrd_loss is not None:
+                tmrd_selfsup_stats = dict(tmrd_selfsup_stats)
+                tmrd_selfsup_stats["tmrd_selfsup_probe_loss"] = float(tmrd_loss.detach().item())
+        if getattr(self.args, "use_tcms", False):
+            tcms_loss, tcms_selfsup_stats = self.model.tcms_self_supervised_loss()
+            if tcms_loss is not None:
+                tcms_selfsup_stats = dict(tcms_selfsup_stats)
+                tcms_selfsup_stats["tcms_selfsup_probe_loss"] = float(tcms_loss.detach().item())
+                tmrd_selfsup_stats.update(tcms_selfsup_stats)
+        return router_stats, tmrd_selfsup_stats
+
     def _test(self, test_left, test_right, last_epoch=False, save_name="", loss=None):
         with torch.no_grad():
             w_normalized = None
@@ -1990,6 +2317,7 @@ class Runner:
                 final_emb = self.model.joint_emb_generat()
                 weight_norm = None
             final_emb = F.normalize(final_emb)
+            router_probe_stats, tmrd_selfsup_probe_stats = self._collect_router_test_probe()
 
             geometry_probe_stats = None
             if (
@@ -2127,6 +2455,96 @@ class Runner:
         if self.rank == 0:
             self.logger.info(f"Ep {self.epoch} | l2r: acc of top {top_k} = {acc_l2r}, mr = {mean_l2r:.3f}, mrr = {mrr_l2r:.3f}{Loss_out}")
             self.logger.info(f"Ep {self.epoch} | r2l: acc of top {top_k} = {acc_r2l}, mr = {mean_r2l:.3f}, mrr = {mrr_r2l:.3f}{Loss_out}")
+            router_line = self._format_probe_stats(
+                "RouterProbe",
+                router_probe_stats,
+                keys=[
+                    "type_modality_bias_abs_mean",
+                    "type_modality_weight_delta_abs_mean",
+                    "dehr_bias_abs_mean",
+                    "tmhg_bias_abs_mean",
+                    "tmrd_q_mean",
+                    "tmrd_q_min",
+                    "tmrd_q_max",
+                    "tmrd_q_std",
+                    "tmrd_quality_bias_abs_mean",
+                    "tmrd_quality_suppress_bias_mean",
+                    "tmrd_quality_suppress_bias_abs_mean",
+                    "tmrd_quality_suppress_active_rate",
+                    "tmrd_quality_suppress_gate_mean",
+                    "tmrd_quality_suppress_shortfall_mean",
+                    "tmrd_quality_suppress_threshold_used",
+                    "tmrd_delta_abs_mean",
+                    "tmrd_delta_norm_mean",
+                    "tmrd_missing_repair_rate",
+                    "tmrd_present_repair_rate",
+                    "tmrd_img_raw_coeff_missing",
+                    "tmrd_img_repair_delta_norm_mean",
+                    "tmrd_learned_img_suppress",
+                    "tmrd_proxy_cos_mean",
+                    "tmrd_memory_diversity",
+                    "tmrd_img_q_present_mean",
+                    "tmrd_img_q_missing_mean",
+                    "tmrd_img_q_present_missing_gap",
+                    "tmrd_img_missing_acc_full",
+                    "tmrd_img_missing_auc_full",
+                    "tmrd_missing_acc_probe",
+                    "tmrd_missing_auc_probe",
+                    "tmrd_missing_q_gap_probe",
+                    "tmrd_missing_present_q_probe",
+                    "tmrd_missing_absent_q_probe",
+                    "tcms_gate_mean",
+                    "tcms_gate_max",
+                    "tcms_delta_norm_mean",
+                    "tcms_delta_abs_mean",
+                    "tcms_missing_rate",
+                    "tcms_anchor_cos_mean",
+                    "tcms_memory_diversity",
+                    "tcms_selfsup_loss_probe",
+                    "tcms_sem_loss_probe",
+                    "tcms_noise_loss_probe",
+                    "tcms_sparse_loss_probe",
+                    "tcms_noise_acc_probe",
+                    "tcms_gate_clean_mean_probe",
+                    "tcms_gate_corrupt_mean_probe",
+                    "tcms_gate_gap_probe",
+                ],
+            )
+            if router_line is not None:
+                self.logger.info(router_line)
+            tmrd_selfsup_line = self._format_probe_stats(
+                "TMRDSelfsupProbe",
+                tmrd_selfsup_probe_stats,
+                keys=[
+                    "tmrd_selfsup_probe_loss",
+                    "tmrd_selfsup_loss",
+                    "tmrd_corrupt_loss",
+                    "tmrd_nce_loss",
+                    "tmrd_corrupt_acc_probe",
+                    "tmrd_corrupt_pair_acc_probe",
+                    "tmrd_quality_gap_probe",
+                    "tmrd_missing_loss",
+                    "tmrd_missing_acc_probe",
+                    "tmrd_missing_auc_probe",
+                    "tmrd_missing_q_gap_probe",
+                    "tmrd_missing_present_q_probe",
+                    "tmrd_missing_absent_q_probe",
+                    "tmrd_q_clean_mean_probe",
+                    "tmrd_q_corrupt_mean_probe",
+                    "tcms_selfsup_probe_loss",
+                    "tcms_selfsup_loss",
+                    "tcms_sem_loss",
+                    "tcms_noise_loss",
+                    "tcms_sparse_loss",
+                    "tcms_noise_acc_probe",
+                    "tcms_gate_clean_mean_probe",
+                    "tcms_gate_corrupt_mean_probe",
+                    "tcms_gate_gap_probe",
+                    "tcms_cross_type_negative_rate",
+                ],
+            )
+            if tmrd_selfsup_line is not None:
+                self.logger.info(tmrd_selfsup_line)
             self._log_type_modality_bias_table()
             if loss_upper_bound_stats is not None:
                 upper_line = (
@@ -2240,7 +2658,7 @@ class Runner:
             state_dict = {k.replace('module.', ''): v for k, v in torch.load(save_path, map_location=self.args.device).items()}
         else:
             state_dict = torch.load(save_path, map_location=self.args.device)
-        if getattr(self.args, "use_type_modality_bias", False) or getattr(self.args, "use_dehr_router", False) or getattr(self.args, "use_tmhg_router", False):
+        if getattr(self.args, "use_type_modality_bias", False) or getattr(self.args, "use_dehr_router", False) or getattr(self.args, "use_tmhg_router", False) or getattr(self.args, "use_tmrd", False) or getattr(self.args, "use_tcms", False):
             incompatible = model.load_state_dict(state_dict, strict=False)
             if self.rank == 0:
                 self.logger.info(

@@ -25,6 +25,7 @@ class SGMEA(nn.Module):
         self.kgs = kgs
         self.args = args
         self.img_features = F.normalize(torch.FloatTensor(kgs["images_list"])).cuda()
+        self.image_available = kgs.get("image_available")
         self.input_idx = kgs["input_idx"].cuda()
         self.adj = kgs["adj"].cuda()
         self.rel_features = torch.Tensor(kgs["rel_features"]).cuda()
@@ -37,6 +38,8 @@ class SGMEA(nn.Module):
             self.left_entity_ids = self.left_entity_ids.cuda()
         if self.right_entity_ids is not None:
             self.right_entity_ids = self.right_entity_ids.cuda()
+        if self.image_available is not None:
+            self.image_available = self.image_available.cuda()
         if self.entity_type_ids is not None:
             self.entity_type_ids = self.entity_type_ids.cuda()
         if self.entity_is_generic is not None:
@@ -87,6 +90,28 @@ class SGMEA(nn.Module):
         if self.args.use_relation_aware_hnm:
             self._load_relation_aware_hnm_cache()
         # self.idx_one = np.ones(self.args.batch_size, dtype=np.int64)
+
+    def set_epoch(self, epoch):
+        self.current_epoch = int(epoch)
+        fusion = getattr(getattr(self, "multimodal_encoder", None), "fusion", None)
+        tcms = getattr(fusion, "tcms", None)
+        if tcms is not None and hasattr(tcms, "set_epoch"):
+            tcms.set_epoch(epoch)
+
+    def _scheduled_tcms_weight(self, base_weight):
+        base_weight = float(base_weight)
+        if base_weight <= 0 or not hasattr(self, "current_epoch"):
+            return base_weight
+        start = int(getattr(self.args, "tcms_selfsup_start", -1))
+        end = int(getattr(self.args, "tcms_selfsup_warmup_end", -1))
+        if start < 0:
+            return base_weight
+        epoch = int(self.current_epoch)
+        if epoch < start:
+            return 0.0
+        if end <= start or epoch >= end:
+            return base_weight
+        return base_weight * float(epoch - start + 1) / float(max(end - start + 1, 1))
 
     def _init_type_modality_bias_from_json(self):
         init_json = getattr(self.args, "type_modality_bias_init_json", "")
@@ -250,6 +275,79 @@ class SGMEA(nn.Module):
                 + " ".join(pieces)
             )
         return True
+
+    def init_tmrd_memory(self, train_links=None, logger=None):
+        fusion = getattr(self.multimodal_encoder, "fusion", None)
+        tmrd = getattr(fusion, "tmrd", None)
+        if tmrd is None:
+            return None
+        if self.entity_type_ids is None:
+            if logger is not None:
+                logger.info("TMRDMemory | skipped: entity_type_ids unavailable")
+            return None
+        with torch.no_grad():
+            was_training = self.training
+            self.eval()
+            _joint, _weight_norm = self.joint_emb_generat()
+            modal_embs = getattr(fusion, "last_modal_embs", None)
+            if modal_embs is None:
+                if was_training:
+                    self.train()
+                return None
+            modal_embs = [F.normalize(emb.detach(), dim=-1) for emb in modal_embs[:tmrd.modal_num]]
+            source = getattr(self.args, "tmrd_memory_source", "train_entities")
+            if source == "all_entities" or train_links is None or len(train_links) == 0:
+                entity_ids = torch.arange(self.entity_type_ids.shape[0], dtype=torch.long, device=self.input_idx.device)
+            else:
+                train_tensor = torch.as_tensor(train_links, dtype=torch.long, device=self.input_idx.device)
+                entity_ids = torch.unique(train_tensor.reshape(-1))
+            stats = tmrd.refresh_memory(modal_embs, self.entity_type_ids, entity_ids=entity_ids)
+            if logger is not None and stats:
+                logger.info(
+                    "TMRDMemory | "
+                    f"source={source} entities={int(entity_ids.numel())} "
+                    f"k={int(getattr(self.args, 'tmrd_memory_k', 4))} "
+                    f"min_count={stats.get('tmrd_memory_min_count', 0.0):.1f} "
+                    f"mean_count={stats.get('tmrd_memory_mean_count', 0.0):.1f} "
+                    f"diversity={stats.get('tmrd_memory_diversity', 0.0):.4f}"
+                )
+            if was_training:
+                self.train()
+            return stats
+
+    def tmrd_self_supervised_loss(self):
+        fusion = getattr(self.multimodal_encoder, "fusion", None)
+        tmrd = getattr(fusion, "tmrd", None)
+        if tmrd is None:
+            return None, {}
+        modal_embs = getattr(fusion, "last_modal_embs", None)
+        if modal_embs is None:
+            return None, {}
+        hidden_states = getattr(fusion, "last_hidden_states", None)
+        return tmrd.self_supervised_loss(
+            modal_embs[:tmrd.modal_num],
+            self.entity_type_ids,
+            sample_size=int(getattr(self.args, "tmrd_loss_sample_size", 2048)),
+            hidden_states=hidden_states,
+            image_available=self.image_available,
+        )
+
+    def tcms_self_supervised_loss(self):
+        fusion = getattr(self.multimodal_encoder, "fusion", None)
+        tcms = getattr(fusion, "tcms", None)
+        if tcms is None:
+            return None, {}
+        modal_embs = getattr(fusion, "last_tcms_raw_embs", None)
+        if modal_embs is None:
+            modal_embs = getattr(fusion, "last_modal_embs", None)
+        if modal_embs is None:
+            return None, {}
+        return tcms.self_supervised_loss(
+            modal_embs[:tcms.modal_num],
+            self.entity_type_ids,
+            sample_size=int(getattr(self.args, "tcms_loss_sample_size", 2048)),
+            image_available=self.image_available,
+        )
 
     def init_tmhg_train_stats(self, train_links, logger=None):
         fusion = getattr(self.multimodal_encoder, "fusion", None)
@@ -525,6 +623,43 @@ class SGMEA(nn.Module):
         dehr_aux = self.dehr_router_alignment_aux_loss(joint_emb, batch_tensor)
         if dehr_aux is not None:
             loss_all = loss_all + dehr_aux
+        tmrd_loss = None
+        tmrd_stats = {}
+        tmrd_weight = float(getattr(self.args, "tmrd_pretrain_loss_weight", 0.0))
+        if getattr(self.args, "use_tmrd", False) and tmrd_weight > 0:
+            tmrd_loss, tmrd_stats = self.tmrd_self_supervised_loss()
+            if tmrd_loss is not None:
+                loss_all = loss_all + tmrd_weight * tmrd_loss
+        tcms_loss = None
+        tcms_stats = {}
+        tcms_weight = self._scheduled_tcms_weight(getattr(self.args, "tcms_pretrain_loss_weight", 0.0))
+        if getattr(self.args, "use_tcms", False) and tcms_weight > 0:
+            tcms_loss, tcms_stats = self.tcms_self_supervised_loss()
+            if tcms_loss is not None:
+                loss_all = loss_all + tcms_weight * tcms_loss
+        if getattr(self.args, "tmrd_only_train", False):
+            if getattr(self.args, "tmrd_only_train_use_ea", False):
+                # Phase-2 decoupled calibration: the backbone is frozen by the
+                # optimizer, but the TMRD heads are nudged by the EA objective.
+                # A small self-supervised term can be kept via tmrd_pretrain_loss_weight.
+                pass
+            else:
+                if tmrd_loss is None:
+                    tmrd_loss, tmrd_stats = self.tmrd_self_supervised_loss()
+                if tmrd_loss is None:
+                    raise RuntimeError("--tmrd_only_train requires a valid TMRD self-supervised loss")
+                tmrd_weight_eff = tmrd_weight if tmrd_weight > 0 else 1.0
+                loss_all = tmrd_weight_eff * tmrd_loss
+        if getattr(self.args, "tcms_only_train", False):
+            if getattr(self.args, "tcms_only_train_use_ea", False):
+                pass
+            else:
+                if tcms_loss is None:
+                    tcms_loss, tcms_stats = self.tcms_self_supervised_loss()
+                if tcms_loss is None:
+                    raise RuntimeError("--tcms_only_train requires a valid TCMS self-supervised loss")
+                tcms_weight_eff = tcms_weight if tcms_weight > 0 else 1.0
+                loss_all = tcms_weight_eff * tcms_loss
        # loss_all = loss_joi + in_loss
         loss_dic = {
             "joint_Intra_modal": loss_joi.item(),
@@ -540,7 +675,15 @@ class SGMEA(nn.Module):
             loss_dic["tmhg_regularization"] = float(tmhg_reg.detach().item())
         if dehr_aux is not None:
             loss_dic["dehr_aux_alignment"] = float(dehr_aux.detach().item())
-        if getattr(self.args, "use_type_modality_bias", False) or getattr(self.args, "use_dehr_router", False) or getattr(self.args, "use_tmhg_router", False):
+        if tmrd_loss is not None:
+            tmrd_weight_eff = tmrd_weight if tmrd_weight > 0 else 1.0
+            loss_dic["tmrd_selfsup_scaled"] = float((tmrd_weight_eff * tmrd_loss).detach().item())
+            loss_dic.update(tmrd_stats)
+        if tcms_loss is not None:
+            tcms_weight_eff = tcms_weight if tcms_weight > 0 else 1.0
+            loss_dic["tcms_selfsup_scaled"] = float((tcms_weight_eff * tcms_loss).detach().item())
+            loss_dic.update(tcms_stats)
+        if getattr(self.args, "use_type_modality_bias", False) or getattr(self.args, "use_dehr_router", False) or getattr(self.args, "use_tmhg_router", False) or getattr(self.args, "use_tmrd", False) or getattr(self.args, "use_tcms", False):
             loss_dic.update(self.type_modality_bias_stats())
         if relation_batch is not None:
             loss_dic["loss_original_raw"] = float(loss_all.detach().item())
@@ -830,6 +973,36 @@ class SGMEA(nn.Module):
                 if type_strength is not None:
                     stats["tmhg_type_strength_mean"] = float(type_strength.mean().item())
                     stats["tmhg_type_strength_max"] = float(type_strength.max().item())
+            tmrd = getattr(fusion, "tmrd", None)
+            if tmrd is not None:
+                stats.update(tmrd.probe_stats())
+                q = getattr(tmrd, "last_quality", None)
+                if q is not None and self.image_available is not None and q.shape[1] > 0:
+                    img_q = q[:, 0].detach()
+                    available = self.image_available.to(img_q.device).bool()
+                    if available.any():
+                        stats["tmrd_img_q_present_mean"] = float(img_q[available].mean().item())
+                    if (~available).any():
+                        stats["tmrd_img_q_missing_mean"] = float(img_q[~available].mean().item())
+                    if available.any() and (~available).any():
+                        stats["tmrd_img_q_present_missing_gap"] = float((img_q[available].mean() - img_q[~available].mean()).item())
+                        labels = available.float()
+                        pred = img_q >= 0.5
+                        stats["tmrd_img_missing_acc_full"] = float((pred == available).float().mean().item())
+                        order = torch.argsort(img_q)
+                        ranks = torch.empty_like(order, dtype=torch.float)
+                        ranks[order] = torch.arange(1, img_q.numel() + 1, device=img_q.device, dtype=torch.float)
+                        pos = labels > 0.5
+                        neg = ~pos
+                        pos_count = pos.float().sum()
+                        neg_count = neg.float().sum()
+                        if pos_count > 0 and neg_count > 0:
+                            rank_sum_pos = ranks[pos].sum()
+                            auc = (rank_sum_pos - pos_count * (pos_count + 1.0) / 2.0) / (pos_count * neg_count)
+                            stats["tmrd_img_missing_auc_full"] = float(auc.item())
+            tcms = getattr(fusion, "tcms", None)
+            if tcms is not None:
+                stats.update(tcms.probe_stats())
         return stats
 
     def estimate_train_stat_dehr_direction(self, train_links, logger=None):
@@ -1066,7 +1239,8 @@ class SGMEA(nn.Module):
                                                                                                 self.att_features,
                                                                                                 self.name_features,
                                                                                                 self.char_features,
-                                                                                                entity_type_ids=self.entity_type_ids)
+                                                                                                entity_type_ids=self.entity_type_ids,
+                                                                                                image_available=self.image_available)
         if only_joint:
             return joint_emb, weight_norm
         else:

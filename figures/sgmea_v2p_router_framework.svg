@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#334155" />
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#2563eb" />
+    </marker>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#0f172a" flood-opacity="0.10" />
+    </filter>
+    <linearGradient id="routerGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eff6ff" />
+      <stop offset="1" stop-color="#f8fafc" />
+    </linearGradient>
+    <linearGradient id="biasGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#dbeafe" />
+      <stop offset="1" stop-color="#fef3c7" />
+    </linearGradient>
+    <style>
+      .title { font: 700 30px Arial, Helvetica, sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 15px Arial, Helvetica, sans-serif; fill: #475569; }
+      .section { font: 700 18px Arial, Helvetica, sans-serif; fill: #0f172a; }
+      .label { font: 600 15px Arial, Helvetica, sans-serif; fill: #1e293b; }
+      .small { font: 500 13px Arial, Helvetica, sans-serif; fill: #475569; }
+      .tiny { font: 500 12px Arial, Helvetica, sans-serif; fill: #64748b; }
+      .formula { font: 600 14px Arial, Helvetica, sans-serif; fill: #334155; }
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; rx: 8; filter: url(#softShadow); }
+      .boxFlat { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; rx: 8; }
+      .blueBox { fill: #eff6ff; stroke: #60a5fa; stroke-width: 1.7; rx: 8; }
+      .yellowBox { fill: #fffbeb; stroke: #f59e0b; stroke-width: 1.7; rx: 8; }
+      .greenBox { fill: #ecfdf5; stroke: #34d399; stroke-width: 1.7; rx: 8; }
+      .purpleBox { fill: #f5f3ff; stroke: #a78bfa; stroke-width: 1.7; rx: 8; }
+      .routerShell { fill: url(#routerGrad); stroke: #2563eb; stroke-width: 2.2; stroke-dasharray: 8 6; rx: 12; filter: url(#softShadow); }
+      .arrow { stroke: #334155; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .arrowBlue { stroke: #2563eb; stroke-width: 2.2; fill: none; marker-end: url(#arrowBlue); }
+      .dash { stroke: #94a3b8; stroke-width: 1.8; fill: none; stroke-dasharray: 6 5; marker-end: url(#arrow); }
+      .modalImg { fill: #fee2e2; stroke: #ef4444; }
+      .modalAttr { fill: #dbeafe; stroke: #3b82f6; }
+      .modalRel { fill: #ede9fe; stroke: #8b5cf6; }
+      .modalGraph { fill: #dcfce7; stroke: #22c55e; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="980" fill="#ffffff" />
+
+  <text x="80" y="58" class="title">SGMEA with V2-P Type-Aware Residual Modality Router</text>
+  <text x="80" y="84" class="subtitle">A lightweight trainable router learns type-specific modality calibration from dense representations, then acts directly on SGMEA fusion.</text>
+
+  <rect x="72" y="112" width="230" height="170" class="box" />
+  <text x="96" y="145" class="section">Input MMEA Data</text>
+  <rect x="98" y="164" width="74" height="54" class="blueBox" />
+  <text x="119" y="187" class="label">KG 1</text>
+  <text x="111" y="207" class="tiny">entities</text>
+  <rect x="202" y="164" width="74" height="54" class="blueBox" />
+  <text x="223" y="187" class="label">KG 2</text>
+  <text x="215" y="207" class="tiny">entities</text>
+  <path d="M172 191 C184 176, 190 176, 202 191" class="dash" />
+  <text x="103" y="247" class="small">Train ILL pairs and entity types</text>
+  <text x="103" y="267" class="tiny">Person / Place / Org / Creative Work</text>
+
+  <rect x="72" y="330" width="230" height="270" class="box" />
+  <text x="96" y="363" class="section">Frozen Modal Features</text>
+  <rect x="98" y="392" width="160" height="36" rx="6" class="modalImg" />
+  <text x="116" y="416" class="label">Image feature</text>
+  <rect x="98" y="442" width="160" height="36" rx="6" class="modalAttr" />
+  <text x="106" y="466" class="label">Attribute feature</text>
+  <rect x="98" y="492" width="160" height="36" rx="6" class="modalRel" />
+  <text x="109" y="516" class="label">Relation feature</text>
+  <rect x="98" y="542" width="160" height="36" rx="6" class="modalGraph" />
+  <text x="123" y="566" class="label">Graph feature</text>
+
+  <rect x="380" y="180" width="270" height="360" class="box" />
+  <text x="410" y="215" class="section">SGMEA Backbone</text>
+  <text x="410" y="242" class="small">Modality projectors encode each entity.</text>
+  <rect x="415" y="278" width="190" height="42" rx="8" class="boxFlat" />
+  <text x="447" y="304" class="formula">z_img = P_img(x_img)</text>
+  <rect x="415" y="336" width="190" height="42" rx="8" class="boxFlat" />
+  <text x="443" y="362" class="formula">z_attr = P_attr(x_attr)</text>
+  <rect x="415" y="394" width="190" height="42" rx="8" class="boxFlat" />
+  <text x="449" y="420" class="formula">z_rel = P_rel(x_rel)</text>
+  <rect x="415" y="452" width="190" height="42" rx="8" class="boxFlat" />
+  <text x="433" y="478" class="formula">z_graph = P_graph(x_graph)</text>
+
+  <rect x="700" y="156" width="340" height="190" class="box" />
+  <text x="732" y="190" class="section">Baseline Fusion</text>
+  <text x="732" y="218" class="small">SGMEA predicts base modality attention.</text>
+  <rect x="742" y="246" width="252" height="46" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4" />
+  <text x="765" y="275" class="formula">w_base = softmax(a_img,...,a_graph)</text>
+  <text x="746" y="318" class="tiny">Problem: averaged weights under noisy modalities</text>
+
+  <rect x="700" y="398" width="790" height="380" class="routerShell" />
+  <text x="730" y="435" class="section">Innovation: V2-P Elegant Triplet Router</text>
+  <text x="730" y="461" class="small">No manual grid prior as the answer. The router observes dense tokens and learns a type-specific calibration bias.</text>
+
+  <rect x="735" y="496" width="180" height="198" class="boxFlat" />
+  <text x="760" y="527" class="label">Clean Inputs</text>
+  <rect x="758" y="552" width="132" height="30" rx="6" class="purpleBox" />
+  <text x="772" y="572" class="tiny">Type token E_type[t]</text>
+  <rect x="758" y="592" width="132" height="30" rx="6" class="modalImg" />
+  <text x="775" y="612" class="tiny">z_img token</text>
+  <rect x="758" y="632" width="132" height="30" rx="6" class="modalAttr" />
+  <text x="774" y="652" class="tiny">z_attr token</text>
+  <rect x="758" y="672" width="62" height="20" rx="5" class="modalRel" />
+  <text x="770" y="687" class="tiny">z_rel</text>
+  <rect x="828" y="672" width="62" height="20" rx="5" class="modalGraph" />
+  <text x="836" y="687" class="tiny">z_graph</text>
+
+  <rect x="965" y="500" width="200" height="188" class="blueBox" />
+  <text x="997" y="529" class="label">Token Mixer</text>
+  <text x="990" y="554" class="small">1-layer Transformer</text>
+  <text x="990" y="577" class="tiny">cross-modality interaction</text>
+  <text x="990" y="597" class="tiny">type-conditioned attention</text>
+  <rect x="995" y="622" width="142" height="38" rx="7" fill="#ffffff" stroke="#93c5fd" stroke-width="1.2" />
+  <text x="1026" y="646" class="formula">H = T(X)</text>
+
+  <rect x="1210" y="500" width="235" height="188" class="yellowBox" />
+  <text x="1241" y="529" class="label">Residual Attribution</text>
+  <text x="1240" y="554" class="small">Transformer contribution</text>
+  <rect x="1240" y="580" width="165" height="38" rx="7" fill="#ffffff" stroke="#f59e0b" stroke-width="1.2" />
+  <text x="1275" y="604" class="formula">Delta H = H - X</text>
+  <text x="1240" y="642" class="tiny">Contextual MLP uses [Delta type,</text>
+  <text x="1240" y="662" class="tiny">Delta modality, interaction] as evidence.</text>
+
+  <rect x="920" y="715" width="300" height="42" rx="8" fill="url(#biasGrad)" stroke="#60a5fa" stroke-width="1.5" />
+  <text x="948" y="742" class="formula">b_t = rho_t · tanh(MLP(Delta H))</text>
+
+  <path d="M915 594 L965 594" class="arrowBlue" />
+  <path d="M1165 594 L1210 594" class="arrowBlue" />
+  <path d="M1328 688 C1328 734, 1276 736, 1220 736" class="arrowBlue" />
+
+  <rect x="1090" y="826" width="360" height="86" class="greenBox" />
+  <text x="1120" y="856" class="section">Log-Space Fusion Calibration</text>
+  <text x="1120" y="883" class="formula">w_final = softmax(log(w_base + eps) + b_t)</text>
+  <text x="1120" y="905" class="tiny">Directly changes ranking embeddings and final EA metrics</text>
+
+  <rect x="118" y="756" width="410" height="110" class="box" />
+  <text x="145" y="790" class="section">Training and Diagnostics</text>
+  <text x="145" y="818" class="small">Supervision: real train ILL ranking / modality utility auxiliary loss</text>
+  <text x="145" y="842" class="small">Regularization: bias L2, entropy / KL style stabilization</text>
+  <text x="145" y="866" class="tiny">Explainability: learned type-modality bias table and Transformer residual patterns</text>
+
+  <rect x="1320" y="180" width="170" height="116" class="box" />
+  <text x="1350" y="214" class="section">Output</text>
+  <text x="1350" y="242" class="small">Joint entity</text>
+  <text x="1350" y="263" class="small">embedding</text>
+  <text x="1350" y="284" class="tiny">Nearest-neighbor EA</text>
+
+  <path d="M302 196 L380 300" class="arrow" />
+  <path d="M302 464 L380 396" class="arrow" />
+  <path d="M650 360 L700 266" class="arrow" />
+  <path d="M650 420 C675 470, 675 560, 700 594" class="arrowBlue" />
+  <path d="M1040 266 L1320 238" class="arrow" />
+  <path d="M1040 290 C1110 344, 1110 800, 1090 866" class="dash" />
+  <path d="M1270 826 C1260 724, 1264 604, 1040 282" class="arrowBlue" />
+  <path d="M1450 856 C1510 790, 1510 330, 1490 252" class="arrowBlue" />
+
+  <rect x="724" y="112" width="290" height="34" rx="17" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.2" />
+  <text x="745" y="134" class="tiny">Base SGMEA path</text>
+  <line x1="848" y1="129" x2="900" y2="129" stroke="#334155" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="917" y="134" class="tiny">calibrated by router</text>
+
+  <rect x="80" y="910" width="1390" height="34" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
+  <text x="104" y="932" class="tiny">Key message: V2-P makes the Transformer output a necessary source of the final modality bias through residual attribution, while preserving lightweight CCF-style modularity and interpretable type-modality calibration.</text>
+</svg>

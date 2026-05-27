@@ -1,0 +1,15 @@
+[info] run_tag=phase27_il_baseline_tcms_dehr_0525_v5
+[info] log_dir=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5
+[info] gpu_ids=0,1,2,3,4,5,6,7
+[info] epochs=1000 il_start=500 semi_learn_step=5 eval_epoch=2 batch_size=2048 lr=5e-4 save_model=1
+[launch] gpu=0 variant=baseline log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbdb_r02_il_baseline_seed42.log
+[launch] gpu=1 variant=tcms_dehr log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbdb_r02_il_tcms_dehr_seed42.log
+[launch] gpu=2 variant=baseline log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbdb_r05_il_baseline_seed42.log
+[launch] gpu=3 variant=tcms_dehr log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbdb_r05_il_tcms_dehr_seed42.log
+[launch] gpu=4 variant=baseline log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbdb_r08_il_baseline_seed42.log
+[launch] gpu=5 variant=tcms_dehr log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbdb_r08_il_tcms_dehr_seed42.log
+[launch] gpu=6 variant=baseline log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbyg_r02_il_baseline_seed42.log
+[launch] gpu=7 variant=tcms_dehr log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbyg_r02_il_tcms_dehr_seed42.log
+[exit] status=0 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbyg_r02_il_baseline_seed42.log
+[launch] gpu=0 variant=baseline log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbyg_r05_il_baseline_seed42.log
+[exit] status=1 log=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5/fbyg_r05_il_baseline_seed42.log

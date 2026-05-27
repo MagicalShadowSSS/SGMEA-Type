@@ -1,0 +1,123 @@
+### 实验数据整理
+
+以下是按照发表年份（从早到晚）整理的对比实验数据表格。数据按 0.2、0.5、0.8 三个对齐率（Ratio）划分，左侧三列为 FBDB15K 结果，右侧三列为 FBYG15K 结果。
+
+| Model | Ratio | FBDB Hits@1 | FBDB Hits@10 | FBDB MRR | FBYG Hits@1 | FBYG Hits@10 | FBYG MRR |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **MCLEA** [1] (2022) | 0.2 | 0.295 | 0.582 | 0.393 | 0.254 | 0.484 | 0.332 |
+|  | 0.5 | 0.555 | 0.784 | 0.637 | 0.501 | 0.705 | 0.574 |
+|  | 0.8 | 0.735 | 0.890 | 0.790 | 0.667 | 0.824 | 0.722 |
+| **MEAformer** [2] (2023) | 0.2 | 0.417 | 0.715 | 0.518 | 0.327 | 0.595 | 0.417 |
+|  | 0.5 | 0.619 | 0.843 | 0.698 | 0.560 | 0.778 | 0.639 |
+|  | 0.8 | 0.765 | 0.916 | 0.820 | 0.703 | 0.873 | 0.766 |
+| **PCMEA** [3] (2024) | 0.2 | 0.436 | 0.707 | 0.528 | 0.397 | 0.654 | 0.486 |
+|  | 0.5 | 0.633 | 0.825 | 0.701 | 0.606 | 0.785 | 0.652 |
+|  | 0.8 | 0.744 | 0.904 | 0.818 | 0.715 | 0.869 | 0.784 |
+| **LoginMEA** [4] (2024) | 0.2 | 0.536 | 0.784 | 0.667 | 0.572 | 0.758 | 0.652 |
+|  | 0.5 | 0.712 | 0.857 | 0.755 | 0.648 | 0.805 | 0.699 |
+|  | 0.8 | 0.773 | 0.908 | 0.822 | 0.724 | 0.904 | 0.803 |
+| **SGMEA** [5] (2025) | 0.2 | 0.543 | 0.777 | 0.625 | 0.587 | 0.826 | 0.670 |
+|  | 0.5 | 0.716 | 0.882 | 0.775 | 0.780 | 0.924 | 0.832 |
+|  | 0.8 | 0.815 | 0.931 | 0.828 | 0.857 | 0.951 | 0.894 |
+| **CDMEA** [6] (2025) | 0.2 | 0.549 | 0.741 | 0.611 | 0.434 | 0.682 | 0.523 |
+|  | 0.5 | 0.675 | 0.861 | 0.737 | 0.628 | 0.824 | 0.692 |
+|  | 0.8 | 0.804 | 0.931 | 0.859 | 0.743 | 0.891 | 0.806 |
+| **RICEA** [7] (2025) | 0.2 | 0.471 | 0.720 | 0.557 | 0.411 | 0.658 | 0.497 |
+|  | 0.5 | 0.648 | 0.852 | 0.721 | 0.617 | 0.811 | 0.687 |
+|  | 0.8 | 0.776 | 0.916 | 0.829 | 0.734 | 0.892 | 0.792 |
+
+---
+
+### 对应参考文献列表 (BibTeX)
+
+**[1] MCLEA (2022)**
+
+```bibtex
+@inproceedings{lin2022multi,
+  title={Multi-modal contrastive representation learning for entity alignment},
+  author={Lin, Zhenxi and Zhang, Ziheng and Wang, Meng and Shi, Yinghui and Wu, Xian and Zheng, Yefeng},
+  booktitle={Proceedings of the 29th international conference on computational linguistics},
+  pages={2572--2584},
+  year={2022}
+}
+
+```
+
+**[2] MEAformer (2023)**
+
+```bibtex
+@inproceedings{chen2023meaformer,
+  title={Meaformer: Multi-modal entity alignment transformer for meta modality hybrid},
+  author={Chen, Zhuo and Chen, Jiaoyan and Zhang, Wen and Guo, Lingbing and Fang, Yin and Huang, Yufeng and Zhang, Yichi and Geng, Yuxia and Pan, Jeff Z and Song, Wenting and others},
+  booktitle={Proceedings of the 31st ACM international conference on multimedia},
+  pages={3317--3327},
+  year={2023}
+}
+
+```
+
+**[3] PCMEA (2024)**
+
+```bibtex
+@inproceedings{wang2024pseudo,
+  title={Pseudo-label calibration semi-supervised multi-modal entity alignment},
+  author={Wang, Luyao and Qi, Pengnian and Bao, Xigang and Zhou, Chunlai and Qin, Biao},
+  booktitle={Proceedings of the AAAI conference on artificial intelligence},
+  volume={38},
+  number={8},
+  pages={9116--9124},
+  year={2024}
+}
+
+```
+
+**[4] LoginMEA (2024)**
+
+```bibtex
+@article{su2024loginmea,
+  title={Loginmea: Local-to-global interaction network for multi-modal entity alignment},
+  author={Su, Taoyu and Zhang, Xinghua and Sheng, Jiawei and Zhang, Zhenyu and Liu, Tingwen},
+  journal={arXiv preprint arXiv:2407.19625},
+  year={2024}
+}
+
+```
+
+**[5] SGMEA (2025)**
+
+```bibtex
+@inproceedings{cheng2025sgmea,
+  title={SGMEA: Structure-Guided Multimodal Entity Alignment},
+  author={Cheng, Jingwei and Guo, Mingxiao and Zhang, Fu},
+  booktitle={Proceedings of the 31st International Conference on Computational Linguistics},
+  pages={7851--7861},
+  year={2025}
+}
+
+```
+
+**[6] CDMEA (2025)**
+
+```bibtex
+@inproceedings{su2025mitigating,
+  title={Mitigating Modality Bias in Multi-modal Entity Alignment from a Causal Perspective},
+  author={Su, Taoyu and Sheng, Jiawei and Ma, Duohe and Li, Xiaodong and Yue, Juwei and Song, Mengxiao and Tang, Yingkai and Liu, Tingwen},
+  booktitle={Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+  pages={1186--1196},
+  year={2025}
+}
+
+```
+
+**[7] RICEA (2025)**
+
+```bibtex
+@inproceedings{li2025probing,
+  title={Probing relative interaction and dynamic calibration in multi-modal entity alignment},
+  author={Li, Chenxiao and Cheng, Jingwei and Tong, Qiang and Zhang, Fu and Wang, Cairui},
+  booktitle={Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  pages={28504--28516},
+  year={2025}
+}
+
+```

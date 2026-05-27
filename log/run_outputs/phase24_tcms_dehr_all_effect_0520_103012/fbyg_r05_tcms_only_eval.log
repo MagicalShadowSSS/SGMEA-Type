@@ -1,0 +1,38 @@
+++ date '+%F %T'
++ echo '[start] 2026-05-20 10:30:12 gpu=4'
+[start] 2026-05-20 10:30:12 gpu=4
++ echo '[cmd] CUDA_VISIBLE_DEVICES=4 /gly/tongqiang/anaconda3/envs/sgmea/bin/python -u main.py --gpu 0 --data_path /gly/tongqiang/dongyufeng/data/mmkg --data_split norm --model_name SGMEA --hidden_units 300,300,300 --batch_size 2048 --csls --csls_k 1 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler fixed --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau 0.1 --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --enable_sota --disable_sgmea_guidance --freeze_type_modality_bias_entity --no_tensorboard --epoch 0 --eval_epoch 1 --save_model 0 --use_tcms --tcms_prefusion --tcms_zero_init_residual --tcms_noise_same_type_ratio 0.7 --tcms_disable_gate_match_features --tcms_beta 0.25 --tcms_beta_warmup_start 70 --tcms_beta_warmup_end 150 --tcms_pretrain_loss_weight 0.002 --tcms_selfsup_start 100 --tcms_selfsup_warmup_end 170 --tcms_sparse_weight 0.03 --tcms_gate_init -3.0 --tcms_missing_mode keep --data_choice FBYG15K --data_rate 0.5 --external_anchor_type_jsonl /gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBYG15K/norm_anchor_type_fixed.jsonl --model_name_save SGMEA_FBYG15K_0.5_fbyg_r05_tcms_keep_ckpt_ --exp_name phase24_tcms_dehr_all_effect_0520_103012 --exp_id fbyg_r05_tcms_only_eval'
+[cmd] CUDA_VISIBLE_DEVICES=4 /gly/tongqiang/anaconda3/envs/sgmea/bin/python -u main.py --gpu 0 --data_path /gly/tongqiang/dongyufeng/data/mmkg --data_split norm --model_name SGMEA --hidden_units 300,300,300 --batch_size 2048 --csls --csls_k 1 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler fixed --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau 0.1 --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --enable_sota --disable_sgmea_guidance --freeze_type_modality_bias_entity --no_tensorboard --epoch 0 --eval_epoch 1 --save_model 0 --use_tcms --tcms_prefusion --tcms_zero_init_residual --tcms_noise_same_type_ratio 0.7 --tcms_disable_gate_match_features --tcms_beta 0.25 --tcms_beta_warmup_start 70 --tcms_beta_warmup_end 150 --tcms_pretrain_loss_weight 0.002 --tcms_selfsup_start 100 --tcms_selfsup_warmup_end 170 --tcms_sparse_weight 0.03 --tcms_gate_init -3.0 --tcms_missing_mode keep --data_choice FBYG15K --data_rate 0.5 --external_anchor_type_jsonl /gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBYG15K/norm_anchor_type_fixed.jsonl --model_name_save SGMEA_FBYG15K_0.5_fbyg_r05_tcms_keep_ckpt_ --exp_name phase24_tcms_dehr_all_effect_0520_103012 --exp_id fbyg_r05_tcms_only_eval
++ CUDA_VISIBLE_DEVICES=4
++ /gly/tongqiang/anaconda3/envs/sgmea/bin/python -u main.py --gpu 0 --data_path /gly/tongqiang/dongyufeng/data/mmkg --data_split norm --model_name SGMEA --hidden_units 300,300,300 --batch_size 2048 --csls --csls_k 1 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler fixed --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau 0.1 --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --enable_sota --disable_sgmea_guidance --freeze_type_modality_bias_entity --no_tensorboard --epoch 0 --eval_epoch 1 --save_model 0 --use_tcms --tcms_prefusion --tcms_zero_init_residual --tcms_noise_same_type_ratio 0.7 --tcms_disable_gate_match_features --tcms_beta 0.25 --tcms_beta_warmup_start 70 --tcms_beta_warmup_end 150 --tcms_pretrain_loss_weight 0.002 --tcms_selfsup_start 100 --tcms_selfsup_warmup_end 170 --tcms_sparse_weight 0.03 --tcms_gate_init -3.0 --tcms_missing_mode keep --data_choice FBYG15K --data_rate 0.5 --external_anchor_type_jsonl /gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBYG15K/norm_anchor_type_fixed.jsonl --model_name_save SGMEA_FBYG15K_0.5_fbyg_r05_tcms_keep_ckpt_ --exp_name phase24_tcms_dehr_all_effect_0520_103012 --exp_id fbyg_r05_tcms_only_eval
+INFO - 05/20/26 10:30:35 - 0:00:00 - ============ Initialized logger ============
+INFO - 05/20/26 10:30:35 - 0:00:00 - The experiment will be stored in /gly/tongqiang/dongyufeng/data/mmkg/dump/0520-phase24_tcms_dehr_all_effect_0520_103012/SGMEA_FBYG15K_0.5_fbyg_r05_tcms_only_eval
+                                     
+INFO - 05/20/26 10:30:35 - 0:00:00 - Running command: python main.py --gpu 0 --data_path '/gly/tongqiang/dongyufeng/data/mmkg' --data_split norm --model_name SGMEA --hidden_units '300,300,300' --batch_size 2048 --csls --csls_k 1 --random_seed 42 --workers 0 --dist 0 --accumulation_steps 1 --scheduler fixed --attr_dim 300 --img_dim 300 --name_dim 300 --char_dim 300 --hidden_size 300 --tau '0.1' --structure_encoder gat --num_attention_heads 1 --num_hidden_layers 1 --use_surface 0 --use_intermediate 0 --enable_sota --disable_sgmea_guidance --freeze_type_modality_bias_entity --no_tensorboard --epoch 0 --eval_epoch 1 --save_model 0 --use_tcms --tcms_prefusion --tcms_zero_init_residual --tcms_noise_same_type_ratio '0.7' --tcms_disable_gate_match_features --tcms_beta '0.25' --tcms_beta_warmup_start 70 --tcms_beta_warmup_end 150 --tcms_pretrain_loss_weight '0.002' --tcms_selfsup_start 100 --tcms_selfsup_warmup_end 170 --tcms_sparse_weight '0.03' --tcms_gate_init '-3.0' --tcms_missing_mode keep --data_choice FBYG15K --data_rate '0.5' --external_anchor_type_jsonl '/gly/tongqiang/dongyufeng/data/mmkg/anchors_nameless/FBYG15K/norm_anchor_type_fixed.jsonl' --model_name_save 'SGMEA_FBYG15K_0.5_fbyg_r05_tcms_keep_ckpt_' --exp_name phase24_tcms_dehr_all_effect_0520_103012 --exp_id fbyg_r05_tcms_only_eval
+
+/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/main.py:49: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = GradScaler()
+loading raw data...
+INFO - 05/20/26 10:30:40 - 0:00:04 - 81.17% entities have images
+INFO - 05/20/26 10:30:40 - 0:00:05 - image feature shape:(30355, 4096)
+INFO - 05/20/26 10:30:40 - 0:00:05 - entity coarse types: external distribution loaded
+INFO - 05/20/26 10:30:40 - 0:00:05 -   Person: 12911 (42.53%)
+INFO - 05/20/26 10:30:40 - 0:00:05 -   Place: 5150 (16.97%)
+INFO - 05/20/26 10:30:40 - 0:00:05 -   Organization: 4016 (13.23%)
+INFO - 05/20/26 10:30:40 - 0:00:05 -   Creative Work: 4181 (13.77%)
+INFO - 05/20/26 10:30:40 - 0:00:05 -   Event: 1344 (4.43%)
+INFO - 05/20/26 10:30:40 - 0:00:05 -   Entity: 2753 (9.07%)
+INFO - 05/20/26 10:30:40 - 0:00:05 - #left entity : 14951, #right entity: 15404
+INFO - 05/20/26 10:30:40 - 0:00:05 - #left entity not in train set: 9352, #right entity not in train set: 9805
+INFO - 05/20/26 10:30:41 - 0:00:06 - relation feature shape:(30355, 1000)
+INFO - 05/20/26 10:30:46 - 0:00:11 - Note: detected 96 virtual cores but NumExpr set to maximum of 64, check "NUMEXPR_MAX_THREADS" environment variable.
+INFO - 05/20/26 10:30:46 - 0:00:11 - Note: NumExpr detected 96 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+INFO - 05/20/26 10:30:46 - 0:00:11 - NumExpr defaulting to 16 threads.
+INFO - 05/20/26 10:31:00 - 0:00:25 - Use pytorch device_name: cuda:0
+INFO - 05/20/26 10:31:00 - 0:00:25 - Load pretrained SentenceTransformer: /gly/tongqiang/dongyufeng/models/LaBSE
+Terminated
++ status=143
+++ date '+%F %T'
++ echo '[exit] 2026-05-20 10:31:11 status=143'
+[exit] 2026-05-20 10:31:11 status=143
++ exit 143

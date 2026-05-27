@@ -458,6 +458,8 @@ class DEHRTypeScaleRouter(nn.Module):
                 tokens.append(self.token_proj(token) + self.modal_token[idx].unsqueeze(0))
         modal_tokens = torch.stack(tokens, dim=1)
         type_token = self.type_token(type_ids).unsqueeze(1)
+        if getattr(self.args, "dehr_drop_type_token", False):
+            type_token = torch.zeros_like(type_token)
         transformer_input = torch.cat([type_token, modal_tokens], dim=1)
         hidden = self.transformer(transformer_input)
         raw = self.evidence_head(hidden[:, 0])
@@ -1290,6 +1292,908 @@ class TypeModalityHyperGate(nn.Module):
         return bias
 
 
+class TypeAwareModalityRecoveryDenoiser(nn.Module):
+    """Type-aware modality recovery and denoising (TMRD).
+
+    The module is intentionally lightweight and conservative: it predicts an
+    instance-level modality quality score, a semantic clean proxy from the
+    contextual modality token, and optionally reads a type-conditioned clustered
+    memory built from real modality features.
+    """
+
+    def __init__(self, args, modal_num, hidden_size):
+        super().__init__()
+        self.args = args
+        self.modal_num = modal_num
+        self.hidden_size = hidden_size
+        type_count = int(getattr(args, "top_type_count", 0) or 0)
+        if type_count <= 0:
+            type_count = 6
+        self.type_count = type_count
+        self.memory_k = max(int(getattr(args, "tmrd_memory_k", 4)), 1)
+        self.type_emb_dim = int(getattr(args, "tmrd_type_emb_dim", 16))
+        self.hidden_dim = int(getattr(args, "tmrd_hidden_dim", 128))
+        self.type_emb = nn.Embedding(type_count, self.type_emb_dim)
+        self.modal_token = nn.Parameter(torch.zeros(modal_num, hidden_size))
+        nn.init.normal_(self.modal_token, std=0.02)
+        quality_input_dim = hidden_size * 5 + self.type_emb_dim + modal_num
+        self.quality_head = nn.Sequential(
+            nn.LayerNorm(quality_input_dim),
+            nn.Linear(quality_input_dim, self.hidden_dim),
+            nn.GELU(),
+            nn.Linear(self.hidden_dim, 1),
+        )
+        quality_init = min(max(float(getattr(args, "tmrd_quality_init", 0.9)), 1e-4), 1.0 - 1e-4)
+        nn.init.zeros_(self.quality_head[-1].weight)
+        nn.init.constant_(self.quality_head[-1].bias, math.log(quality_init / (1.0 - quality_init)))
+        proxy_input_dim = hidden_size + self.type_emb_dim + modal_num
+        self.proxy_head = nn.Sequential(
+            nn.LayerNorm(proxy_input_dim),
+            nn.Linear(proxy_input_dim, self.hidden_dim),
+            nn.GELU(),
+            nn.Linear(self.hidden_dim, hidden_size),
+        )
+        suppress_init = min(max(float(getattr(args, "tmrd_learned_img_suppress_init", 0.08)), 1e-6), 10.0)
+        self.raw_img_suppress = nn.Parameter(torch.tensor(math.log(math.exp(suppress_init) - 1.0)))
+        self.recovery_query = nn.Linear(hidden_size + self.type_emb_dim, hidden_size)
+        self.register_buffer("memory", torch.zeros(type_count, modal_num, self.memory_k, hidden_size))
+        self.register_buffer("memory_counts", torch.zeros(type_count, modal_num))
+        self.memory_ready = False
+        self.last_quality = None
+        self.last_quality_bias = None
+        self.last_clean_delta = None
+        self.last_proxy_cos = None
+        self.last_memory_diversity = None
+        self.last_corrupt_acc = None
+        self.last_nce_loss = None
+        self.last_corrupt_loss = None
+        self.last_loss = None
+        self.last_corrupt_pair_acc = None
+        self.last_quality_gap = None
+        self.last_missing_loss = None
+        self.last_missing_acc = None
+        self.last_missing_auc = None
+        self.last_missing_gap = None
+        self.last_missing_present_q = None
+        self.last_missing_absent_q = None
+        self.last_suppress_gate = None
+        self.last_suppress_shortfall = None
+        self.last_suppress_threshold = None
+        self.last_missing_repair_rate = None
+        self.last_present_repair_rate = None
+        self.last_img_raw_coeff_missing = None
+        self.last_img_repair_delta_norm = None
+        self.last_learned_img_suppress = None
+
+    def _safe_type_ids(self, entity_type_ids, device):
+        if entity_type_ids is None:
+            return None
+        return entity_type_ids.to(device).long().clamp(min=0, max=self.type_count - 1)
+
+    def _modal_one_hot(self, batch_size, device):
+        eye = torch.eye(self.modal_num, device=device)
+        return eye.view(1, self.modal_num, self.modal_num).expand(batch_size, -1, -1)
+
+    def _context_without_self(self, tokens):
+        if self.modal_num <= 1:
+            return tokens
+        pooled = tokens.sum(dim=1, keepdim=True) - tokens
+        return pooled / float(self.modal_num - 1)
+
+    def _predict_semantic_proxy(self, context, type_emb, modal_one_hot):
+        """Predict a clean semantic proxy from other modalities only.
+
+        This deliberately avoids an identity shortcut from the target modality.
+        The residual is anchored on the cross-modal context, not on raw z_m.
+        """
+        proxy_in = torch.cat([context, type_emb, modal_one_hot], dim=-1)
+        denoise_scale = float(getattr(self.args, "tmrd_denoise_scale", 0.25))
+        proxy = context + denoise_scale * torch.tanh(self.proxy_head(proxy_in))
+        return F.normalize(proxy, dim=-1, eps=1e-8)
+
+    def _read_memory(self, context, type_ids):
+        if (not self.memory_ready) or (not getattr(self.args, "tmrd_use_memory_recovery", False)):
+            return None
+        device = context.device
+        type_emb = self.type_emb(type_ids).unsqueeze(1).expand(-1, self.modal_num, -1)
+        query = self.recovery_query(torch.cat([context, type_emb], dim=-1))
+        proto = self.memory.to(device)[type_ids]
+        logits = torch.einsum("bmd,bmkd->bmk", F.normalize(query, dim=-1), F.normalize(proto, dim=-1))
+        attn = F.softmax(logits, dim=-1)
+        return torch.einsum("bmk,bmkd->bmd", attn, proto)
+
+    def _quality_input(self, raw, proxy, memory_ref, type_emb, modal_one_hot):
+        if memory_ref is None:
+            memory_ref = proxy.detach()
+        return torch.cat(
+            [raw, proxy, torch.abs(raw - proxy), memory_ref, torch.abs(raw - memory_ref), type_emb, modal_one_hot],
+            dim=-1,
+        )
+
+    def forward(self, embs, hidden_states, weight_norm, entity_type_ids=None, image_available=None):
+        if entity_type_ids is None:
+            return embs, torch.zeros_like(weight_norm)
+        raw = torch.stack(embs[:self.modal_num], dim=1)
+        device = raw.device
+        type_ids = self._safe_type_ids(entity_type_ids, device)
+        type_emb = self.type_emb(type_ids).unsqueeze(1).expand(-1, self.modal_num, -1)
+        modal_one_hot = self._modal_one_hot(raw.shape[0], device)
+        if getattr(self.args, "tmrd_context_source", "hidden") == "raw":
+            context = self._context_without_self(raw)
+        else:
+            context = self._context_without_self(hidden_states[:, :self.modal_num])
+        proxy = self._predict_semantic_proxy(context, type_emb, modal_one_hot)
+        memory_proxy = self._read_memory(context, type_ids)
+        if memory_proxy is not None:
+            memory_mix = min(max(float(getattr(self.args, "tmrd_memory_mix", 0.0)), 0.0), 1.0)
+            if memory_mix > 0:
+                proxy = F.normalize((1.0 - memory_mix) * proxy + memory_mix * memory_proxy, dim=-1, eps=1e-8)
+        quality_in = self._quality_input(raw, proxy, memory_proxy, type_emb, modal_one_hot)
+        quality = torch.sigmoid(self.quality_head(quality_in)).squeeze(-1).clamp(min=1e-4, max=1.0)
+        clean_candidate = quality.unsqueeze(-1) * raw + (1.0 - quality).unsqueeze(-1) * proxy
+        clean_mix = min(max(float(getattr(self.args, "tmrd_clean_mix_scale", 0.0)), 0.0), 1.0)
+        if clean_mix <= 0:
+            clean = raw
+        else:
+            clean_gate = torch.full_like(quality, clean_mix)
+            clean_modal_idx = int(getattr(self.args, "tmrd_clean_modal_idx", -1))
+            if 0 <= clean_modal_idx < self.modal_num:
+                modal_mask = torch.zeros_like(clean_gate)
+                modal_mask[:, clean_modal_idx] = 1.0
+                clean_gate = clean_gate * modal_mask
+            quality_threshold = float(getattr(self.args, "tmrd_clean_quality_threshold", 0.0))
+            if quality_threshold > 0:
+                clean_gate = clean_gate * (quality < quality_threshold).float()
+            clean = raw + clean_gate.unsqueeze(-1) * (clean_candidate - raw)
+        img_repair_delta = None
+        missing_repair_rate = None
+        present_repair_rate = None
+        img_raw_coeff_missing = None
+        repair_mode = getattr(self.args, "tmrd_missing_repair_mode", "none")
+        if repair_mode != "none" and self.modal_num > 0:
+            img_idx = int(getattr(self.args, "tmrd_missing_modal_idx", 0))
+            if 0 <= img_idx < self.modal_num:
+                available = None
+                if image_available is not None:
+                    available = image_available.to(device).bool()
+                if available is not None and available.shape[0] == raw.shape[0]:
+                    proxy_img = proxy[:, img_idx, :]
+                    memory_img = memory_proxy[:, img_idx, :] if memory_proxy is not None else proxy_img
+                    if repair_mode == "proxy":
+                        repair_img = proxy_img
+                    elif repair_mode == "memory":
+                        repair_img = memory_img
+                    elif repair_mode == "zero":
+                        repair_img = torch.zeros_like(proxy_img)
+                    else:
+                        mix = min(max(float(getattr(self.args, "tmrd_missing_repair_mix", 0.5)), 0.0), 1.0)
+                        repair_img = F.normalize(mix * proxy_img + (1.0 - mix) * memory_img, dim=-1, eps=1e-8)
+                    repaired_clean = clean.clone()
+                    missing_mask = (~available).float().view(-1, 1)
+                    present_mask = available.float().view(-1, 1)
+                    img_before = repaired_clean[:, img_idx, :]
+                    # Hard rule: unavailable image tokens have zero raw-image coefficient.
+                    img_after = present_mask * img_before + missing_mask * repair_img
+                    present_quantile = float(getattr(self.args, "tmrd_present_repair_quantile", 0.0))
+                    present_gate = torch.zeros_like(missing_mask)
+                    if present_quantile > 0 and available.any():
+                        present_quantile = min(max(present_quantile, 0.0), 1.0)
+                        q_img = quality[:, img_idx].detach()
+                        present_q = q_img[available]
+                        if present_q.numel() > 0:
+                            threshold = torch.quantile(present_q, present_quantile)
+                            low_present = (q_img <= threshold).float().view(-1, 1) * present_mask
+                            present_mix = min(max(float(getattr(self.args, "tmrd_present_repair_mix", 0.5)), 0.0), 1.0)
+                            present_gate = low_present * present_mix
+                            img_after = (1.0 - present_gate) * img_after + present_gate * repair_img
+                    repaired_clean[:, img_idx, :] = img_after
+                    clean = repaired_clean
+                    missing_repair_rate = (~available).float().mean()
+                    present_repair_rate = (present_gate.squeeze(-1) > 0).float().mean()
+                    img_raw_coeff_missing = torch.zeros((), device=device)
+                    img_repair_delta = (img_after - raw[:, img_idx, :]).norm(dim=-1)
+        quality_bias = torch.zeros_like(weight_norm)
+        suppress_gate = None
+        suppress_shortfall = None
+        suppress_threshold_used = None
+        if not getattr(self.args, "tmrd_disable_quality_bias", False):
+            gamma = float(getattr(self.args, "tmrd_quality_gamma", 0.5))
+            bias_mode = getattr(self.args, "tmrd_quality_bias_mode", "logq")
+            if bias_mode == "centered_logit":
+                # Entity-local reliability contrast: only reward/suppress a modality
+                # when its clean odds deviate from the entity's average modality odds.
+                odds = torch.logit(quality.clamp(min=1e-4, max=1.0 - 1e-4))
+                quality_bias = gamma * (odds - odds.mean(dim=-1, keepdim=True))
+            elif bias_mode == "learned_img_suppress":
+                modal_idx = int(getattr(self.args, "tmrd_quality_suppress_modal_idx", 0))
+                max_suppress = max(float(getattr(self.args, "tmrd_learned_img_suppress_max", 0.50)), 1e-6)
+                suppress = F.softplus(self.raw_img_suppress).clamp(max=max_suppress)
+                if 0 <= modal_idx < self.modal_num:
+                    quality_bias[:, modal_idx] = -suppress
+                self.last_learned_img_suppress = suppress.detach()
+            elif bias_mode == "auto_img_suppress":
+                modal_idx = int(getattr(self.args, "tmrd_quality_suppress_modal_idx", 0))
+                max_suppress = max(float(getattr(self.args, "tmrd_learned_img_suppress_max", 0.50)), 1e-6)
+                scale = max(float(getattr(self.args, "tmrd_auto_img_suppress_scale", 0.20)), 0.0)
+                if 0 <= modal_idx < self.modal_num:
+                    q_modal = quality[:, modal_idx]
+                    suppress = (scale * (1.0 - q_modal.detach().mean())).clamp(max=max_suppress)
+                    quality_bias[:, modal_idx] = -suppress
+                    self.last_learned_img_suppress = suppress.detach()
+            elif bias_mode in {"image_suppress", "image_suppress_gate", "image_suppress_targeted"}:
+                modal_idx = int(getattr(self.args, "tmrd_quality_suppress_modal_idx", 0))
+                threshold = float(getattr(self.args, "tmrd_quality_suppress_threshold", 0.52))
+                temp = max(float(getattr(self.args, "tmrd_quality_suppress_temp", 0.10)), 1e-6)
+                if 0 <= modal_idx < self.modal_num:
+                    q_modal = quality[:, modal_idx]
+                    quantile = float(getattr(self.args, "tmrd_quality_suppress_quantile", 0.0))
+                    if quantile > 0:
+                        quantile = min(max(quantile, 0.0), 1.0)
+                        threshold = float(torch.quantile(q_modal.detach(), quantile).item())
+                    suppress_threshold_used = torch.tensor(threshold, device=device)
+                    suppress_shortfall = torch.relu(threshold - q_modal)
+                    suppress_gate = torch.sigmoid((threshold - q_modal) / temp)
+                    if bias_mode == "image_suppress_gate":
+                        quality_bias[:, modal_idx] = -gamma * suppress_gate
+                    elif bias_mode == "image_suppress_targeted":
+                        quality_bias[:, modal_idx] = -gamma * suppress_gate * (suppress_shortfall > 0).float()
+                    else:
+                        quality_bias[:, modal_idx] = -gamma * suppress_gate * suppress_shortfall
+            else:
+                quality_bias = gamma * torch.log(quality.clamp_min(1e-6))
+            bias_clip = float(getattr(self.args, "tmrd_quality_bias_clip", 1.0))
+            if bias_clip > 0:
+                if bias_mode == "centered_logit":
+                    quality_bias = quality_bias.clamp(min=-bias_clip, max=bias_clip)
+                else:
+                    quality_bias = quality_bias.clamp(min=-bias_clip, max=0.0)
+        self.last_quality = quality.detach()
+        self.last_quality_bias = quality_bias.detach()
+        if getattr(self.args, "tmrd_quality_bias_mode", "logq") not in {"learned_img_suppress", "auto_img_suppress"}:
+            self.last_learned_img_suppress = None
+        self.last_suppress_gate = suppress_gate.detach() if suppress_gate is not None else None
+        self.last_suppress_shortfall = suppress_shortfall.detach() if suppress_shortfall is not None else None
+        self.last_suppress_threshold = suppress_threshold_used.detach() if suppress_threshold_used is not None else None
+        self.last_missing_repair_rate = missing_repair_rate.detach() if missing_repair_rate is not None else None
+        self.last_present_repair_rate = present_repair_rate.detach() if present_repair_rate is not None else None
+        self.last_img_raw_coeff_missing = img_raw_coeff_missing.detach() if img_raw_coeff_missing is not None else None
+        self.last_img_repair_delta_norm = img_repair_delta.detach() if img_repair_delta is not None else None
+        self.last_clean_delta = (clean - raw).detach()
+        self.last_proxy_cos = F.cosine_similarity(
+            F.normalize(proxy.detach(), dim=-1),
+            F.normalize(raw.detach(), dim=-1),
+            dim=-1,
+            eps=1e-8,
+        )
+        clean_embs = [clean[:, idx, :] for idx in range(self.modal_num)]
+        return clean_embs, quality_bias
+
+    @torch.no_grad()
+    def refresh_memory(self, modal_embs, entity_type_ids, entity_ids=None):
+        if entity_type_ids is None:
+            return {}
+        device = self.memory.device
+        embs = [emb.detach().to(device) for emb in modal_embs[:self.modal_num]]
+        if entity_ids is None:
+            entity_ids = torch.arange(embs[0].shape[0], dtype=torch.long, device=device)
+        else:
+            entity_ids = torch.as_tensor(entity_ids, dtype=torch.long, device=device)
+        type_ids = entity_type_ids.to(device).long().clamp(min=0, max=self.type_count - 1)[entity_ids]
+        iters = max(int(getattr(self.args, "tmrd_kmeans_iters", 8)), 1)
+        new_memory = torch.zeros_like(self.memory)
+        counts = torch.zeros_like(self.memory_counts)
+        global_proto = []
+        for m_idx, emb in enumerate(embs):
+            values_all = emb[entity_ids]
+            if values_all.shape[0] == 0:
+                global_center = torch.zeros(self.memory_k, self.hidden_size, device=device, dtype=emb.dtype)
+            else:
+                seeds = values_all[torch.linspace(0, values_all.shape[0] - 1, steps=min(self.memory_k, values_all.shape[0]), device=device).long()]
+                if seeds.shape[0] < self.memory_k:
+                    seeds = torch.cat([seeds, seeds[-1:].expand(self.memory_k - seeds.shape[0], -1)], dim=0)
+                global_center = seeds[:self.memory_k].clone()
+            global_proto.append(global_center)
+            for t_idx in range(self.type_count):
+                mask = type_ids == t_idx
+                values = values_all[mask]
+                counts[t_idx, m_idx] = float(values.shape[0])
+                if values.shape[0] == 0:
+                    centers = global_center.clone()
+                elif values.shape[0] < self.memory_k:
+                    centers = values[torch.arange(self.memory_k, device=device) % values.shape[0]].clone()
+                else:
+                    init_idx = torch.linspace(0, values.shape[0] - 1, steps=self.memory_k, device=device).long()
+                    centers = values[init_idx].clone()
+                    for _ in range(iters):
+                        sim = F.normalize(values, dim=-1) @ F.normalize(centers, dim=-1).t()
+                        assign = sim.argmax(dim=1)
+                        for k_idx in range(self.memory_k):
+                            kmask = assign == k_idx
+                            if kmask.any():
+                                centers[k_idx] = values[kmask].mean(dim=0)
+                new_memory[t_idx, m_idx] = centers
+        self.memory.copy_(new_memory)
+        self.memory_counts.copy_(counts)
+        self.memory_ready = True
+        diversity = self._memory_diversity().detach()
+        self.last_memory_diversity = diversity
+        return {
+            "tmrd_memory_min_count": float(counts.min().item()) if counts.numel() else 0.0,
+            "tmrd_memory_mean_count": float(counts.mean().item()) if counts.numel() else 0.0,
+            "tmrd_memory_diversity": float(diversity.item()),
+        }
+
+    def _memory_diversity(self):
+        if self.memory_k <= 1:
+            return self.memory.new_tensor(0.0)
+        proto = F.normalize(self.memory, dim=-1, eps=1e-8)
+        sim = torch.matmul(proto, proto.transpose(-1, -2))
+        eye = torch.eye(self.memory_k, device=sim.device, dtype=torch.bool).view(1, 1, self.memory_k, self.memory_k)
+        off = sim.masked_select(~eye.expand_as(sim))
+        if off.numel() == 0:
+            return sim.new_tensor(0.0)
+        return 1.0 - off.mean()
+
+    @staticmethod
+    def _binary_auc(scores, labels):
+        pos = labels > 0.5
+        neg = ~pos
+        pos_count = pos.sum()
+        neg_count = neg.sum()
+        if pos_count == 0 or neg_count == 0:
+            return None
+        order = torch.argsort(scores)
+        ranks = torch.empty_like(order, dtype=scores.dtype)
+        ranks[order] = torch.arange(1, scores.numel() + 1, device=scores.device, dtype=scores.dtype)
+        pos_rank_sum = ranks[pos].sum()
+        auc = (pos_rank_sum - pos_count.to(scores.dtype) * (pos_count.to(scores.dtype) + 1.0) / 2.0) / (
+            pos_count.to(scores.dtype) * neg_count.to(scores.dtype)
+        )
+        return auc
+
+    def self_supervised_loss(self, embs, entity_type_ids, sample_size=2048, hidden_states=None, image_available=None):
+        if entity_type_ids is None:
+            return None, {}
+        raw = torch.stack(embs[:self.modal_num], dim=1)
+        hidden = None
+        if hidden_states is not None:
+            hidden = hidden_states[:, :self.modal_num]
+        if getattr(self.args, "tmrd_detach_selfsup_inputs", True):
+            raw = raw.detach()
+            if hidden is not None:
+                hidden = hidden.detach()
+        device = raw.device
+        type_ids_all = self._safe_type_ids(entity_type_ids, device)
+        n = raw.shape[0]
+        if n <= 1:
+            return None, {}
+        sample_size = min(max(int(sample_size), 2), n)
+        idx = torch.randperm(n, device=device)[:sample_size]
+        raw = raw[idx]
+        if hidden is not None:
+            hidden = hidden[idx]
+        type_ids = type_ids_all[idx]
+        available = None
+        if image_available is not None:
+            available = image_available.to(device).bool()[idx]
+        batch_size = raw.shape[0]
+        type_emb = self.type_emb(type_ids).unsqueeze(1).expand(-1, self.modal_num, -1)
+        modal_one_hot = self._modal_one_hot(batch_size, device)
+        if getattr(self.args, "tmrd_context_source", "hidden") == "raw" or hidden is None:
+            context = self._context_without_self(raw)
+        else:
+            context = self._context_without_self(hidden)
+        proxy = self._predict_semantic_proxy(context, type_emb, modal_one_hot)
+        memory_proxy = self._read_memory(context, type_ids)
+        quality_in = self._quality_input(raw, proxy, memory_proxy, type_emb, modal_one_hot)
+        q_clean = torch.sigmoid(self.quality_head(quality_in)).squeeze(-1).clamp(min=1e-4, max=1.0)
+
+        corrupt_raw = raw.clone()
+        modal_choice = torch.randint(0, self.modal_num, (batch_size,), device=device)
+        donor_idx = torch.empty(batch_size, dtype=torch.long, device=device)
+        for row in range(batch_size):
+            same = (type_ids == type_ids[row]).nonzero(as_tuple=False).flatten()
+            same = same[same != row]
+            if same.numel() == 0:
+                donor_idx[row] = (row + 1) % batch_size
+            else:
+                donor_idx[row] = same[torch.randint(0, same.numel(), (1,), device=device)]
+        corrupt_raw[torch.arange(batch_size, device=device), modal_choice] = raw[donor_idx, modal_choice]
+        if getattr(self.args, "tmrd_context_source", "hidden") == "raw" or hidden is None:
+            corrupt_context = self._context_without_self(corrupt_raw)
+        else:
+            corrupt_hidden = hidden.clone()
+            corrupt_hidden[torch.arange(batch_size, device=device), modal_choice] = hidden[donor_idx, modal_choice]
+            corrupt_context = self._context_without_self(corrupt_hidden)
+        corrupt_proxy = self._predict_semantic_proxy(corrupt_context, type_emb, modal_one_hot)
+        corrupt_memory_proxy = self._read_memory(corrupt_context, type_ids)
+        corrupt_quality_in = self._quality_input(corrupt_raw, corrupt_proxy, corrupt_memory_proxy, type_emb, modal_one_hot)
+        q_corrupt = torch.sigmoid(self.quality_head(corrupt_quality_in)).squeeze(-1).clamp(min=1e-4, max=1.0)
+        chosen_clean = q_clean[torch.arange(batch_size, device=device), modal_choice]
+        chosen_corrupt = q_corrupt[torch.arange(batch_size, device=device), modal_choice]
+        clean_loss = F.binary_cross_entropy(chosen_clean, torch.ones_like(chosen_clean))
+        corrupt_loss = F.binary_cross_entropy(chosen_corrupt, torch.zeros_like(chosen_corrupt))
+        rank_margin = 0.20
+        rank_loss = F.relu(rank_margin - chosen_clean + chosen_corrupt).mean()
+        clean_anchor = F.mse_loss(q_clean, torch.full_like(q_clean, float(getattr(self.args, "tmrd_quality_init", 0.9))))
+        clean_anchor_weight = float(getattr(self.args, "tmrd_clean_anchor_weight", 0.10))
+        corrupt_loss = 0.35 * clean_loss + 0.45 * corrupt_loss + 0.20 * rank_loss + clean_anchor_weight * clean_anchor
+
+        tau = max(float(getattr(self.args, "tmrd_nce_tau", 0.07)), 1e-6)
+        nce_losses = []
+        for m_idx in range(self.modal_num):
+            logits = F.normalize(proxy[:, m_idx, :], dim=-1) @ F.normalize(raw[:, m_idx, :], dim=-1).t()
+            logits = logits / tau
+            target = torch.arange(batch_size, device=device)
+            nce_losses.append(F.cross_entropy(logits, target))
+        nce_loss = torch.stack(nce_losses).mean()
+        total = float(getattr(self.args, "tmrd_corrupt_loss_weight", 1.0)) * corrupt_loss + float(getattr(self.args, "tmrd_nce_loss_weight", 1.0)) * nce_loss
+        missing_loss = None
+        missing_acc = None
+        missing_auc = None
+        missing_gap = None
+        missing_present_q = None
+        missing_absent_q = None
+        missing_weight = float(getattr(self.args, "tmrd_missing_loss_weight", 0.0))
+        missing_modal_idx = int(getattr(self.args, "tmrd_missing_modal_idx", 0))
+        if missing_weight > 0 and available is not None and 0 <= missing_modal_idx < self.modal_num:
+            img_q = q_clean[:, missing_modal_idx]
+            labels = available.float()
+            if labels.min() < labels.max():
+                # Use real image availability as a weak diagnostic target. It trains
+                # the quality head to notice distributional fake-image tokens, while
+                # final inference still relies on learned quality scores rather than
+                # directly masking a modality.
+                missing_loss = F.binary_cross_entropy(img_q, labels)
+                total = total + missing_weight * missing_loss
+                missing_acc = ((img_q >= 0.5) == available).float().mean()
+                missing_auc = self._binary_auc(img_q.detach(), labels.detach())
+                present_q = img_q[available]
+                absent_q = img_q[~available]
+                missing_present_q = present_q.mean() if present_q.numel() > 0 else None
+                missing_absent_q = absent_q.mean() if absent_q.numel() > 0 else None
+                if missing_present_q is not None and missing_absent_q is not None:
+                    missing_gap = missing_present_q - missing_absent_q
+        pred_corrupt = q_corrupt[torch.arange(batch_size, device=device), modal_choice] < 0.5
+        pred_clean = q_corrupt.clone()
+        pred_clean[torch.arange(batch_size, device=device), modal_choice] = 1.0
+        clean_ok = pred_clean > 0.5
+        corrupt_acc = 0.5 * pred_corrupt.float().mean() + 0.5 * clean_ok.float().mean()
+        corrupt_pair_acc = (chosen_clean > chosen_corrupt).float().mean()
+        quality_gap = (chosen_clean - chosen_corrupt).mean()
+        self.last_corrupt_loss = corrupt_loss.detach()
+        self.last_nce_loss = nce_loss.detach()
+        self.last_corrupt_acc = corrupt_acc.detach()
+        self.last_corrupt_pair_acc = corrupt_pair_acc.detach()
+        self.last_quality_gap = quality_gap.detach()
+        self.last_missing_loss = missing_loss.detach() if missing_loss is not None else None
+        self.last_missing_acc = missing_acc.detach() if missing_acc is not None else None
+        self.last_missing_auc = missing_auc.detach() if missing_auc is not None else None
+        self.last_missing_gap = missing_gap.detach() if missing_gap is not None else None
+        self.last_missing_present_q = missing_present_q.detach() if missing_present_q is not None else None
+        self.last_missing_absent_q = missing_absent_q.detach() if missing_absent_q is not None else None
+        self.last_loss = total.detach()
+        stats = {
+            "tmrd_corrupt_loss": float(corrupt_loss.detach().item()),
+            "tmrd_nce_loss": float(nce_loss.detach().item()),
+            "tmrd_selfsup_loss": float(total.detach().item()),
+            "tmrd_corrupt_acc_probe": float(corrupt_acc.detach().item()),
+            "tmrd_corrupt_pair_acc_probe": float(corrupt_pair_acc.detach().item()),
+            "tmrd_quality_gap_probe": float(quality_gap.detach().item()),
+            "tmrd_q_clean_mean_probe": float(q_clean.detach().mean().item()),
+            "tmrd_q_corrupt_mean_probe": float(q_corrupt.detach().mean().item()),
+        }
+        if missing_loss is not None:
+            stats["tmrd_missing_loss"] = float(missing_loss.detach().item())
+        if missing_acc is not None:
+            stats["tmrd_missing_acc_probe"] = float(missing_acc.detach().item())
+        if missing_auc is not None:
+            stats["tmrd_missing_auc_probe"] = float(missing_auc.detach().item())
+        if missing_gap is not None:
+            stats["tmrd_missing_q_gap_probe"] = float(missing_gap.detach().item())
+        if missing_present_q is not None:
+            stats["tmrd_missing_present_q_probe"] = float(missing_present_q.detach().item())
+        if missing_absent_q is not None:
+            stats["tmrd_missing_absent_q_probe"] = float(missing_absent_q.detach().item())
+        return total, stats
+
+    def probe_stats(self):
+        stats = {}
+        if self.last_quality is not None:
+            q = self.last_quality.detach()
+            stats["tmrd_q_mean"] = float(q.mean().item())
+            stats["tmrd_q_min"] = float(q.min().item())
+            stats["tmrd_q_max"] = float(q.max().item())
+            stats["tmrd_q_std"] = float(q.std().item())
+        if self.last_quality_bias is not None:
+            b = self.last_quality_bias.detach()
+            stats["tmrd_quality_bias_abs_mean"] = float(b.abs().mean().item())
+            suppress_modal_idx = int(getattr(self.args, "tmrd_quality_suppress_modal_idx", 0))
+            if 0 <= suppress_modal_idx < b.shape[1]:
+                stats["tmrd_quality_suppress_bias_mean"] = float(b[:, suppress_modal_idx].mean().item())
+                stats["tmrd_quality_suppress_bias_abs_mean"] = float(b[:, suppress_modal_idx].abs().mean().item())
+                stats["tmrd_quality_suppress_active_rate"] = float((b[:, suppress_modal_idx] < 0).float().mean().item())
+        if self.last_suppress_gate is not None:
+            gate = self.last_suppress_gate.detach()
+            stats["tmrd_quality_suppress_gate_mean"] = float(gate.mean().item())
+        if self.last_suppress_shortfall is not None:
+            shortfall = self.last_suppress_shortfall.detach()
+            stats["tmrd_quality_suppress_shortfall_mean"] = float(shortfall.mean().item())
+        if self.last_suppress_threshold is not None:
+            stats["tmrd_quality_suppress_threshold_used"] = float(self.last_suppress_threshold.detach().item())
+        if self.last_clean_delta is not None:
+            d = self.last_clean_delta.detach()
+            stats["tmrd_delta_abs_mean"] = float(d.abs().mean().item())
+            stats["tmrd_delta_norm_mean"] = float(d.norm(dim=-1).mean().item())
+        if self.last_missing_repair_rate is not None:
+            stats["tmrd_missing_repair_rate"] = float(self.last_missing_repair_rate.detach().item())
+        if self.last_present_repair_rate is not None:
+            stats["tmrd_present_repair_rate"] = float(self.last_present_repair_rate.detach().item())
+        if self.last_img_raw_coeff_missing is not None:
+            stats["tmrd_img_raw_coeff_missing"] = float(self.last_img_raw_coeff_missing.detach().item())
+        if self.last_img_repair_delta_norm is not None:
+            stats["tmrd_img_repair_delta_norm_mean"] = float(self.last_img_repair_delta_norm.detach().mean().item())
+        if self.last_learned_img_suppress is not None:
+            stats["tmrd_learned_img_suppress"] = float(self.last_learned_img_suppress.detach().item())
+        if self.last_proxy_cos is not None:
+            stats["tmrd_proxy_cos_mean"] = float(self.last_proxy_cos.detach().mean().item())
+        if self.last_memory_diversity is not None:
+            stats["tmrd_memory_diversity"] = float(self.last_memory_diversity.detach().item())
+        if self.last_corrupt_acc is not None:
+            stats["tmrd_corrupt_acc_probe"] = float(self.last_corrupt_acc.detach().item())
+        if self.last_corrupt_pair_acc is not None:
+            stats["tmrd_corrupt_pair_acc_probe"] = float(self.last_corrupt_pair_acc.detach().item())
+        if self.last_quality_gap is not None:
+            stats["tmrd_quality_gap_probe"] = float(self.last_quality_gap.detach().item())
+        if self.last_nce_loss is not None:
+            stats["tmrd_nce_loss_probe"] = float(self.last_nce_loss.detach().item())
+        if self.last_corrupt_loss is not None:
+            stats["tmrd_corrupt_loss_probe"] = float(self.last_corrupt_loss.detach().item())
+        if self.last_missing_loss is not None:
+            stats["tmrd_missing_loss"] = float(self.last_missing_loss.detach().item())
+        if self.last_missing_acc is not None:
+            stats["tmrd_missing_acc_probe"] = float(self.last_missing_acc.detach().item())
+        if self.last_missing_auc is not None:
+            stats["tmrd_missing_auc_probe"] = float(self.last_missing_auc.detach().item())
+        if self.last_missing_gap is not None:
+            stats["tmrd_missing_q_gap_probe"] = float(self.last_missing_gap.detach().item())
+        if self.last_missing_present_q is not None:
+            stats["tmrd_missing_present_q_probe"] = float(self.last_missing_present_q.detach().item())
+        if self.last_missing_absent_q is not None:
+            stats["tmrd_missing_absent_q_probe"] = float(self.last_missing_absent_q.detach().item())
+        return stats
+
+
+class TCMSFormerSanitizer(nn.Module):
+    """Type-conditioned cross-modal visual sanitizer.
+
+    TCMS does not output modality weights. It uses type-aware cross-modal
+    interaction to repair the image token before the normal fusion stage.
+    """
+
+    def __init__(self, args, modal_num, hidden_size):
+        super().__init__()
+        self.args = args
+        self.modal_num = modal_num
+        self.hidden_size = hidden_size
+        type_count = int(getattr(args, "top_type_count", 0) or 0)
+        if type_count <= 0:
+            type_count = 6
+        self.type_count = type_count
+        self.memory_k = max(int(getattr(args, "tcms_memory_k", 4)), 1)
+        self.type_emb = nn.Embedding(type_count, hidden_size)
+        self.avail_emb = nn.Embedding(2, hidden_size)
+        self.modal_token = nn.Parameter(torch.zeros(modal_num, hidden_size))
+        nn.init.normal_(self.modal_token, std=0.02)
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=hidden_size,
+            nhead=max(int(getattr(args, "tcms_heads", 2)), 1),
+            dim_feedforward=hidden_size * 2,
+            dropout=0.1,
+            activation="gelu",
+            batch_first=True,
+            norm_first=True,
+        )
+        tcms_layers = max(int(getattr(args, "tcms_layers", 1)), 0)
+        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=tcms_layers) if tcms_layers > 0 else nn.Identity()
+        self.anchor_norm = nn.LayerNorm(hidden_size)
+        self.use_gate_match_features = not bool(getattr(args, "tcms_disable_gate_match_features", False))
+        gate_dim = hidden_size * (6 if self.use_gate_match_features else 4)
+        self.gate_head = nn.Sequential(
+            nn.LayerNorm(gate_dim),
+            nn.Linear(gate_dim, hidden_size // 2),
+            nn.GELU(),
+            nn.Linear(hidden_size // 2, 1),
+        )
+        self.residual_head = nn.Sequential(
+            nn.LayerNorm(gate_dim),
+            nn.Linear(gate_dim, hidden_size),
+            nn.GELU(),
+            nn.Linear(hidden_size, hidden_size),
+        )
+        nn.init.constant_(self.gate_head[-1].bias, float(getattr(args, "tcms_gate_init", -2.0)))
+        if getattr(args, "tcms_zero_init_residual", False):
+            nn.init.zeros_(self.residual_head[-1].weight)
+            nn.init.zeros_(self.residual_head[-1].bias)
+        self.register_buffer("memory", torch.zeros(type_count, self.memory_k, hidden_size))
+        self.register_buffer("memory_counts", torch.zeros(type_count, self.memory_k))
+        self.memory_ready = False
+        self.last_gate = None
+        self.last_clean_delta = None
+        self.last_missing_rate = None
+        self.last_anchor_cos = None
+        self.last_sem_loss = None
+        self.last_noise_loss = None
+        self.last_sparse_loss = None
+        self.last_loss = None
+        self.last_noise_acc = None
+        self.last_gate_clean = None
+        self.last_gate_corrupt = None
+        self.last_gate_gap = None
+        self.last_cross_type_negative_rate = None
+        self.last_memory_diversity = None
+        self.current_epoch = 0
+
+    def set_epoch(self, epoch):
+        self.current_epoch = int(epoch)
+
+    def _effective_beta(self):
+        beta = float(getattr(self.args, "tcms_beta", 0.25))
+        start = int(getattr(self.args, "tcms_beta_warmup_start", -1))
+        end = int(getattr(self.args, "tcms_beta_warmup_end", -1))
+        if start < 0:
+            return beta
+        epoch = int(getattr(self, "current_epoch", 0))
+        if epoch < start:
+            return 0.0
+        if end <= start or epoch >= end:
+            return beta
+        return beta * float(epoch - start + 1) / float(max(end - start + 1, 1))
+
+    def _safe_type_ids(self, entity_type_ids, device):
+        return entity_type_ids.to(device).long().clamp(min=0, max=self.type_count - 1)
+
+    def _encode(self, raw, type_ids, image_available=None):
+        device = raw.device
+        bs = raw.shape[0]
+        type_token = self.type_emb(type_ids).unsqueeze(1)
+        modal_tokens = raw + self.modal_token[: self.modal_num].view(1, self.modal_num, -1)
+        if image_available is not None and self.modal_num > 0:
+            avail_idx = image_available.to(device).long().clamp(min=0, max=1)
+            modal_tokens[:, 0, :] = modal_tokens[:, 0, :] + self.avail_emb(avail_idx)
+        tokens = torch.cat([type_token, modal_tokens], dim=1)
+        hidden = self.encoder(tokens)
+        h_type = hidden[:, 0, :]
+        h_modal = hidden[:, 1:, :]
+        if self.modal_num > 1:
+            anchor = self.anchor_norm(h_modal[:, 1:, :].mean(dim=1) + h_type)
+        else:
+            anchor = self.anchor_norm(h_type)
+        return hidden, h_type, h_modal, anchor
+
+    def _read_memory(self, query, type_ids):
+        proto = self.memory.to(query.device)[type_ids]
+        if not self.memory_ready:
+            return query
+        logits = torch.einsum("bd,bkd->bk", F.normalize(query, dim=-1), F.normalize(proto, dim=-1))
+        attn = F.softmax(logits, dim=-1)
+        return torch.einsum("bk,bkd->bd", attn, proto)
+
+    def _sanitize_from_parts(self, raw_img, h_img, h_type, anchor, proto, available=None):
+        gate_parts = [h_img, h_type, anchor, proto]
+        if self.use_gate_match_features:
+            gate_parts.extend([h_img * anchor, torch.abs(h_img - anchor)])
+        gate_input = torch.cat(gate_parts, dim=-1)
+        gate = torch.sigmoid(self.gate_head(gate_input)).squeeze(-1)
+        residual = torch.tanh(self.residual_head(gate_input))
+        beta = self._effective_beta()
+        clean_img = raw_img + beta * gate.unsqueeze(-1) * residual
+        if not getattr(self.args, "tcms_prefusion", False):
+            clean_img = F.normalize(clean_img, dim=-1, eps=1e-8)
+        if available is not None:
+            missing = (~available).to(raw_img.device).view(-1, 1)
+            missing_mode = getattr(self.args, "tcms_missing_mode", "anchor_proto")
+            if missing_mode in {"anchor", "anchor_blend"}:
+                missing_fill = anchor if getattr(self.args, "tcms_prefusion", False) else F.normalize(anchor, dim=-1, eps=1e-8)
+            elif missing_mode in {"proto", "proto_blend"}:
+                missing_fill = proto if getattr(self.args, "tcms_prefusion", False) else F.normalize(proto, dim=-1, eps=1e-8)
+            elif missing_mode == "zero":
+                missing_fill = torch.zeros_like(raw_img)
+            elif missing_mode == "keep":
+                missing_fill = raw_img
+            else:
+                missing_fill = 0.5 * anchor + 0.5 * proto
+                if not getattr(self.args, "tcms_prefusion", False):
+                    missing_fill = F.normalize(missing_fill, dim=-1, eps=1e-8)
+            if missing_mode.endswith("_blend"):
+                # Conservative recovery avoids pushing explicitly-missing visual
+                # tokens completely off the pretrained image-feature manifold.
+                blend = min(max(float(getattr(self.args, "tcms_missing_blend", 0.25)), 0.0), 1.0)
+                if float(getattr(self.args, "tcms_beta", 0.25)) > 0:
+                    blend = blend * min(beta / max(float(getattr(self.args, "tcms_beta", 0.25)), 1e-12), 1.0)
+                missing_fill = (1.0 - blend) * raw_img + blend * missing_fill
+            clean_img = torch.where(missing, missing_fill, clean_img)
+        return clean_img, gate
+
+    def forward(self, embs, entity_type_ids=None, image_available=None):
+        if entity_type_ids is None or self.modal_num <= 0:
+            return embs
+        raw = torch.stack(embs[: self.modal_num], dim=1)
+        device = raw.device
+        type_ids = self._safe_type_ids(entity_type_ids, device)
+        available = image_available.to(device).bool() if image_available is not None else None
+        _, h_type, h_modal, anchor = self._encode(raw, type_ids, available)
+        h_img = h_modal[:, 0, :]
+        proto = self._read_memory(anchor, type_ids)
+        clean_img, gate = self._sanitize_from_parts(raw[:, 0, :], h_img, h_type, anchor, proto, available)
+        clean = raw.clone()
+        clean[:, 0, :] = clean_img
+        self._ema_update(h_img.detach(), type_ids, gate.detach(), available)
+        self.last_gate = gate.detach()
+        self.last_clean_delta = (clean[:, 0, :] - raw[:, 0, :]).detach()
+        self.last_missing_rate = ((~available).float().mean().detach() if available is not None else None)
+        self.last_anchor_cos = F.cosine_similarity(clean_img.detach(), anchor.detach(), dim=-1).mean()
+        return [clean[:, idx, :] for idx in range(self.modal_num)]
+
+    @torch.no_grad()
+    def _ema_update(self, h_img, type_ids, gate, available=None):
+        if self.memory_k <= 0:
+            return
+        if available is None:
+            available = torch.ones_like(gate, dtype=torch.bool)
+        threshold = float(getattr(self.args, "tcms_gate_threshold", 0.35))
+        valid = available.bool() & (gate < threshold)
+        if not valid.any():
+            return
+        momentum = min(max(float(getattr(self.args, "tcms_ema_momentum", 0.99)), 0.0), 0.9999)
+        for t_idx in torch.unique(type_ids[valid]):
+            t_mask = valid & (type_ids == t_idx)
+            values = F.normalize(h_img[t_mask], dim=-1, eps=1e-8)
+            if values.numel() == 0:
+                continue
+            center = values.mean(dim=0)
+            counts = self.memory_counts[t_idx]
+            k_idx = int(torch.argmin(counts).item()) if (counts <= 0).any() else int(torch.argmin(F.normalize(self.memory[t_idx], dim=-1, eps=1e-8) @ center).item())
+            if counts[k_idx] <= 0:
+                self.memory[t_idx, k_idx].copy_(center)
+            else:
+                self.memory[t_idx, k_idx].mul_(momentum).add_(center, alpha=1.0 - momentum)
+                self.memory[t_idx, k_idx].copy_(F.normalize(self.memory[t_idx, k_idx], dim=-1, eps=1e-8))
+            self.memory_counts[t_idx, k_idx] += float(values.shape[0])
+        self.memory_ready = bool((self.memory_counts > 0).any().item())
+        self.last_memory_diversity = self._memory_diversity().detach()
+
+    def _memory_diversity(self):
+        if self.memory_k <= 1:
+            return self.memory.new_tensor(0.0)
+        proto = F.normalize(self.memory, dim=-1, eps=1e-8)
+        sim = torch.matmul(proto, proto.transpose(-1, -2))
+        eye = torch.eye(self.memory_k, device=sim.device, dtype=torch.bool).view(1, self.memory_k, self.memory_k)
+        valid = self.memory_counts > 0
+        pair_valid = valid.unsqueeze(-1) & valid.unsqueeze(-2) & (~eye)
+        if not pair_valid.any():
+            return sim.new_tensor(0.0)
+        return 1.0 - sim.masked_select(pair_valid).mean()
+
+    def _type_masked_nce(self, query, anchor, type_ids):
+        tau = max(float(getattr(self.args, "tcms_nce_tau", 0.07)), 1e-6)
+        logits = F.normalize(query, dim=-1) @ F.normalize(anchor.detach(), dim=-1).t()
+        logits = logits / tau
+        same_type = type_ids.view(-1, 1) == type_ids.view(1, -1)
+        eye = torch.eye(type_ids.shape[0], dtype=torch.bool, device=type_ids.device)
+        mask_out = same_type & (~eye)
+        logits = logits.masked_fill(mask_out, -1e4)
+        labels = torch.arange(type_ids.shape[0], device=type_ids.device)
+        neg_rate = (~same_type).float().mean()
+        self.last_cross_type_negative_rate = neg_rate.detach()
+        return F.cross_entropy(logits, labels)
+
+    def self_supervised_loss(self, embs, entity_type_ids, sample_size=2048, image_available=None):
+        if entity_type_ids is None or self.modal_num <= 0:
+            return None, {}
+        raw_all = torch.stack(embs[: self.modal_num], dim=1)
+        if getattr(self.args, "tmrd_detach_selfsup_inputs", True):
+            raw_all = raw_all.detach()
+        device = raw_all.device
+        n = raw_all.shape[0]
+        if n <= 1:
+            return None, {}
+        sample_size = min(max(int(sample_size), 2), n)
+        idx = torch.randperm(n, device=device)[:sample_size]
+        raw = raw_all[idx]
+        type_ids_all = self._safe_type_ids(entity_type_ids, device)
+        type_ids = type_ids_all[idx]
+        available = image_available.to(device).bool()[idx] if image_available is not None else None
+        _, h_type, h_modal, anchor = self._encode(raw, type_ids, available)
+        h_img = h_modal[:, 0, :]
+        proto = self._read_memory(anchor, type_ids)
+        clean_img, gate_clean = self._sanitize_from_parts(raw[:, 0, :], h_img, h_type, anchor, proto, available)
+        sem_loss = self._type_masked_nce(clean_img, anchor, type_ids)
+
+        bsz = raw.shape[0]
+        same_ratio = min(max(float(getattr(self.args, "tcms_noise_same_type_ratio", 0.70)), 0.0), 1.0)
+        corrupt = raw.clone()
+        donor_idx = torch.empty(bsz, dtype=torch.long, device=device)
+        for row in range(bsz):
+            use_same = torch.rand((), device=device).item() < same_ratio
+            if use_same:
+                candidates = (type_ids == type_ids[row]).nonzero(as_tuple=False).flatten()
+                candidates = candidates[candidates != row]
+            else:
+                candidates = (type_ids != type_ids[row]).nonzero(as_tuple=False).flatten()
+            if candidates.numel() == 0:
+                candidates = torch.arange(bsz, device=device)
+                candidates = candidates[candidates != row]
+            donor_idx[row] = candidates[torch.randint(0, candidates.numel(), (1,), device=device)] if candidates.numel() > 0 else row
+        corrupt[:, 0, :] = raw[donor_idx, 0, :]
+        _, _ch_type, ch_modal, _c_anchor = self._encode(corrupt, type_ids, available)
+        # Keep the semantic anchor fixed to the original non-visual context.
+        # Otherwise the corrupted image can leak into self-attention and make
+        # the clean/corrupt gate target ambiguous.
+        _, gate_corrupt = self._sanitize_from_parts(corrupt[:, 0, :], ch_modal[:, 0, :], h_type, anchor, proto, available)
+        noise_logits = torch.cat([gate_clean, gate_corrupt], dim=0)
+        noise_labels = torch.cat([torch.zeros_like(gate_clean), torch.ones_like(gate_corrupt)], dim=0)
+        noise_loss = F.binary_cross_entropy(noise_logits.clamp(min=1e-4, max=1.0 - 1e-4), noise_labels)
+        sparse_loss = gate_clean.mean()
+        total = sem_loss + float(getattr(self.args, "tcms_noise_loss_weight", 1.0)) * noise_loss + float(getattr(self.args, "tcms_sparse_weight", 0.01)) * sparse_loss
+        noise_acc = ((noise_logits >= 0.5) == noise_labels.bool()).float().mean()
+        self.last_sem_loss = sem_loss.detach()
+        self.last_noise_loss = noise_loss.detach()
+        self.last_sparse_loss = sparse_loss.detach()
+        self.last_loss = total.detach()
+        self.last_noise_acc = noise_acc.detach()
+        self.last_gate_clean = gate_clean.detach().mean()
+        self.last_gate_corrupt = gate_corrupt.detach().mean()
+        self.last_gate_gap = (gate_corrupt.detach().mean() - gate_clean.detach().mean())
+        self._ema_update(h_img.detach(), type_ids, gate_clean.detach(), available)
+        stats = {
+            "tcms_selfsup_loss": float(total.detach().item()),
+            "tcms_sem_loss": float(sem_loss.detach().item()),
+            "tcms_noise_loss": float(noise_loss.detach().item()),
+            "tcms_sparse_loss": float(sparse_loss.detach().item()),
+            "tcms_noise_acc_probe": float(noise_acc.detach().item()),
+            "tcms_gate_clean_mean_probe": float(gate_clean.detach().mean().item()),
+            "tcms_gate_corrupt_mean_probe": float(gate_corrupt.detach().mean().item()),
+            "tcms_gate_gap_probe": float((gate_corrupt.detach().mean() - gate_clean.detach().mean()).item()),
+            "tcms_cross_type_negative_rate": float(self.last_cross_type_negative_rate.detach().item()) if self.last_cross_type_negative_rate is not None else 0.0,
+        }
+        return total, stats
+
+    def probe_stats(self):
+        stats = {}
+        if self.last_gate is not None:
+            gate = self.last_gate.detach()
+            stats["tcms_gate_mean"] = float(gate.mean().item())
+            stats["tcms_gate_max"] = float(gate.max().item())
+        if self.last_clean_delta is not None:
+            delta = self.last_clean_delta.detach()
+            stats["tcms_delta_norm_mean"] = float(delta.norm(dim=-1).mean().item())
+            stats["tcms_delta_abs_mean"] = float(delta.abs().mean().item())
+        if self.last_missing_rate is not None:
+            stats["tcms_missing_rate"] = float(self.last_missing_rate.detach().item())
+        if self.last_anchor_cos is not None:
+            stats["tcms_anchor_cos_mean"] = float(self.last_anchor_cos.detach().item())
+        if self.last_sem_loss is not None:
+            stats["tcms_sem_loss_probe"] = float(self.last_sem_loss.detach().item())
+        if self.last_noise_loss is not None:
+            stats["tcms_noise_loss_probe"] = float(self.last_noise_loss.detach().item())
+        if self.last_sparse_loss is not None:
+            stats["tcms_sparse_loss_probe"] = float(self.last_sparse_loss.detach().item())
+        if self.last_noise_acc is not None:
+            stats["tcms_noise_acc_probe"] = float(self.last_noise_acc.detach().item())
+        if self.last_gate_clean is not None:
+            stats["tcms_gate_clean_mean_probe"] = float(self.last_gate_clean.detach().item())
+        if self.last_gate_corrupt is not None:
+            stats["tcms_gate_corrupt_mean_probe"] = float(self.last_gate_corrupt.detach().item())
+        if self.last_gate_gap is not None:
+            stats["tcms_gate_gap_probe"] = float(self.last_gate_gap.detach().item())
+        if self.last_memory_diversity is not None:
+            stats["tcms_memory_diversity"] = float(self.last_memory_diversity.detach().item())
+        if self.last_loss is not None:
+            stats["tcms_selfsup_loss_probe"] = float(self.last_loss.detach().item())
+        return stats
+
+
 class MformerFusion(nn.Module):
     def __init__(self, args, modal_num, with_weight=1):
         super().__init__()
@@ -1322,10 +2226,21 @@ class MformerFusion(nn.Module):
             self.tmhg_router = TypeModalityHyperGate(args, modal_num=modal_num)
         else:
             self.tmhg_router = None
+        if getattr(args, "use_tmrd", False):
+            self.tmrd = TypeAwareModalityRecoveryDenoiser(args, modal_num=modal_num, hidden_size=args.hidden_size)
+        else:
+            self.tmrd = None
+        if getattr(args, "use_tcms", False):
+            self.tcms = TCMSFormerSanitizer(args, modal_num=modal_num, hidden_size=args.hidden_size)
+        else:
+            self.tcms = None
 
-    def _apply_type_modality_bias(self, weight_norm, entity_type_ids, embs=None):
+    def _apply_type_modality_bias(self, weight_norm, entity_type_ids, embs=None, extra_bias=None):
         if self.type_modality_bias is None and self.cdmr_router is None and self.dehr_router is None and self.tmhg_router is None:
-            return weight_norm
+            if extra_bias is None:
+                return weight_norm
+            logits = torch.log(weight_norm.clamp_min(1e-12)) + extra_bias
+            return F.softmax(logits, dim=-1)
         bias = torch.zeros_like(weight_norm)
         if self.type_modality_bias is not None and entity_type_ids is not None:
             type_ids = entity_type_ids.to(weight_norm.device).long().clamp(
@@ -1352,6 +2267,8 @@ class MformerFusion(nn.Module):
             residual = residual + self.dehr_router(embs, weight_norm, entity_type_ids=entity_type_ids)
         if self.tmhg_router is not None:
             residual = residual + self.tmhg_router(weight_norm, entity_type_ids=entity_type_ids, modal_embs=embs)
+        if extra_bias is not None:
+            residual = residual + extra_bias
         self.last_cdmr_residual = residual.detach()
         tau_route = float(getattr(self.args, "cdmr_tau_route", 1.0))
         if not self.training:
@@ -1363,11 +2280,19 @@ class MformerFusion(nn.Module):
         weight_final = F.softmax(logits, dim=-1)
         return weight_final
 
-    def forward(self, embs, entity_type_ids=None):
+    def forward(self, embs, entity_type_ids=None, image_available=None):
         # 过滤掉 None 值，仅保留非空嵌入
         embs = [embs[idx] for idx in range(len(embs)) if embs[idx] is not None]
         # 计算有效模态数量
         modal_num = len(embs)
+
+        self.last_tcms_raw_embs = [emb.detach() for emb in embs]
+        if getattr(self, "tcms", None) is not None and getattr(self.args, "tcms_prefusion", False):
+            embs = self.tcms(
+                embs,
+                entity_type_ids=entity_type_ids,
+                image_available=image_available,
+            )
 
         # 将非空嵌入堆叠到一起，形成一个新的张量，维度为 [batch_size, modal_num, hidden_size]
         hidden_states = torch.stack(embs, dim=1)
@@ -1377,12 +2302,27 @@ class MformerFusion(nn.Module):
         for i, layer_module in enumerate(self.fusion_layer):
             layer_outputs = layer_module(hidden_states, output_attentions=True)
             hidden_states = layer_outputs[0]
+        if getattr(self, "tcms", None) is not None and not getattr(self.args, "tcms_prefusion", False):
+            embs = self.tcms(
+                embs,
+                entity_type_ids=entity_type_ids,
+                image_available=image_available,
+            )
 
         # 计算注意力权重
         attention_pro = torch.sum(layer_outputs[1], dim=-3)
         attention_pro_comb = torch.sum(attention_pro, dim=-2) / math.sqrt(modal_num * self.args.num_attention_heads)
         weight_norm = F.softmax(attention_pro_comb, dim=-1)
-        weight_final = self._apply_type_modality_bias(weight_norm, entity_type_ids, embs=embs)
+        quality_bias = None
+        if self.tmrd is not None:
+            embs, quality_bias = self.tmrd(
+                embs,
+                hidden_states,
+                weight_norm,
+                entity_type_ids=entity_type_ids,
+                image_available=image_available,
+            )
+        weight_final = self._apply_type_modality_bias(weight_norm, entity_type_ids, embs=embs, extra_bias=quality_bias)
         self.last_weight_norm = weight_norm
         self.last_weight_final = weight_final
         self.last_modal_embs = [emb.detach() for emb in embs]
@@ -1503,7 +2443,8 @@ class MultiModalEncoder(nn.Module):
                 att_features=None,
                 name_features=None,
                 char_features=None,
-                entity_type_ids=None):
+                entity_type_ids=None,
+                image_available=None):
 
         if self.args.w_gcn:
             gph_emb = self.cross_graph_model(self.entity_emb(input_idx), adj)
@@ -1552,6 +2493,7 @@ class MultiModalEncoder(nn.Module):
         joint_emb, hidden_states, weight_norm = self.fusion(
             [img_emb, att_emb, rel_emb, gph_emb, name_emb, char_emb, gat_img_emb, gat_att_emb, gat_rel_emb, gat_name_emb, gat_char_emb],
             entity_type_ids=entity_type_ids,
+            image_available=image_available,
         )
         return gph_emb, img_emb, rel_emb, att_emb, name_emb, char_emb, gat_img_emb, gat_att_emb, gat_rel_emb, gat_name_emb, gat_char_emb,joint_emb, hidden_states, weight_norm
 

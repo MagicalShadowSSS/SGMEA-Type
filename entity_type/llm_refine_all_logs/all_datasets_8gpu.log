@@ -1,0 +1,19 @@
++ set -euo pipefail
++ ROOT_DIR=/gly/tongqiang/dongyufeng/Mode-Test/SGMEA
++ GPU_IDS=0,1,2,3,4,5,6,7
++ RESUME=1
++ MAX_CASES_PER_SHARD=0
++ MAX_NEW_TOKENS=192
++ MIN_CONFIDENCE=0.70
++ cd /gly/tongqiang/dongyufeng/Mode-Test/SGMEA
++ for lang_pair in zh_en ja_en fr_en
+++ date '+%F %T'
++ echo '[2026-05-24 23:46:34] START zh_en'
+[2026-05-24 23:46:34] START zh_en
++ LANG_PAIR=zh_en
++ GPU_IDS=0,1,2,3,4,5,6,7
++ RESUME=1
++ MAX_CASES_PER_SHARD=0
++ MAX_NEW_TOKENS=192
++ MIN_CONFIDENCE=0.70
++ bash /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/run_dbp_entity_type_refine_8gpu.sh

@@ -1,0 +1,5 @@
+[launch] 0 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5_dehr_eval_saved/fbdb_r02_il_tcms_dehr_seed42_dehr_eval_saved.log
+[launch] 1 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5_dehr_eval_saved/fbdb_r05_il_tcms_dehr_seed42_dehr_eval_saved.log
+[launch] 2 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5_dehr_eval_saved/fbdb_r08_il_tcms_dehr_seed42_dehr_eval_saved.log
+[launch] 3 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5_dehr_eval_saved/fbyg_r02_il_tcms_dehr_seed42_dehr_eval_saved.log
+[done] 0 /gly/tongqiang/dongyufeng/Mode-Test/SGMEA/log/run_outputs/phase27_il_baseline_tcms_dehr_0525_v5_dehr_eval_saved

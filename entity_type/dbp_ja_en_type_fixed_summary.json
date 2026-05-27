@@ -1,0 +1,23 @@
+{
+  "lang_pair": "ja_en",
+  "output": "entity_type/dbp_ja_en_type_fixed.jsonl",
+  "total_rows": 39594,
+  "source_entities": 19814,
+  "target_entities": 19780,
+  "ill_pairs": 15000,
+  "propagated_target_types": 15000,
+  "skipped_source_conflicts": 0,
+  "coarse_type_distribution": {
+    "Place": 7916,
+    "Person": 9318,
+    "Organization": 4567,
+    "Creative Work": 4099,
+    "Entity": 12765,
+    "Event": 929
+  },
+  "type_source_distribution": {
+    "dbpedia_source": 19814,
+    "alignment_propagated": 15000,
+    "default_target": 4780
+  }
+}

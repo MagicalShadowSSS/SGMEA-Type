@@ -1,0 +1,21 @@
+{
+  "model_name": "llama3_8b_instruct",
+  "output_jsonl": "/gly/tongqiang/dongyufeng/Mode-Test/SGMEA/entity_type/llm_refine_fr_en/shard_7.jsonl",
+  "total_rows": 39654,
+  "attempted_entity_rows": 1565,
+  "changed_rows": 1441,
+  "coarse_type_distribution": {
+    "Place": 6632,
+    "Creative Work": 5178,
+    "Organization": 5107,
+    "Person": 10926,
+    "Event": 731,
+    "Entity": 11080
+  },
+  "type_source_distribution": {
+    "dbpedia_source": 19177,
+    "llm_entity_refine": 1441,
+    "alignment_propagated": 14656,
+    "default_target": 4380
+  }
+}
