@@ -3,6 +3,7 @@
 This repository contains the anonymous reproduction code for TIDEA.
 
 ## Data Layout
+SGMEA File shared via Baidu Netdisk: mmkg.zip Link: https://pan.baidu.com/s/11pEZHDM7SAVN0wDk3vwm1w Extraction code: 4o9t
 
 Download and unpack `mmkg.zip`, then organize the files as follows:
 
